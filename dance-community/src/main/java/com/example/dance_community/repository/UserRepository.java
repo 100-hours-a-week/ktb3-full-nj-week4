@@ -17,21 +17,23 @@ public class UserRepository {
 
     @PostConstruct
     public void initData() {
-        UserDto defaultUser = new UserDto();
-        defaultUser.setUserId(userIdGen.incrementAndGet());
-        defaultUser.setEmail("test@gmail.com");
-        String hashedPW = BCrypt.hashpw("1234", BCrypt.gensalt());
-        defaultUser.setPassword(hashedPW);
-        defaultUser.setUsername("namjin");
-        defaultUser.setClubId(null);
-        defaultUser.setProfileImage(null);
+        UserDto defaultUser = UserDto.builder()
+                .userId(userIdGen.incrementAndGet())
+                .email("test@gmail.com")
+                .password(BCrypt.hashpw("1234", BCrypt.gensalt()))
+                .username("tester")
+                .clubId(null)
+                .profileImage(null)
+                .build();
 
         this.saveUser(defaultUser);
     }
 
     public UserDto saveUser(UserDto userDto){
         if(userDto.getUserId() == null){
-            userDto.setUserId(userIdGen.incrementAndGet());
+            userDto.toBuilder()
+                    .userId(userIdGen.incrementAndGet())
+                    .build();
         }
         idToUserMap.put(userDto.getUserId(), userDto);
         emailToIdMap.put(userDto.getEmail(),userDto.getUserId());

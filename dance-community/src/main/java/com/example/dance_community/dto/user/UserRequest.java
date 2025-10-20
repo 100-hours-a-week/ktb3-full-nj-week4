@@ -1,8 +1,8 @@
 package com.example.dance_community.dto.user;
 
-import lombok.Data;
+import lombok.Getter;
 
-@Data
+@Getter
 public class UserRequest {
     private String password;
     private String username;

@@ -33,14 +33,14 @@ public class AuthService {
             throw new ConflictException("이미 존재하는 이메일입니다.");
         }
 
-        UserDto user = new UserDto();
-        user.setEmail(signupRequest.getEmail());
-        String hashedPW = BCrypt.hashpw(signupRequest.getPassword(), BCrypt.gensalt());
-        user.setPassword(hashedPW);
-        user.setUsername(signupRequest.getUsername());
+        UserDto user = UserDto.builder()
+                .email(signupRequest.getEmail())
+                .password(BCrypt.hashpw(signupRequest.getPassword(), BCrypt.gensalt()))
+                .username(signupRequest.getUsername())
+                .build();
 
         userRepository.saveUser(user);
-        return new AuthDto(user.getUserId(), null, null);
+        return new AuthDto(user.getUserId());
     }
 
     public AuthDto login(LoginRequest loginRequest) {
