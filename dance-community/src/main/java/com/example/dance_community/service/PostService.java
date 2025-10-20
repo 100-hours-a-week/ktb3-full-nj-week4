@@ -20,10 +20,6 @@ public class PostService {
     }
 
     public PostDto createPost(Long userId, PostRequest postRequest) {
-        if (postRequest.getScope() == null || postRequest.getTitle() == null || postRequest.getContent() == null) {
-            throw new InvalidRequestException("필수 필드 누락");
-        }
-
         try {
             PostDto newPost = PostDto.builder()
                     .userId(userId)

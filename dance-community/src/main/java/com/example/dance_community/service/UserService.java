@@ -45,7 +45,6 @@ public class UserService {
         }
     }
 
-
     public void deleteCurrentUser(Long userId) {
         userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("회원 삭제 실패"));

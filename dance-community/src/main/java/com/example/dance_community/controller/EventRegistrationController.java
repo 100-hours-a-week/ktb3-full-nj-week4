@@ -5,6 +5,7 @@ import com.example.dance_community.dto.eventRegistration.EventRegistrationReques
 import com.example.dance_community.dto.eventRegistration.EventRegistrationResponse;
 import com.example.dance_community.dto.eventRegistration.EventRegistrationsResponse;
 import com.example.dance_community.service.EventRegistrationService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,7 +22,7 @@ public class EventRegistrationController {
     }
 
     @PostMapping("/registrations")
-    public ResponseEntity<EventRegistrationResponse> register(@RequestBody EventRegistrationRequest eventRegistrationRequest) {
+    public ResponseEntity<EventRegistrationResponse> register(@Valid @RequestBody EventRegistrationRequest eventRegistrationRequest) {
         EventRegistrationDto registrationDto = service.register(eventRegistrationRequest);
         return ResponseEntity.status(201).body(new EventRegistrationResponse("행사 신청 성공", registrationDto));
     }

@@ -22,15 +22,8 @@ public class AuthService {
     }
 
     public AuthDto signup(SignupRequest signupRequest){
-        if (signupRequest == null
-                || signupRequest.getEmail() == null || signupRequest.getEmail().isBlank()
-                || signupRequest.getPassword() == null || signupRequest.getPassword().isBlank()
-                || signupRequest.getUsername() == null || signupRequest.getUsername().isBlank()) {
-            throw new InvalidRequestException("필수 필드가 누락되었습니다.");
-        }
-
         if (userRepository.findByEmail(signupRequest.getEmail()).isPresent()){
-            throw new ConflictException("이미 존재하는 이메일입니다.");
+            throw new ConflictException("이메일 중복");
         }
 
         UserDto user = UserDto.builder()
@@ -44,17 +37,11 @@ public class AuthService {
     }
 
     public AuthDto login(LoginRequest loginRequest) {
-        if (loginRequest == null
-                || loginRequest.getEmail() == null || loginRequest.getEmail().isBlank()
-                || loginRequest.getPassword() == null || loginRequest.getPassword().isBlank()) {
-            throw new InvalidRequestException("이메일과 비밀번호는 필수입니다.");
-        }
-
         UserDto user = userRepository.findByEmail(loginRequest.getEmail())
-                .orElseThrow(() -> new AuthException("등록된 이메일이 없습니다. 회원가입을 진행해주세요."));
+                .orElseThrow(() -> new AuthException("등록되지 않은 이메일"));
 
         if (!BCrypt.checkpw(loginRequest.getPassword(), user.getPassword())) {
-            throw new AuthException("비밀번호가 일치하지 않습니다.");
+            throw new AuthException("비밀번호 미일치");
         }
 
         String accessToken = jwtUtil.generateAccessToken(user.getUserId());
@@ -65,15 +52,15 @@ public class AuthService {
 
     public AuthDto refreshAccessToken(String nowRefreshToken) {
         if (nowRefreshToken == null || nowRefreshToken.isBlank()) {
-            throw new InvalidRequestException("리프레시 토큰이 없습니다.");
+            throw new InvalidRequestException("토큰 미입력");
         }
 
         if (!jwtUtil.validateToken(nowRefreshToken)) {
-            throw new AuthException("유효하지 않은 리프레시 토큰입니다.");
+            throw new AuthException("유효하지 않은 토큰");
         }
 
         if (!"refresh".equals(jwtUtil.getTokenType(nowRefreshToken))) {
-            throw new AuthException("리프레시 토큰이 아닙니다.");
+            throw new AuthException("다른 토큰 입력");
         }
 
         String userIdStr = jwtUtil.getUserId(nowRefreshToken);
@@ -81,11 +68,11 @@ public class AuthService {
         try {
             userId = Long.valueOf(userIdStr);
         } catch (NumberFormatException e) {
-            throw new InvalidRequestException("토큰에서 사용자 ID를 파싱할 수 없습니다.");
+            throw new InvalidRequestException("토큰 해석 실패");
         }
 
         if (userRepository.findById(userId).isEmpty()) {
-            throw new NotFoundException("해당 사용자가 존재하지 않습니다.");
+            throw new NotFoundException("사용자 인증 실패");
         }
 
         String newAccessToken = jwtUtil.generateAccessToken(userId);

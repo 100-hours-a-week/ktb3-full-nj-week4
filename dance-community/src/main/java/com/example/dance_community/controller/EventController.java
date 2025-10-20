@@ -5,13 +5,17 @@ import com.example.dance_community.dto.event.EventRequest;
 import com.example.dance_community.dto.event.EventResponse;
 import com.example.dance_community.dto.event.EventsResponse;
 import com.example.dance_community.service.EventService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+
+@Validated
 @RestController
 @RequestMapping("/events")
 @RequiredArgsConstructor
@@ -19,7 +23,7 @@ public class EventController {
     private final EventService eventService;
 
     @PostMapping("/{userId}")
-    public ResponseEntity<EventResponse> createEvent(@PathVariable Long userId, @RequestBody EventRequest eventRequest) {
+    public ResponseEntity<EventResponse> createEvent(@PathVariable Long userId, @Valid @RequestBody EventRequest eventRequest) {
         EventDto eventDto = eventService.createEvent(userId, eventRequest);
         return ResponseEntity.status(201).body(new EventResponse("행사 생성 성공", eventDto));
     }
@@ -37,7 +41,7 @@ public class EventController {
     }
 
     @PatchMapping("/{eventId}")
-    public ResponseEntity<EventResponse> updateEvent(@PathVariable Long eventId, @RequestBody EventRequest eventRequest) {
+    public ResponseEntity<EventResponse> updateEvent(@PathVariable Long eventId, @Valid @RequestBody EventRequest eventRequest) {
         EventDto eventDto = eventService.updateEvent(eventId, eventRequest);
         return ResponseEntity.ok(new EventResponse("행사 수정 성공", eventDto));
     }

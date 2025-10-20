@@ -16,14 +16,14 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping("/{userId}")
-    public ResponseEntity<UserResponse> getUser(@PathVariable String userId) {
-        UserDto userDto = userService.getUserById(Long.valueOf(userId));
+    public ResponseEntity<UserResponse> getUser(@PathVariable Long userId) {
+        UserDto userDto = userService.getUserById(userId);
         return ResponseEntity.ok(new UserResponse("회원 정보 조회 성공", userDto));
     }
 
     @PatchMapping("/{userId}")
-    public ResponseEntity<UserResponse> updateUser(@PathVariable String userId, @RequestBody UserRequest request) {
-        UserDto userDto = userService.updateUser(Long.valueOf(userId), request);
+    public ResponseEntity<UserResponse> updateUser(@PathVariable Long userId, @RequestBody UserRequest request) {
+        UserDto userDto = userService.updateUser(userId, request);
         return ResponseEntity.ok(new UserResponse("회원 정보 수정 성공", userDto));
     }
 

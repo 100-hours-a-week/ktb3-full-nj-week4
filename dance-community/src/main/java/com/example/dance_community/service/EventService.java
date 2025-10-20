@@ -21,13 +21,6 @@ public class EventService {
     }
 
     public EventDto createEvent(Long userId, EventRequest eventRequest) {
-        if (eventRequest.getScope() == null || eventRequest.getType() == null ||
-                eventRequest.getTitle() == null || eventRequest.getContent() == null ||
-                eventRequest.getStartsAt() == null || eventRequest.getEndsAt() == null ||
-                eventRequest.getLocation() == null || eventRequest.getCapacity() == null) {
-            throw new InvalidRequestException("필수 필드 누락");
-        }
-
         try {
             EventDto newEvent = EventDto.builder()
                     .userId(userId)
