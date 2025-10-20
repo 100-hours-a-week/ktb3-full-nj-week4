@@ -19,33 +19,39 @@ public class EventRepository{
 
     @PostConstruct
     public void initData() {
-        EventDto defaultEvent = new EventDto();
-        defaultEvent.setEventId(eventId.incrementAndGet());
-        defaultEvent.setUserId(1L);
-        defaultEvent.setScope(Scope.GLOBAL);
-        defaultEvent.setClubId(null);
-        defaultEvent.setType(EventType.WORKSHOP);
-        defaultEvent.setTitle("Party Lock");
-        defaultEvent.setContent("대학씬 최고 행사 파티락이 열립니다!");
-        defaultEvent.setStartsAt(LocalDateTime.now());
-        defaultEvent.setEndsAt(LocalDateTime.now());
-        Location location = new Location();
-        location.setName("스테핀 스튜디오");
-        location.setAddress("서울 서초구 방배천로6길 3-4 B1층");
-        location.setLink("https://naver.me/GdyG7ZUn");
-        defaultEvent.setLocation(location);
-        defaultEvent.setCapacity(30L);
-        defaultEvent.setCurrentParticipants(29L);
-        defaultEvent.setTags(Arrays.asList("locking", "beginner"));
-        defaultEvent.setImages(Arrays.asList("https://image3.kr/img.jpg", "https://image4.kr/img.jpg"));
-        defaultEvent.setCreatedAt(LocalDateTime.now());
-        eventMap.put(defaultEvent.getEventId(), defaultEvent);
+        Location location = Location.builder()
+                .name("스테핀 스튜디오")
+                .address("서울 서초구 방배천로6길 3-4 B1층")
+                .link("https://naver.me/GdyG7ZUn")
+                .build();
+
+        EventDto defaultEvent = EventDto.builder()
+                .eventId(eventId.incrementAndGet())
+                .userId(1L)
+                .scope(Scope.GLOBAL)
+                .clubId(null)
+                .type(EventType.WORKSHOP)
+                .title("Party Lock")
+                .content("대학씬 최고 행사 파티락이 열립니다!")
+                .startsAt(LocalDateTime.now())
+                .endsAt(LocalDateTime.now())
+                .location(location)
+                .capacity(30L)
+                .currentParticipants(29L)
+                .tags(Arrays.asList("locking", "beginner"))
+                .images(Arrays.asList("https://image3.kr/img.jpg", "https://image4.kr/img.jpg"))
+                .createdAt(LocalDateTime.now())
+                .build();
+
+        this.saveEvent(defaultEvent);
     }
 
     public EventDto saveEvent(EventDto eventDto) {
         if (eventDto.getEventId() == null) {
-            eventDto.setEventId(eventId.incrementAndGet());
-            eventDto.setCreatedAt(LocalDateTime.now());
+            eventDto = eventDto.toBuilder()
+                    .eventId(eventId.incrementAndGet())
+                    .createdAt(LocalDateTime.now())
+                    .build();
         }
         eventMap.put(eventDto.getEventId(), eventDto);
         return eventDto;

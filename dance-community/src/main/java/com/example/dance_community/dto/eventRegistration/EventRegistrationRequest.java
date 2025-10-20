@@ -1,9 +1,9 @@
 package com.example.dance_community.dto.eventRegistration;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 
-@Data
+@Getter
 @AllArgsConstructor
 public class EventRegistrationRequest {
     private Long eventId;

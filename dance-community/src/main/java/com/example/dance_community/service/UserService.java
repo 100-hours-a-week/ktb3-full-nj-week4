@@ -26,23 +26,28 @@ public class UserService {
         UserDto userDto = userRepository.findById(userId)
                 .orElseThrow(() -> new InvalidRequestException("회원 정보 수정 실패"));
 
-        String newPassword = userRequest.getPassword() != null
-                ? BCrypt.hashpw(userRequest.getPassword(), BCrypt.gensalt())
-                : null;
+        try {
+            String newPassword = userRequest.getPassword() != null
+                    ? BCrypt.hashpw(userRequest.getPassword(), BCrypt.gensalt())
+                    : userDto.getPassword();
 
-        UserDto updatedUser = userDto.toBuilder()
-                .password(newPassword != null ? newPassword : userDto.getPassword())
-                .username(userRequest.getUsername() != null ? userRequest.getUsername() : userDto.getUsername())
-                .clubId(userRequest.getClubId() != null ? userRequest.getClubId() : userDto.getClubId())
-                .profileImage(userRequest.getProfileImage() != null ? userRequest.getProfileImage() : userDto.getProfileImage())
-                .build();
+            UserDto updatedUser = userDto.toBuilder()
+                    .password(newPassword)
+                    .username(userRequest.getUsername() != null ? userRequest.getUsername() : userDto.getUsername())
+                    .clubId(userRequest.getClubId() != null ? userRequest.getClubId() : userDto.getClubId())
+                    .profileImage(userRequest.getProfileImage() != null ? userRequest.getProfileImage() : userDto.getProfileImage())
+                    .build();
 
-        userRepository.saveUser(updatedUser);
-        return UserDto.changePassword(updatedUser);
+            userRepository.saveUser(updatedUser);
+            return UserDto.changePassword(updatedUser);
+        } catch (Exception e) {
+            throw new InvalidRequestException("잘못된 요청 데이터");
+        }
     }
 
+
     public void deleteCurrentUser(Long userId) {
-        UserDto userDto = userRepository.findById(userId)
+        userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("회원 삭제 실패"));
         userRepository.deleteUser(userId);
     }

@@ -24,23 +24,28 @@ public class PostService {
             throw new InvalidRequestException("필수 필드 누락");
         }
 
-        PostDto postDto = new PostDto();
-        postDto.setUserId(userId);
-        postDto.setScope(Scope.valueOf(postRequest.getScope()));
-        postDto.setClubId(postRequest.getClubId());
-        postDto.setTitle(postRequest.getTitle());
-        postDto.setContent(postRequest.getContent());
-        postDto.setTags(postRequest.getTags());
-        postDto.setImages(postRequest.getImages());
-        PostDto newPost = postRepository.savePost(postDto);
+        try {
+            PostDto newPost = PostDto.builder()
+                    .userId(userId)
+                    .scope(Scope.valueOf(postRequest.getScope()))
+                    .clubId(postRequest.getClubId())
+                    .title(postRequest.getTitle())
+                    .content(postRequest.getContent())
+                    .tags(postRequest.getTags())
+                    .images(postRequest.getImages())
+                    .build();
 
-        return newPost;
+            return postRepository.savePost(newPost);
+        } catch (IllegalArgumentException e) {
+            throw new InvalidRequestException("잘못된 요청 데이터");
+        } catch (Exception e) {
+            throw new RuntimeException("행사 생성 실패");
+        }
     }
 
     public PostDto getPost(Long postId) {
-        PostDto postDto = postRepository.findById(postId)
+        return postRepository.findById(postId)
                 .orElseThrow(() -> new NotFoundException("게시글 조회 실패"));
-        return postDto;
     }
 
     public List<PostDto> getPosts() {
@@ -56,19 +61,26 @@ public class PostService {
                 .orElseThrow(() -> new NotFoundException("게시글 조회 실패"));
 
         try {
-            if (postRequest.getScope() != null) postDto.setScope(Scope.valueOf(postRequest.getScope()));
-            if (postRequest.getTitle() != null) postDto.setTitle(postRequest.getTitle());
-            if (postRequest.getContent() != null) postDto.setContent(postRequest.getContent());
-            if (postRequest.getTags() != null) postDto.setTags(postRequest.getTags());
-            if (postRequest.getImages() != null) postDto.setImages(postRequest.getImages());
-        } catch (Exception e) {
-            throw new InvalidRequestException("잘못된 요청 데이터");
-        }
+            Scope newScope = postRequest.getScope() != null ? Scope.valueOf(postRequest.getScope()) : postDto.getScope();
 
-        postDto.setUpdatedAt(LocalDateTime.now());
-        postRepository.savePost(postDto);
-        return postDto;
+            PostDto updatedPost = postDto.toBuilder()
+                    .scope(newScope)
+                    .title(postRequest.getTitle() != null ? postRequest.getTitle() : postDto.getTitle())
+                    .content(postRequest.getContent() != null ? postRequest.getContent() : postDto.getContent())
+                    .tags(postRequest.getTags() != null ? postRequest.getTags() : postDto.getTags())
+                    .images(postRequest.getImages() != null ? postRequest.getImages() : postDto.getImages())
+                    .updatedAt(LocalDateTime.now())
+                    .build();
+
+            postRepository.savePost(updatedPost);
+            return updatedPost;
+        } catch (IllegalArgumentException e) {
+            throw new InvalidRequestException("잘못된 요청 데이터");
+        } catch (Exception e) {
+            throw new RuntimeException("게시글 수정 실패");
+        }
     }
+
 
     public void deletePost(Long postId) {
         postRepository.findById(postId)

@@ -5,7 +5,6 @@ import com.example.dance_community.dto.eventRegistration.EventRegistrationReques
 import com.example.dance_community.dto.eventRegistration.EventRegistrationResponse;
 import com.example.dance_community.dto.eventRegistration.EventRegistrationsResponse;
 import com.example.dance_community.service.EventRegistrationService;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -39,9 +38,12 @@ public class EventRegistrationController {
         return ResponseEntity.ok(new EventRegistrationsResponse("행사 신청 인원 조회 성공", registrationsDto));
     }
 
-    @DeleteMapping("/{eventId}/registrations/{userId}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void cancelRegistration(@PathVariable Long eventId, @PathVariable Long userId) {
-        service.cancelRegistration(eventId, userId);
+    @PatchMapping("/{userId}/cancel")
+    public ResponseEntity<EventRegistrationDto> cancelRegistration(
+            @PathVariable Long eventId,
+            @PathVariable Long userId) {
+
+        EventRegistrationDto updated = service.cancelRegistration(eventId, userId);
+        return ResponseEntity.ok(updated);
     }
 }

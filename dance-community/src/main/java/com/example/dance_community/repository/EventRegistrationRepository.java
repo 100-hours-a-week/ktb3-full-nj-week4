@@ -15,13 +15,14 @@ public class EventRegistrationRepository {
 
     @PostConstruct
     public void initData() {
-        EventRegistrationDto eventRegistrationDto = new EventRegistrationDto();
-        eventRegistrationDto.setEventId(1L);
-        eventRegistrationDto.setUserId(1L);
-        eventRegistrationDto.setStatus(EventRegistrationStatus.SUCCESS);
-        eventRegistrationDto.setCreatedAt(LocalDateTime.now());
+        EventRegistrationDto newRegistration = EventRegistrationDto.builder()
+                .eventId(1L)
+                .userId(1L)
+                .status(EventRegistrationStatus.SUCCESS)
+                .createdAt(LocalDateTime.now())
+                .build();
 
-        this.saveRegistration(eventRegistrationDto);
+        this.saveRegistration(newRegistration);
     }
 
     public EventRegistrationDto saveRegistration(EventRegistrationDto dto) {
@@ -38,12 +39,5 @@ public class EventRegistrationRepository {
     public List<EventRegistrationDto> findByEventId(Long eventId) {
         Collection<EventRegistrationDto> values = eventRegistrationMap.getOrDefault(eventId, Collections.emptyMap()).values();
         return new ArrayList<>(values);
-    }
-
-    public void deleteRegistration(Long eventId, Long userId) {
-        Map<Long, EventRegistrationDto> map = eventRegistrationMap.get(eventId);
-        if (map != null) {
-            map.remove(userId);
-        }
     }
 }

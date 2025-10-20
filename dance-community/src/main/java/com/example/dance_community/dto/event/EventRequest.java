@@ -1,12 +1,12 @@
 package com.example.dance_community.dto.event;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Data
+@Getter
 @AllArgsConstructor
 public class EventRequest {
     private String scope;

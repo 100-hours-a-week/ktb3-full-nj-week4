@@ -18,12 +18,9 @@ public class UserRepository {
     @PostConstruct
     public void initData() {
         UserDto defaultUser = UserDto.builder()
-                .userId(userIdGen.incrementAndGet())
                 .email("test@gmail.com")
                 .password(BCrypt.hashpw("1234", BCrypt.gensalt()))
                 .username("tester")
-                .clubId(null)
-                .profileImage(null)
                 .build();
 
         this.saveUser(defaultUser);
@@ -31,7 +28,7 @@ public class UserRepository {
 
     public UserDto saveUser(UserDto userDto){
         if(userDto.getUserId() == null){
-            userDto.toBuilder()
+            userDto = userDto.toBuilder()
                     .userId(userIdGen.incrementAndGet())
                     .build();
         }

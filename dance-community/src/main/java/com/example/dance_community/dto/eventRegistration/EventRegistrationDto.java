@@ -2,10 +2,13 @@ package com.example.dance_community.dto.eventRegistration;
 
 import com.example.dance_community.enums.EventRegistrationStatus;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Builder;
+import lombok.Getter;
+
 import java.time.LocalDateTime;
 
-@Data
+@Getter
+@Builder(toBuilder = true)
 @AllArgsConstructor
 public class EventRegistrationDto {
     private Long eventId;
