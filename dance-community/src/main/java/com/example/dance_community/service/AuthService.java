@@ -49,9 +49,11 @@ public class AuthService {
 
         UserDto user = userRepository.findByEmail(loginRequest.getEmail())
                 .orElseThrow(() -> new AuthException("등록된 이메일이 없습니다. 회원가입을 진행해주세요."));
+
         if (!loginRequest.getPassword().equals(user.getPassword())) {
             throw new AuthException("비밀번호가 일치하지 않습니다.");
         }
+
         String accessToken = jwtUtil.generateAccessToken(user.getUserId());
         String refreshToken = jwtUtil.generateRefreshToken(user.getUserId());
 
