@@ -2,6 +2,7 @@ package com.example.dance_community.repository;
 
 import com.example.dance_community.dto.user.UserDto;
 import jakarta.annotation.PostConstruct;
+import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
@@ -19,7 +20,8 @@ public class UserRepository {
         UserDto defaultUser = new UserDto();
         defaultUser.setUserId(userIdGen.incrementAndGet());
         defaultUser.setEmail("test@gmail.com");
-        defaultUser.setPassword("1234");
+        String hashedPW = BCrypt.hashpw("1234", BCrypt.gensalt());
+        defaultUser.setPassword(hashedPW);
         defaultUser.setUsername("namjin");
         defaultUser.setClubId(null);
         defaultUser.setProfileImage(null);

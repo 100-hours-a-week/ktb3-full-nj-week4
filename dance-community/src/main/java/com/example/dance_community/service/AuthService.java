@@ -8,6 +8,7 @@ import com.example.dance_community.exception.InvalidRequestException;
 import com.example.dance_community.exception.NotFoundException;
 import com.example.dance_community.repository.UserRepository;
 import com.example.dance_community.util.JwtUtil;
+import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -31,9 +32,11 @@ public class AuthService {
         if (userRepository.findByEmail(signupRequest.getEmail()).isPresent()){
             throw new ConflictException("이미 존재하는 이메일입니다.");
         }
+
         UserDto user = new UserDto();
         user.setEmail(signupRequest.getEmail());
-        user.setPassword(signupRequest.getPassword());
+        String hashedPW = BCrypt.hashpw(signupRequest.getPassword(), BCrypt.gensalt());
+        user.setPassword(hashedPW);
         user.setUsername(signupRequest.getUsername());
 
         userRepository.saveUser(user);
@@ -50,7 +53,7 @@ public class AuthService {
         UserDto user = userRepository.findByEmail(loginRequest.getEmail())
                 .orElseThrow(() -> new AuthException("등록된 이메일이 없습니다. 회원가입을 진행해주세요."));
 
-        if (!loginRequest.getPassword().equals(user.getPassword())) {
+        if (!BCrypt.checkpw(loginRequest.getPassword(), user.getPassword())) {
             throw new AuthException("비밀번호가 일치하지 않습니다.");
         }
 
