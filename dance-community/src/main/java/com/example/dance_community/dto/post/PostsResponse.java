@@ -2,7 +2,9 @@ package com.example.dance_community.dto.post;
 
 import lombok.AllArgsConstructor;
 import java.util.List;
+import lombok.Getter;
 
+@Getter
 @AllArgsConstructor
 public class PostsResponse {
     private String message;
