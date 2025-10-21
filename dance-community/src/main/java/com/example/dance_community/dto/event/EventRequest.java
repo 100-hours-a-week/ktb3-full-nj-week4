@@ -30,7 +30,6 @@ public class EventRequest {
 
     private List<String> images;
 
-    @NotBlank(message = "행사 장소 미입력")
     @Valid
     private Location location;
 
