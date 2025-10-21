@@ -17,9 +17,5 @@ public class EventRegistrationDto {
     private EventRegistrationStatus status;
 
     private LocalDateTime createdAt;
-
-    public EventRegistrationDto() {
-
-    }
 }
 

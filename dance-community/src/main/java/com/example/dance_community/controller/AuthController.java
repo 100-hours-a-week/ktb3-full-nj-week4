@@ -2,6 +2,7 @@ package com.example.dance_community.controller;
 
 import com.example.dance_community.dto.auth.*;
 import com.example.dance_community.service.AuthService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -28,8 +29,8 @@ public class AuthController {
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<AuthResponse> refresh(@RequestParam String refreshToken) {
-        AuthDto authDto = authService.refreshAccessToken(refreshToken);
+    public ResponseEntity<AuthResponse> refresh(HttpServletRequest request) {
+        AuthDto authDto = authService.refreshAccessToken(Long.valueOf((String) request.getAttribute("userId")));
         return ResponseEntity.ok(new AuthResponse("토큰 재발급 성공", authDto));
     }
 }

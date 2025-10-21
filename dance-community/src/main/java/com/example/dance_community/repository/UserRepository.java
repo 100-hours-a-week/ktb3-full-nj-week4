@@ -18,8 +18,8 @@ public class UserRepository {
     @PostConstruct
     public void initData() {
         UserDto defaultUser = UserDto.builder()
-                .email("test@gmail.com")
-                .password(BCrypt.hashpw("1234", BCrypt.gensalt()))
+                .email("user@example.com")
+                .password(BCrypt.hashpw("string", BCrypt.gensalt()))
                 .username("tester")
                 .build();
 
