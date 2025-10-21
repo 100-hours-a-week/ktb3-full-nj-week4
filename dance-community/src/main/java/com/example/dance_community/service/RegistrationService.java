@@ -8,7 +8,6 @@ import com.example.dance_community.repository.RegistrationRepository;
 import com.example.dance_community.repository.EventRepository;
 import org.springframework.stereotype.Service;
 
-
 import java.util.List;
 
 @Service

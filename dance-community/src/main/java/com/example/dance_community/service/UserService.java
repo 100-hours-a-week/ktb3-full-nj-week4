@@ -2,7 +2,6 @@ package com.example.dance_community.service;
 
 import com.example.dance_community.dto.user.UserDto;
 import com.example.dance_community.dto.user.UserRequest;
-import com.example.dance_community.exception.InvalidRequestException;
 import com.example.dance_community.exception.NotFoundException;
 import com.example.dance_community.repository.UserRepository;
 import org.mindrot.jbcrypt.BCrypt;
@@ -48,6 +47,3 @@ public class UserService {
         userRepository.deleteUser(userId);
     }
 }
-
-
-//TODO : @Transactional 반영하기 서비스에서만 쓰는건지? 수정? 삭제?

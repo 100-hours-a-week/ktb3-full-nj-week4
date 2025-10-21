@@ -20,8 +20,6 @@ public class AuthService {
         this.jwtUtil = jwtUtil;
     }
 
-
-
     public AuthDto signup(SignupRequest signupRequest){
         if (userRepository.findByEmail(signupRequest.getEmail()).isPresent()){
             throw new ConflictException("이메일 중복");
