@@ -4,6 +4,7 @@ import com.example.dance_community.dto.auth.*;
 import com.example.dance_community.dto.user.UserDto;
 import com.example.dance_community.exception.AuthException;
 import com.example.dance_community.exception.ConflictException;
+import com.example.dance_community.exception.NotFoundException;
 import com.example.dance_community.repository.UserRepository;
 import com.example.dance_community.jwt.JwtUtil;
 import org.mindrot.jbcrypt.BCrypt;
@@ -18,6 +19,8 @@ public class AuthService {
         this.userRepository = userRepository;
         this.jwtUtil = jwtUtil;
     }
+
+
 
     public AuthDto signup(SignupRequest signupRequest){
         if (userRepository.findByEmail(signupRequest.getEmail()).isPresent()){
@@ -49,6 +52,10 @@ public class AuthService {
     }
 
     public AuthDto refreshAccessToken(Long userId) {
+        if (userRepository.findById(userId).isEmpty()) {
+            throw new NotFoundException("사용자 인증 실패");
+        }
+
         String newAccessToken = jwtUtil.generateAccessToken(userId);
         String newRefreshToken = jwtUtil.generateRefreshToken(userId);
 

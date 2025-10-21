@@ -5,6 +5,7 @@ import com.example.dance_community.dto.event.EventRequest;
 import com.example.dance_community.dto.event.EventResponse;
 import com.example.dance_community.dto.event.EventsResponse;
 import com.example.dance_community.service.EventService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -19,9 +20,9 @@ import java.util.List;
 public class EventController {
     private final EventService eventService;
 
-    @PostMapping("/{userId}")
-    public ResponseEntity<EventResponse> createEvent(@PathVariable Long userId, @Valid @RequestBody EventRequest eventRequest) {
-        EventDto eventDto = eventService.createEvent(userId, eventRequest);
+    @PostMapping()
+    public ResponseEntity<EventResponse> createEvent(HttpServletRequest request, @Valid @RequestBody EventRequest eventRequest) {
+        EventDto eventDto = eventService.createEvent(Long.valueOf((String) request.getAttribute("userId")), eventRequest);
         return ResponseEntity.status(201).body(new EventResponse("행사 생성 성공", eventDto));
     }
 

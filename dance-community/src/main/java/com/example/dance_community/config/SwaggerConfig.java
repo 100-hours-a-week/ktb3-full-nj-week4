@@ -7,7 +7,6 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import org.springframework.context.annotation.Configuration;
 
-
 @OpenAPIDefinition(
         info = @Info(title = "DANCE COMMUNITY API", version = "v1"),
         security = @SecurityRequirement(name = "bearerAuth")
@@ -18,7 +17,6 @@ import org.springframework.context.annotation.Configuration;
         scheme = "bearer", // 스킴 유형
         bearerFormat = "JWT" // 토큰 형식
 )
-
 @Configuration
 public class SwaggerConfig {
 }

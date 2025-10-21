@@ -16,38 +16,41 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
+    private UserDto getUser(Long userId) {
+        if (userId == null) {
+            throw new InvalidRequestException("사용자 없음");
+        }
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("사용자 인증 실패"));
+    }
+
     public UserDto getUserById(Long userId) {
-        UserDto userDto = userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException("회원 정보 조회 실패"));
-        return UserDto.changePassword(userDto);
+        return UserDto.changePassword(getUser(userId));
     }
 
     public UserDto updateUser(Long userId, UserRequest userRequest) {
-        UserDto userDto = userRepository.findById(userId)
-                .orElseThrow(() -> new InvalidRequestException("회원 정보 수정 실패"));
+        UserDto userDto = getUser(userId);
 
-        try {
-            String newPassword = userRequest.getPassword() != null
-                    ? BCrypt.hashpw(userRequest.getPassword(), BCrypt.gensalt())
-                    : userDto.getPassword();
+        String newPassword = userRequest.getPassword() != null
+                ? BCrypt.hashpw(userRequest.getPassword(), BCrypt.gensalt())
+                : userDto.getPassword();
 
-            UserDto updatedUser = userDto.toBuilder()
-                    .password(newPassword)
-                    .username(userRequest.getUsername() != null ? userRequest.getUsername() : userDto.getUsername())
-                    .clubId(userRequest.getClubId() != null ? userRequest.getClubId() : userDto.getClubId())
-                    .profileImage(userRequest.getProfileImage() != null ? userRequest.getProfileImage() : userDto.getProfileImage())
-                    .build();
+        UserDto updatedUser = userDto.toBuilder()
+                .password(newPassword)
+                .username(userRequest.getUsername() != null ? userRequest.getUsername() : userDto.getUsername())
+                .clubId(userRequest.getClubId() != null ? userRequest.getClubId() : userDto.getClubId())
+                .profileImage(userRequest.getProfileImage() != null ? userRequest.getProfileImage() : userDto.getProfileImage())
+                .build();
 
-            userRepository.saveUser(updatedUser);
-            return UserDto.changePassword(updatedUser);
-        } catch (Exception e) {
-            throw new InvalidRequestException("잘못된 요청 데이터");
-        }
+        userRepository.saveUser(updatedUser);
+        return UserDto.changePassword(updatedUser);
     }
 
     public void deleteCurrentUser(Long userId) {
-        userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException("회원 삭제 실패"));
+        getUser(userId);
         userRepository.deleteUser(userId);
     }
 }
+
+
+//TODO : @Transactional 반영하기 서비스에서만 쓰는건지? 수정? 삭제?

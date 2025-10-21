@@ -5,6 +5,7 @@ import com.example.dance_community.dto.post.PostRequest;
 import com.example.dance_community.dto.post.PostResponse;
 import com.example.dance_community.dto.post.PostsResponse;
 import com.example.dance_community.service.PostService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -19,9 +20,9 @@ import java.util.List;
 public class PostController {
     private final PostService postService;
 
-    @PostMapping("/{userId}")
-    public ResponseEntity<PostResponse> createPost(@PathVariable Long userId, @Valid @RequestBody PostRequest postRequest) {
-        PostDto postDto = postService.createPost(userId, postRequest);
+    @PostMapping()
+    public ResponseEntity<PostResponse> createPost(HttpServletRequest request, @Valid @RequestBody PostRequest postRequest) {
+        PostDto postDto = postService.createPost(Long.valueOf((String) request.getAttribute("userId")), postRequest);
         return ResponseEntity.status(201).body(new PostResponse("게시글 생성 성공", postDto));
     }
 
