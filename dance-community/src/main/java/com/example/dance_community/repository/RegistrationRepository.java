@@ -34,8 +34,9 @@ public class RegistrationRepository {
     }
 
     public Optional<RegistrationDto> findRegistration(Long userId, Long eventId) {
-        Map<Long, RegistrationDto> map = userRegistrationMap.get(userId);
-        return Optional.ofNullable(map.get(eventId));
+        return Optional.ofNullable(
+                userRegistrationMap.getOrDefault(userId, Collections.emptyMap()).get(eventId)
+        );
     }
 
     public List<RegistrationDto> findEventsByUser(Long userId) {
