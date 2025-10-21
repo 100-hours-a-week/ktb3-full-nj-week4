@@ -9,5 +9,4 @@ public class DanceCommunityApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(DanceCommunityApplication.class, args);
 	}
-
 }

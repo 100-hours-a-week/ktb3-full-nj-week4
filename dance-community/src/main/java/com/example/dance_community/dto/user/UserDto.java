@@ -1,14 +1,11 @@
-/**
- * UserDto
- * *여기서부터 lombok 라이브러리 적용*
- */
-
 package com.example.dance_community.dto.user;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Builder;
+import lombok.Getter;
 
-@Data
+@Getter
+@Builder(toBuilder = true)
 @AllArgsConstructor
 public class UserDto {
     private String email;
@@ -19,6 +16,9 @@ public class UserDto {
     private Long userId;
     private Long clubId;
 
-    public UserDto() {
+    public static UserDto changePassword(UserDto user) {
+        return user.toBuilder()
+                .password(null)
+                .build();
     }
 }

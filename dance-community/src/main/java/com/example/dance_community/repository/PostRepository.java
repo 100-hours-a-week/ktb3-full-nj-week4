@@ -5,7 +5,6 @@ import com.example.dance_community.enums.Scope;
 import jakarta.annotation.PostConstruct;
 import org.springframework.stereotype.Repository;
 
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -18,24 +17,27 @@ public class PostRepository{
 
     @PostConstruct
     public void initData() {
-        PostDto defaultPost = new PostDto();
-        defaultPost.setPostId(postId.incrementAndGet());
-        defaultPost.setUserId(1L);
-        defaultPost.setScope(Scope.CLUB);
-        defaultPost.setClubId(1L);
-        defaultPost.setTitle("10월 락킹 워크샵 공지");
-        defaultPost.setContent("00 선생님 워크샵이 사당에서 열립니다!");
-        defaultPost.setTags(Arrays.asList("locking", "workshop"));
-        defaultPost.setImages(Arrays.asList("https://image1.kr/img.jpg", "https://image2.kr/img.jpg"));
-        defaultPost.setCreatedAt(LocalDateTime.now());
+        PostDto defaultPost = PostDto.builder()
+                .postId(postId.incrementAndGet())
+                .userId(1L)
+                .scope(Scope.CLUB)
+                .clubId(1L)
+                .title("10월 락킹 워크샵 공지")
+                .content("00 선생님 워크샵이 사당에서 열립니다!")
+                .tags(Arrays.asList("locking", "workshop"))
+                .images(Arrays.asList("https://image1.kr/img.jpg", "https://image2.kr/img.jpg"))
+                .createdAt(LocalDateTime.now())
+                .build();
 
-        postMap.put(defaultPost.getPostId(), defaultPost);
+        this.savePost(defaultPost);
     }
 
     public PostDto savePost(PostDto postDto) {
         if (postDto.getPostId() == null) {
-            postDto.setPostId(postId.incrementAndGet());
-            postDto.setCreatedAt(LocalDateTime.now());
+            postDto = postDto.toBuilder()
+                    .postId(postId.incrementAndGet())
+                    .createdAt(LocalDateTime.now())
+                    .build();
         }
         postMap.put(postDto.getPostId(), postDto);
         return postDto;

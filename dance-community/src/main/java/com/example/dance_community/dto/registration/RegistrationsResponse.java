@@ -1,13 +1,12 @@
-package com.example.dance_community.dto.event;
+package com.example.dance_community.dto.registration;
 
 import lombok.AllArgsConstructor;
-
 import java.util.List;
 import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class EventsResponse {
+public class RegistrationsResponse {
     private String message;
-    private List<EventDto> data;
+    private List<RegistrationDto> data;
 }

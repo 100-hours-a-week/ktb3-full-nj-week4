@@ -1,28 +1,45 @@
 package com.example.dance_community.dto.event;
 
+import com.example.dance_community.validation.ValidScopeTypeEvent;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Data
+@Getter
 @AllArgsConstructor
+@ValidScopeTypeEvent
 public class EventRequest {
+    @NotBlank(message = "행사 범위 미입력")
     private String scope;
+
+    @NotBlank(message = "행사 종류 미입력")
     private String type;
 
+    @NotBlank(message = "행사 제목 미입력")
     private String title;
+
+    @NotBlank(message = "행사 내용 미입력")
     private String content;
 
+    @NotNull(message = "행사 내용 미입력")
     private List<String> tags;
+
     private List<String> images;
 
+    @NotBlank(message = "행사 장소 미입력")
+    @Valid
     private Location location;
 
     private Long clubId;
+    @NotNull(message = "행사 마감인원 미입력")
     private Long capacity;
 
+    @NotNull(message = "행사 시작시간 미입력")
     private LocalDateTime startsAt;
+    @NotNull(message = "행사 종료시간 미입력")
     private LocalDateTime endsAt;
 }
