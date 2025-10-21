@@ -1,15 +1,16 @@
-package com.example.dance_community.jwt;
+package com.example.dance_community.config;
 
+import com.example.dance_community.jwt.JwtInterceptor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
-public class WebConfig implements WebMvcConfigurer {
+public class JwtWebConfig implements WebMvcConfigurer {
 
     private final JwtInterceptor jwtInterceptor;
 
-    public WebConfig(JwtInterceptor jwtInterceptor) {
+    public JwtWebConfig(JwtInterceptor jwtInterceptor) {
         this.jwtInterceptor = jwtInterceptor;
     }
 

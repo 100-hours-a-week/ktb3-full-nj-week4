@@ -39,6 +39,6 @@ public class JwtInterceptor implements HandlerInterceptor {
         }
 
         req.setAttribute("userId", String.valueOf(userId));
-        throw new AuthException("유효하지 않은 토큰");
+        return true;
     }
 }
