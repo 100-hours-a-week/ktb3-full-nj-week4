@@ -17,9 +17,6 @@ public class UserService {
     }
 
     private UserDto getUser(Long userId) {
-        if (userId == null) {
-            throw new InvalidRequestException("사용자 없음");
-        }
         return userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("사용자 인증 실패"));
     }

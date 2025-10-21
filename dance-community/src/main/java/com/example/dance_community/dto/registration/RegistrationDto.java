@@ -1,6 +1,5 @@
-package com.example.dance_community.dto.eventRegistration;
+package com.example.dance_community.dto.registration;
 
-import com.example.dance_community.enums.EventRegistrationStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -10,12 +9,11 @@ import java.time.LocalDateTime;
 @Getter
 @Builder(toBuilder = true)
 @AllArgsConstructor
-public class EventRegistrationDto {
+public class RegistrationDto {
     private Long eventId;
     private Long userId;
 
-    private EventRegistrationStatus status;
+    private boolean isSuccess;
 
     private LocalDateTime createdAt;
 }
-

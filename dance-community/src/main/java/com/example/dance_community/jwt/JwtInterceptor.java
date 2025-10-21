@@ -1,9 +1,6 @@
 package com.example.dance_community.jwt;
 
-import com.example.dance_community.dto.user.UserDto;
 import com.example.dance_community.exception.AuthException;
-import com.example.dance_community.exception.InvalidRequestException;
-import com.example.dance_community.exception.NotFoundException;
 import com.example.dance_community.repository.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -34,6 +31,10 @@ public class JwtInterceptor implements HandlerInterceptor {
         }
 
         Long userId = jwtUtil.getUserId(token);
+
+        if (userId == null) {
+            throw new AuthException("사용자 정보 없음");
+        }
 
         req.setAttribute("userId", String.valueOf(userId));
         return true;
