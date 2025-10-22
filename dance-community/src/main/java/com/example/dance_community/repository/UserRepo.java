@@ -4,7 +4,7 @@ import com.example.dance_community.dto.user.UserDto;
 
 import java.util.Optional;
 
-public interface UserRepository {
+public interface UserRepo {
     UserDto saveUser(UserDto userDto);
     Optional<UserDto> findById(Long userId);
     Optional<UserDto> findByEmail(String email);

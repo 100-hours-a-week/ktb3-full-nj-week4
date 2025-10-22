@@ -5,7 +5,7 @@ import com.example.dance_community.dto.user.UserDto;
 import com.example.dance_community.exception.AuthException;
 import com.example.dance_community.exception.ConflictException;
 import com.example.dance_community.exception.NotFoundException;
-import com.example.dance_community.repository.UserRepository;
+import com.example.dance_community.repository.UserRepo;
 import com.example.dance_community.jwt.JwtUtil;
 import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,17 +13,17 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class AuthService {
-    private final UserRepository userRepository;
+    private final UserRepo userRepo;
     private final JwtUtil jwtUtil;
 
     @Autowired
-    public AuthService(UserRepository userRepository, JwtUtil jwtUtil) {
-        this.userRepository = userRepository;
+    public AuthService(UserRepo userRepo, JwtUtil jwtUtil) {
+        this.userRepo = userRepo;
         this.jwtUtil = jwtUtil;
     }
 
     public AuthDto signup(SignupRequest signupRequest){
-        if (userRepository.findByEmail(signupRequest.getEmail()).isPresent()){
+        if (userRepo.findByEmail(signupRequest.getEmail()).isPresent()){
             throw new ConflictException("이메일 중복");
         }
 
@@ -33,12 +33,12 @@ public class AuthService {
                 .username(signupRequest.getUsername())
                 .build();
 
-        userRepository.saveUser(user);
+        userRepo.saveUser(user);
         return new AuthDto(user.getUserId());
     }
 
     public AuthDto login(LoginRequest loginRequest) {
-        UserDto user = userRepository.findByEmail(loginRequest.getEmail())
+        UserDto user = userRepo.findByEmail(loginRequest.getEmail())
                 .orElseThrow(() -> new AuthException("등록되지 않은 이메일"));
 
         if (!BCrypt.checkpw(loginRequest.getPassword(), user.getPassword())) {
@@ -52,7 +52,7 @@ public class AuthService {
     }
 
     public AuthDto refreshAccessToken(Long userId) {
-        if (userRepository.findById(userId).isEmpty()) {
+        if (userRepo.findById(userId).isEmpty()) {
             throw new NotFoundException("사용자 인증 실패");
         }
 

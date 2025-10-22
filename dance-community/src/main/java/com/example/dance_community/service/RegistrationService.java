@@ -4,28 +4,28 @@ import com.example.dance_community.dto.event.EventDto;
 import com.example.dance_community.dto.registration.RegistrationDto;
 import com.example.dance_community.exception.ConflictException;
 import com.example.dance_community.exception.NotFoundException;
-import com.example.dance_community.repository.RegistrationRepository;
-import com.example.dance_community.repository.EventRepository;
+import com.example.dance_community.repository.EventRepo;
+import com.example.dance_community.repository.RegistrationRepo;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
 public class RegistrationService {
-    private final RegistrationRepository registrationRepository;
-    private final EventRepository eventRepository;
+    private final RegistrationRepo registrationRepo;
+    private final EventRepo eventRepo;
 
-    public RegistrationService(RegistrationRepository registrationRepository,
-                               EventRepository eventRepository) {
-        this.registrationRepository = registrationRepository;
-        this.eventRepository = eventRepository;
+    public RegistrationService(RegistrationRepo registrationRepo,
+                               EventRepo eventRepo) {
+        this.registrationRepo = registrationRepo;
+        this.eventRepo = eventRepo;
     }
 
     public RegistrationDto createRegistration(Long userId, Long eventId) {
-        EventDto eventDto = eventRepository.findById(eventId)
+        EventDto eventDto = eventRepo.findById(eventId)
                 .orElseThrow(() -> new NotFoundException("행사 조회 실패"));
 
-        boolean alreadyRegistered = registrationRepository.findRegistration(
+        boolean alreadyRegistered = registrationRepo.findRegistration(
                         eventId, userId)
                 .filter(r -> r.isSuccess())
                 .isPresent();
@@ -35,14 +35,14 @@ public class RegistrationService {
 
         try {
             eventDto.incrementParticipants();
-            eventRepository.saveEvent(eventDto);
+            eventRepo.saveEvent(eventDto);
 
             RegistrationDto newRegistration = RegistrationDto.builder()
                     .eventId(eventId)
                     .userId(userId)
                     .isSuccess(true)
                     .build();
-            return registrationRepository.saveRegistration(newRegistration);
+            return registrationRepo.saveRegistration(newRegistration);
         } catch (IllegalStateException e) {
             throw new ConflictException("행사 정원 초과");
         } catch (Exception e) {
@@ -51,13 +51,13 @@ public class RegistrationService {
     }
 
     public RegistrationDto getRegistration(Long userId, Long eventId) {
-        return registrationRepository.findRegistration(userId, eventId)
+        return registrationRepo.findRegistration(userId, eventId)
                 .orElseThrow(() -> new NotFoundException("행사 신청 조회 실패"));
     }
 
     public List<RegistrationDto> getAllEventRegistrations(Long userId) {
         try {
-            return registrationRepository.findEventsByUser(userId).stream()
+            return registrationRepo.findEventsByUser(userId).stream()
                     .filter(r -> r.isSuccess())
                     .toList();
         } catch (Exception e) {
@@ -67,7 +67,7 @@ public class RegistrationService {
 
     public List<RegistrationDto> getAllUserRegistrations(Long eventId) {
         try {
-            return registrationRepository.findUsersByEvent(eventId).stream()
+            return registrationRepo.findUsersByEvent(eventId).stream()
                     .filter(r -> r.isSuccess())
                     .toList();
         } catch (Exception e) {
@@ -76,10 +76,10 @@ public class RegistrationService {
     }
 
     public RegistrationDto cancelRegistration(Long userId, Long eventId) {
-        EventDto event = eventRepository.findById(eventId)
+        EventDto event = eventRepo.findById(eventId)
                 .orElseThrow(() -> new NotFoundException("행사 조회 실패"));
 
-        RegistrationDto registration = registrationRepository.findRegistration(userId, eventId)
+        RegistrationDto registration = registrationRepo.findRegistration(userId, eventId)
                 .orElseThrow(() -> new NotFoundException("행사 신청 조회 실패"));
 
         if (!registration.isSuccess()) {
@@ -87,11 +87,11 @@ public class RegistrationService {
         }
 
         event.decrementParticipants();
-        eventRepository.saveEvent(event);
+        eventRepo.saveEvent(event);
 
         RegistrationDto canceledRegistration = registration.toBuilder()
                 .isSuccess(false)
                 .build();
-        return registrationRepository.saveRegistration(canceledRegistration);
+        return registrationRepo.saveRegistration(canceledRegistration);
     }
 }

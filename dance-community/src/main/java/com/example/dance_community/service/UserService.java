@@ -3,22 +3,22 @@ package com.example.dance_community.service;
 import com.example.dance_community.dto.user.UserDto;
 import com.example.dance_community.dto.user.UserRequest;
 import com.example.dance_community.exception.NotFoundException;
-import com.example.dance_community.repository.UserRepository;
+import com.example.dance_community.repository.UserRepo;
 import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class UserService {
-    private final UserRepository userRepository;
+    private final UserRepo userRepo;
 
     @Autowired
-    public UserService(UserRepository userRepository) {
-        this.userRepository = userRepository;
+    public UserService(UserRepo userRepo) {
+        this.userRepo = userRepo;
     }
 
     private UserDto getUser(Long userId) {
-        return userRepository.findById(userId)
+        return userRepo.findById(userId)
                 .orElseThrow(() -> new NotFoundException("사용자 인증 실패"));
     }
 
@@ -40,12 +40,12 @@ public class UserService {
                 .profileImage(userRequest.getProfileImage() != null ? userRequest.getProfileImage() : userDto.getProfileImage())
                 .build();
 
-        userRepository.saveUser(updatedUser);
+        userRepo.saveUser(updatedUser);
         return UserDto.changePassword(updatedUser);
     }
 
     public void deleteCurrentUser(Long userId) {
         getUser(userId);
-        userRepository.deleteUser(userId);
+        userRepo.deleteUser(userId);
     }
 }

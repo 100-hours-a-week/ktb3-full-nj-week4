@@ -10,7 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 @Repository
-public class UserRepositoryImpl implements UserRepository{
+public class UserRepoImpl implements UserRepo {
     private final ConcurrentHashMap<Long, UserDto> idToUserMap = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, Long> emailToIdMap = new ConcurrentHashMap<>();
     private final static AtomicLong userIdGen = new AtomicLong(0);

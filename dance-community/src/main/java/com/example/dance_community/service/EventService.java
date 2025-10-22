@@ -6,7 +6,8 @@ import com.example.dance_community.enums.EventType;
 import com.example.dance_community.enums.Scope;
 import com.example.dance_community.exception.InvalidRequestException;
 import com.example.dance_community.exception.NotFoundException;
-import com.example.dance_community.repository.EventRepository;
+import com.example.dance_community.repository.EventRepo;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -14,10 +15,11 @@ import java.util.List;
 
 @Service
 public class EventService {
-    private final EventRepository eventRepository;
+    private final EventRepo eventRepo;
 
-    public EventService(EventRepository eventRepository) {
-        this.eventRepository = eventRepository;
+    @Autowired
+    public EventService(EventRepo eventRepo) {
+        this.eventRepo = eventRepo;
     }
 
     public EventDto createEvent(Long userId, EventRequest eventRequest) {
@@ -39,7 +41,7 @@ public class EventService {
                     .updatedAt(LocalDateTime.now())
                     .build();
 
-            return eventRepository.saveEvent(newEvent);
+            return eventRepo.saveEvent(newEvent);
         } catch (IllegalArgumentException e) {
             throw new InvalidRequestException("잘못된 요청 데이터");
         } catch (Exception e) {
@@ -48,20 +50,20 @@ public class EventService {
     }
 
     public EventDto getEvent(Long eventId) {
-        return eventRepository.findById(eventId)
+        return eventRepo.findById(eventId)
                 .orElseThrow(() -> new NotFoundException("행사 조회 실패"));
     }
 
     public List<EventDto> getEvents() {
         try {
-            return eventRepository.findAll();
+            return eventRepo.findAll();
         } catch (Exception e) {
             throw new RuntimeException("행사 전체 조회 실패");
         }
     }
 
     public EventDto updateEvent(Long eventId, EventRequest eventRequest) {
-        EventDto eventDto = eventRepository.findById(eventId)
+        EventDto eventDto = eventRepo.findById(eventId)
                 .orElseThrow(() -> new NotFoundException("행사 조회 실패"));
 
         try {
@@ -82,7 +84,7 @@ public class EventService {
                     .updatedAt(LocalDateTime.now())
                     .build();
 
-            return eventRepository.saveEvent(updatedEvent);
+            return eventRepo.saveEvent(updatedEvent);
         } catch (IllegalArgumentException e) {
             throw new InvalidRequestException("잘못된 요청 데이터");
         } catch (Exception e) {
@@ -91,9 +93,9 @@ public class EventService {
     }
 
     public void deleteEvent(Long eventId) {
-        eventRepository.findById(eventId)
+        eventRepo.findById(eventId)
                 .orElseThrow(() -> new NotFoundException("행사 삭제 실패"));
 
-        eventRepository.deleteById(eventId);
+        eventRepo.deleteById(eventId);
     }
 }

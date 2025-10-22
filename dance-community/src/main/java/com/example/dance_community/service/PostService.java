@@ -5,7 +5,8 @@ import com.example.dance_community.dto.post.PostRequest;
 import com.example.dance_community.enums.Scope;
 import com.example.dance_community.exception.InvalidRequestException;
 import com.example.dance_community.exception.NotFoundException;
-import com.example.dance_community.repository.PostRepository;
+import com.example.dance_community.repository.PostRepo;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -13,10 +14,11 @@ import java.util.List;
 
 @Service
 public class PostService {
-    private final PostRepository postRepository;
+    private final PostRepo postRepo;
 
-    public PostService(PostRepository postRepository) {
-        this.postRepository = postRepository;
+    @Autowired
+    public PostService(PostRepo postRepo) {
+        this.postRepo = postRepo;
     }
 
     public PostDto createPost(Long userId, PostRequest postRequest) {
@@ -31,7 +33,7 @@ public class PostService {
                     .images(postRequest.getImages())
                     .build();
 
-            return postRepository.savePost(newPost);
+            return postRepo.savePost(newPost);
         } catch (IllegalArgumentException e) {
             throw new InvalidRequestException("잘못된 요청 데이터");
         } catch (Exception e) {
@@ -40,20 +42,20 @@ public class PostService {
     }
 
     public PostDto getPost(Long postId) {
-        return postRepository.findById(postId)
+        return postRepo.findById(postId)
                 .orElseThrow(() -> new NotFoundException("게시글 조회 실패"));
     }
 
     public List<PostDto> getPosts() {
         try {
-            return postRepository.findAll();
+            return postRepo.findAll();
         } catch (Exception e) {
             throw new RuntimeException("게시글 전체 조회 실패");
         }
     }
 
     public PostDto updatePost(Long postId, PostRequest postRequest) {
-        PostDto postDto = postRepository.findById(postId)
+        PostDto postDto = postRepo.findById(postId)
                 .orElseThrow(() -> new NotFoundException("게시글 조회 실패"));
 
         try {
@@ -68,7 +70,7 @@ public class PostService {
                     .updatedAt(LocalDateTime.now())
                     .build();
 
-            postRepository.savePost(updatedPost);
+            postRepo.savePost(updatedPost);
             return updatedPost;
         } catch (IllegalArgumentException e) {
             throw new InvalidRequestException("잘못된 요청 데이터");
@@ -79,8 +81,8 @@ public class PostService {
 
 
     public void deletePost(Long postId) {
-        postRepository.findById(postId)
+        postRepo.findById(postId)
                 .orElseThrow(() -> new NotFoundException("게시글 삭제 실패"));
-        postRepository.deleteById(postId);
+        postRepo.deleteById(postId);
     }
 }

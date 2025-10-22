@@ -13,7 +13,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 @Repository
-public class EventRepository{
+public class EventRepoImpl implements EventRepo{
     private final Map<Long, EventDto> eventMap = new ConcurrentHashMap<>();
     private final AtomicLong eventId = new AtomicLong(0);
 
@@ -46,6 +46,7 @@ public class EventRepository{
         this.saveEvent(defaultEvent);
     }
 
+    @Override
     public EventDto saveEvent(EventDto eventDto) {
         if (eventDto.getEventId() == null) {
             eventDto = eventDto.toBuilder()
@@ -57,14 +58,17 @@ public class EventRepository{
         return eventDto;
     }
 
+    @Override
     public Optional<EventDto> findById(Long eventId) {
         return Optional.ofNullable(eventMap.get(eventId));
     }
 
+    @Override
     public List<EventDto> findAll() {
         return new ArrayList<>(eventMap.values());
     }
 
+    @Override
     public void deleteById(Long id) {
         eventMap.remove(id);
     }
