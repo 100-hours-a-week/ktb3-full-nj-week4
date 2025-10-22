@@ -1,7 +1,7 @@
 package com.example.dance_community.jwt;
 
 import com.example.dance_community.exception.AuthException;
-import com.example.dance_community.repository.UserRepository;
+import com.example.dance_community.repository.UserRepositoryImpl;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.stereotype.Component;
@@ -12,7 +12,7 @@ public class JwtInterceptor implements HandlerInterceptor {
 
     private final JwtUtil jwtUtil;
 
-    public JwtInterceptor(JwtUtil jwtUtil, UserRepository userRepository) {
+    public JwtInterceptor(JwtUtil jwtUtil, UserRepositoryImpl userRepositoryImpl) {
         this.jwtUtil = jwtUtil;
     }
 

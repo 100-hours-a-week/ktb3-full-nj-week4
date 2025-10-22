@@ -5,12 +5,14 @@ import com.example.dance_community.dto.user.UserRequest;
 import com.example.dance_community.exception.NotFoundException;
 import com.example.dance_community.repository.UserRepository;
 import org.mindrot.jbcrypt.BCrypt;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class UserService {
     private final UserRepository userRepository;
 
+    @Autowired
     public UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }

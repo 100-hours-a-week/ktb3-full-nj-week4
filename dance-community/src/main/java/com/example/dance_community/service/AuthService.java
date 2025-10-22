@@ -8,6 +8,7 @@ import com.example.dance_community.exception.NotFoundException;
 import com.example.dance_community.repository.UserRepository;
 import com.example.dance_community.jwt.JwtUtil;
 import org.mindrot.jbcrypt.BCrypt;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -15,6 +16,7 @@ public class AuthService {
     private final UserRepository userRepository;
     private final JwtUtil jwtUtil;
 
+    @Autowired
     public AuthService(UserRepository userRepository, JwtUtil jwtUtil) {
         this.userRepository = userRepository;
         this.jwtUtil = jwtUtil;
