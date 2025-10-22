@@ -27,14 +27,14 @@ public class AuthService {
             throw new ConflictException("이메일 중복");
         }
 
-        UserDto user = UserDto.builder()
+        UserDto createUser = UserDto.builder()
                 .email(signupRequest.getEmail())
                 .password(BCrypt.hashpw(signupRequest.getPassword(), BCrypt.gensalt()))
                 .username(signupRequest.getUsername())
                 .build();
 
-        userRepo.saveUser(user);
-        return new AuthDto(user.getUserId());
+        UserDto newUser = userRepo.saveUser(createUser);
+        return new AuthDto(newUser.getUserId());
     }
 
     public AuthDto login(LoginRequest loginRequest) {
