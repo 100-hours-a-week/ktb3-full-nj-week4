@@ -2,12 +2,14 @@ package com.example.dance_community.dto.post;
 
 import com.example.dance_community.enums.Scope;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Builder;
+import lombok.Getter;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Data
+@Getter
+@Builder(toBuilder = true)
 @AllArgsConstructor
 public class PostDto {
     private Scope scope;
@@ -24,8 +26,4 @@ public class PostDto {
 
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-
-    public PostDto() {
-
-    }
 }

@@ -6,7 +6,8 @@ import com.example.dance_community.enums.EventType;
 import com.example.dance_community.enums.Scope;
 import com.example.dance_community.exception.InvalidRequestException;
 import com.example.dance_community.exception.NotFoundException;
-import com.example.dance_community.repository.EventRepository;
+import com.example.dance_community.repository.EventRepo;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -14,80 +15,87 @@ import java.util.List;
 
 @Service
 public class EventService {
-    private final EventRepository eventRepository;
+    private final EventRepo eventRepo;
 
-    public EventService(EventRepository eventRepository) {
-        this.eventRepository = eventRepository;
+    @Autowired
+    public EventService(EventRepo eventRepo) {
+        this.eventRepo = eventRepo;
     }
 
     public EventDto createEvent(Long userId, EventRequest eventRequest) {
-        if (eventRequest.getScope() == null || eventRequest.getType() == null ||
-                eventRequest.getTitle() == null || eventRequest.getContent() == null ||
-                eventRequest.getStartsAt() == null || eventRequest.getEndsAt() == null ||
-                eventRequest.getLocation() == null || eventRequest.getCapacity() == null) {
-            throw new InvalidRequestException("필수 필드 누락");
+        try {
+            EventDto newEvent = EventDto.builder()
+                    .userId(userId)
+                    .scope(Scope.valueOf(eventRequest.getScope()))
+                    .type(EventType.valueOf(eventRequest.getType()))
+                    .clubId(eventRequest.getClubId())
+                    .title(eventRequest.getTitle())
+                    .content(eventRequest.getContent())
+                    .tags(eventRequest.getTags())
+                    .images(eventRequest.getImages())
+                    .location(eventRequest.getLocation())
+                    .capacity(eventRequest.getCapacity())
+                    .startsAt(eventRequest.getStartsAt())
+                    .endsAt(eventRequest.getEndsAt())
+                    .createdAt(LocalDateTime.now())
+                    .updatedAt(LocalDateTime.now())
+                    .build();
+
+            return eventRepo.saveEvent(newEvent);
+        } catch (IllegalArgumentException e) {
+            throw new InvalidRequestException("잘못된 요청 데이터");
+        } catch (Exception e) {
+            throw new RuntimeException("행사 생성 실패");
         }
-
-        EventDto eventDto = new EventDto();
-        eventDto.setUserId(userId);
-        eventDto.setScope(Scope.valueOf(eventRequest.getScope()));
-        eventDto.setType(EventType.valueOf(eventRequest.getType()));
-        eventDto.setClubId(eventRequest.getClubId());
-        eventDto.setTitle(eventRequest.getTitle());
-        eventDto.setContent(eventRequest.getContent());
-        eventDto.setTags(eventRequest.getTags());
-        eventDto.setImages(eventRequest.getImages());
-        eventDto.setLocation(eventRequest.getLocation());
-        eventDto.setCapacity(eventRequest.getCapacity());
-        eventDto.setStartsAt(eventRequest.getStartsAt());
-        eventDto.setEndsAt(eventRequest.getEndsAt());
-
-        EventDto newEvent = eventRepository.saveEvent(eventDto);
-        return newEvent;
     }
 
     public EventDto getEvent(Long eventId) {
-        EventDto eventDto = eventRepository.findById(eventId)
+        return eventRepo.findById(eventId)
                 .orElseThrow(() -> new NotFoundException("행사 조회 실패"));
-        return eventDto;
     }
 
     public List<EventDto> getEvents() {
         try {
-            return eventRepository.findAll();
+            return eventRepo.findAll();
         } catch (Exception e) {
             throw new RuntimeException("행사 전체 조회 실패");
         }
     }
 
     public EventDto updateEvent(Long eventId, EventRequest eventRequest) {
-        EventDto eventDto = eventRepository.findById(eventId)
+        EventDto eventDto = eventRepo.findById(eventId)
                 .orElseThrow(() -> new NotFoundException("행사 조회 실패"));
 
         try {
-            if (eventRequest.getScope() != null) eventDto.setScope(Scope.valueOf(eventRequest.getScope()));
-            if (eventRequest.getType() != null) eventDto.setType(EventType.valueOf(eventRequest.getType()));
-            if (eventRequest.getTitle() != null) eventDto.setTitle(eventRequest.getTitle());
-            if (eventRequest.getContent() != null) eventDto.setContent(eventRequest.getContent());
-            if (eventRequest.getTags() != null) eventDto.setTags(eventRequest.getTags());
-            if (eventRequest.getImages() != null) eventDto.setImages(eventRequest.getImages());
-            if (eventRequest.getLocation() != null) eventDto.setLocation(eventRequest.getLocation());
-            if (eventRequest.getCapacity() != null) eventDto.setCapacity(eventRequest.getCapacity());
-            if (eventRequest.getStartsAt() != null) eventDto.setStartsAt(eventRequest.getStartsAt());
-            if (eventRequest.getEndsAt() != null) eventDto.setEndsAt(eventRequest.getEndsAt());
-        } catch (Exception e) {
-            throw new InvalidRequestException("잘못된 요청 데이터");
-        }
-        eventDto.setUpdatedAt(LocalDateTime.now());
-        eventRepository.saveEvent(eventDto);
+            Scope newScope = eventRequest.getScope() != null ? Scope.valueOf(eventRequest.getScope()) : eventDto.getScope();
+            EventType newType = eventRequest.getType() != null ? EventType.valueOf(eventRequest.getType()) : eventDto.getType();
 
-        return eventDto;
+            EventDto updatedEvent = eventDto.toBuilder()
+                    .scope(newScope)
+                    .type(newType)
+                    .title(eventRequest.getTitle() != null ? eventRequest.getTitle() : eventDto.getTitle())
+                    .content(eventRequest.getContent() != null ? eventRequest.getContent() : eventDto.getContent())
+                    .tags(eventRequest.getTags() != null ? eventRequest.getTags() : eventDto.getTags())
+                    .images(eventRequest.getImages() != null ? eventRequest.getImages() : eventDto.getImages())
+                    .location(eventRequest.getLocation() != null ? eventRequest.getLocation() : eventDto.getLocation())
+                    .capacity(eventRequest.getCapacity() != null ? eventRequest.getCapacity() : eventDto.getCapacity())
+                    .startsAt(eventRequest.getStartsAt() != null ? eventRequest.getStartsAt() : eventDto.getStartsAt())
+                    .endsAt(eventRequest.getEndsAt() != null ? eventRequest.getEndsAt() : eventDto.getEndsAt())
+                    .updatedAt(LocalDateTime.now())
+                    .build();
+
+            return eventRepo.saveEvent(updatedEvent);
+        } catch (IllegalArgumentException e) {
+            throw new InvalidRequestException("잘못된 요청 데이터");
+        } catch (Exception e) {
+            throw new RuntimeException("행사 수정 실패");
+        }
     }
 
     public void deleteEvent(Long eventId) {
-        EventDto eventDto = eventRepository.findById(eventId)
+        eventRepo.findById(eventId)
                 .orElseThrow(() -> new NotFoundException("행사 삭제 실패"));
 
-        eventRepository.deleteById(eventId);
+        eventRepo.deleteById(eventId);
     }
 }
