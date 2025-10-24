@@ -39,6 +39,11 @@ public class UserRepoImpl implements UserRepo {
     }
 
     @Override
+    public boolean existsById(Long userId){
+        return idToUserMap.containsKey(userId);
+    }
+
+    @Override
     public Optional<UserDto> findById(Long userId){
         return Optional.ofNullable(idToUserMap.get(userId));
     }
@@ -46,8 +51,8 @@ public class UserRepoImpl implements UserRepo {
     @Override
     public Optional<UserDto> findByEmail(String email) {
         Long userId = emailToIdMap.get(email);
-        return Optional.ofNullable(userId)
-                .flatMap(this::findById);
+        if (userId == null) return Optional.empty();
+        return findById(userId);
     }
 
     @Override

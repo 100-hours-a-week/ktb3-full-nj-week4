@@ -8,6 +8,8 @@ import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 public class UserService {
     private final UserRepo userRepo;
@@ -17,17 +19,13 @@ public class UserService {
         this.userRepo = userRepo;
     }
 
-    private UserDto getUser(Long userId) {
-        return userRepo.findById(userId)
-                .orElseThrow(() -> new NotFoundException("사용자 인증 실패"));
-    }
-
     public UserDto getUserById(Long userId) {
-        return UserDto.changePassword(getUser(userId));
+        return UserDto.changePassword(userRepo.findById(userId));
     }
 
     public UserDto updateUser(Long userId, UserRequest userRequest) {
-        UserDto userDto = getUser(userId);
+        UserDto userDto = userRepo.findById(userId)
+                .orElseThrow(() -> new NotFoundException("등록되지 않은 사용자"));
 
         String newPassword = userRequest.getPassword() != null
                 ? BCrypt.hashpw(userRequest.getPassword(), BCrypt.gensalt())
@@ -41,11 +39,10 @@ public class UserService {
                 .build();
 
         userRepo.saveUser(updatedUser);
-        return UserDto.changePassword(updatedUser);
+        return UserDto.changePassword(Optional.ofNullable(updatedUser));
     }
 
     public void deleteCurrentUser(Long userId) {
-        getUser(userId);
         userRepo.deleteUser(userId);
     }
 }

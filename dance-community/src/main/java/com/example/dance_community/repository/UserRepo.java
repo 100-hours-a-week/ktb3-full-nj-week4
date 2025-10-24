@@ -6,6 +6,7 @@ import java.util.Optional;
 
 public interface UserRepo {
     UserDto saveUser(UserDto userDto);
+    boolean existsById(Long userId);
     Optional<UserDto> findById(Long userId);
     Optional<UserDto> findByEmail(String email);
     void deleteUser(Long userId);

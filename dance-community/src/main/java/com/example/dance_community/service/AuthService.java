@@ -52,10 +52,6 @@ public class AuthService {
     }
 
     public AuthDto refreshAccessToken(Long userId) {
-        if (userRepo.findById(userId).isEmpty()) {
-            throw new NotFoundException("사용자 인증 실패");
-        }
-
         String newAccessToken = jwtUtil.generateAccessToken(userId);
         String newRefreshToken = jwtUtil.generateRefreshToken(userId);
 
