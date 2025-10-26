@@ -1,7 +1,7 @@
 package com.example.dance_community.repository;
 
-import com.example.dance_community.dto.event.EventDto;
 import com.example.dance_community.dto.event.Location;
+import com.example.dance_community.entity.Event;
 import com.example.dance_community.enums.EventType;
 import com.example.dance_community.enums.Scope;
 import jakarta.annotation.PostConstruct;
@@ -14,7 +14,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 @Repository
 public class EventRepoImpl implements EventRepo{
-    private final Map<Long, EventDto> eventMap = new ConcurrentHashMap<>();
+    private final Map<Long, Event> eventMap = new ConcurrentHashMap<>();
     private final AtomicLong eventId = new AtomicLong(0);
 
     @PostConstruct
@@ -25,7 +25,7 @@ public class EventRepoImpl implements EventRepo{
                 .link("https://naver.me/GdyG7ZUn")
                 .build();
 
-        EventDto defaultEvent = EventDto.builder()
+        Event defaultEvent = Event.builder()
                 .eventId(eventId.incrementAndGet())
                 .userId(1L)
                 .scope(Scope.GLOBAL)
@@ -47,24 +47,22 @@ public class EventRepoImpl implements EventRepo{
     }
 
     @Override
-    public EventDto saveEvent(EventDto eventDto) {
-        if (eventDto.getEventId() == null) {
-            eventDto = eventDto.toBuilder()
-                    .eventId(eventId.incrementAndGet())
-                    .createdAt(LocalDateTime.now())
-                    .build();
+    public Event saveEvent(Event event) {
+        if (event.getEventId() == null) {
+            event.setEventId(eventId.incrementAndGet());
+            event.setCreatedAt(LocalDateTime.now());
         }
-        eventMap.put(eventDto.getEventId(), eventDto);
-        return eventDto;
+        eventMap.put(event.getEventId(), event);
+        return event;
     }
 
     @Override
-    public Optional<EventDto> findById(Long eventId) {
+    public Optional<Event> findById(Long eventId) {
         return Optional.ofNullable(eventMap.get(eventId));
     }
 
     @Override
-    public List<EventDto> findAll() {
+    public List<Event> findAll() {
         return new ArrayList<>(eventMap.values());
     }
 

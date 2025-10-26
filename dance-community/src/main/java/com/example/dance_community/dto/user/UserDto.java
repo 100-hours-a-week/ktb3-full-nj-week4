@@ -4,8 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
-import java.util.Optional;
-
 @Getter
 @Builder(toBuilder = true)
 @AllArgsConstructor
@@ -17,10 +15,4 @@ public class UserDto {
 
     private Long userId;
     private Long clubId;
-
-    public static UserDto changePassword(Optional<UserDto> user) {
-        return user.toBuilder()
-                .password(null)
-                .build();
-    }
 }

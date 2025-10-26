@@ -2,7 +2,7 @@ package com.example.dance_community.controller;
 
 import com.example.dance_community.dto.ApiResponse;
 import com.example.dance_community.dto.event.EventDto;
-import com.example.dance_community.dto.event.EventRequest;
+import com.example.dance_community.dto.event.EventUpdateRequest;
 import com.example.dance_community.service.EventService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -24,8 +24,8 @@ public class EventController {
 
     @Operation(summary = "행사 생성", description = "행사를 새로 만듭니다.")
     @PostMapping()
-    public ResponseEntity<ApiResponse<EventDto>> createEvent(HttpServletRequest request, @Valid @RequestBody EventRequest eventRequest) {
-        EventDto eventDto = eventService.createEvent(Long.valueOf((String) request.getAttribute("userId")), eventRequest);
+    public ResponseEntity<ApiResponse<EventDto>> createEvent(HttpServletRequest request, @Valid @RequestBody EventUpdateRequest eventUpdateRequest) {
+        EventDto eventDto = eventService.createEvent(Long.valueOf((String) request.getAttribute("userId")), eventUpdateRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResponse<>("행사 생성 성공", eventDto));
     }
 
@@ -45,8 +45,8 @@ public class EventController {
 
     @Operation(summary = "내 행사 수정", description = "사용자의 행사 정보를 수정합니다.")
     @PatchMapping("/{eventId}")
-    public ResponseEntity<ApiResponse<EventDto>> updateEvent(@PathVariable Long eventId, @Valid @RequestBody EventRequest eventRequest) {
-        EventDto eventDto = eventService.updateEvent(eventId, eventRequest);
+    public ResponseEntity<ApiResponse<EventDto>> updateEvent(@PathVariable Long eventId, @Valid @RequestBody EventUpdateRequest eventUpdateRequest) {
+        EventDto eventDto = eventService.updateEvent(eventId, eventUpdateRequest);
         return ResponseEntity.ok(new ApiResponse<>("행사 수정 성공", eventDto));
     }
 

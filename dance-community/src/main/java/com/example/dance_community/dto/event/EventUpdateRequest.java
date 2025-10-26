@@ -1,5 +1,8 @@
 package com.example.dance_community.dto.event;
 
+import com.example.dance_community.entity.Event;
+import com.example.dance_community.enums.EventType;
+import com.example.dance_community.enums.Scope;
 import com.example.dance_community.validation.ValidScopeTypeEvent;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
@@ -12,7 +15,7 @@ import java.util.List;
 @Getter
 @AllArgsConstructor
 @ValidScopeTypeEvent
-public class EventRequest {
+public class EventUpdateRequest {
     @NotBlank(message = "행사 범위 미입력")
     private String scope;
 
@@ -41,4 +44,22 @@ public class EventRequest {
     private LocalDateTime startsAt;
     @NotNull(message = "행사 종료시간 미입력")
     private LocalDateTime endsAt;
+
+    public Event toEntity(Long userId) {
+        return Event.builder()
+                .userId(userId)
+                .scope(Scope.valueOf(this.scope))
+                .type(EventType.valueOf(this.type))
+                .clubId(this.clubId)
+                .title(this.title)
+                .content(this.content)
+                .tags(this.tags)
+                .images(this.images)
+                .location(this.location)
+                .capacity(this.capacity)
+                .currentParticipants(0L)
+                .startsAt(this.startsAt)
+                .endsAt(this.endsAt)
+                .build();
+    }
 }

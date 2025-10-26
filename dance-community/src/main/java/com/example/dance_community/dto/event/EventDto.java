@@ -13,46 +13,27 @@ import java.util.List;
 @Builder(toBuilder = true)
 @AllArgsConstructor
 public class EventDto {
-    private Scope scope;
-    private EventType type;
+    private final Scope scope;
+    private final EventType type;
 
-    private String title;
-    private String content;
+    private final String title;
+    private final String content;
 
-    private List<String> tags;
-    private List<String> images;
+    private final List<String> tags;
+    private final List<String> images;
 
-    private Location location;
+    private final Location location;
 
-    private Long eventId;
-    private Long userId;
-    private Long clubId;
+    private final Long eventId;
+    private final Long userId;
+    private final Long clubId;
 
-    private Long capacity;
-    private Long currentParticipants;
+    private final Long capacity;
+    private final Long currentParticipants;
 
-    private LocalDateTime startsAt;
-    private LocalDateTime endsAt;
+    private final LocalDateTime startsAt;
+    private final LocalDateTime endsAt;
 
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
-
-    public void incrementParticipants() {
-        if (this.currentParticipants == null) {
-            this.currentParticipants = 0L;
-        }
-        if (this.capacity != null && this.currentParticipants >= this.capacity) {
-            throw new IllegalStateException("행사 신청 실패(신청 마감)");
-        }
-        this.currentParticipants = this.currentParticipants + 1;
-    }
-
-    public void decrementParticipants() {
-        if (this.currentParticipants == null || this.currentParticipants <= 0) {
-            this.currentParticipants = 0L;
-            return;
-        }
-        this.currentParticipants = this.currentParticipants - 1;
-    }
+    private final LocalDateTime createdAt;
+    private final LocalDateTime updatedAt;
 }
-

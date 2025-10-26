@@ -1,7 +1,8 @@
 package com.example.dance_community.service;
 
 import com.example.dance_community.dto.event.EventDto;
-import com.example.dance_community.dto.event.EventRequest;
+import com.example.dance_community.dto.event.EventUpdateRequest;
+import com.example.dance_community.entity.Event;
 import com.example.dance_community.enums.EventType;
 import com.example.dance_community.enums.Scope;
 import com.example.dance_community.exception.InvalidRequestException;
@@ -22,26 +23,27 @@ public class EventService {
         this.eventRepo = eventRepo;
     }
 
-    public EventDto createEvent(Long userId, EventRequest eventRequest) {
+    public EventDto createEvent(Long userId, EventUpdateRequest eventUpdateRequest) {
         try {
-            EventDto newEvent = EventDto.builder()
+            Event newEvent = Event.builder()
                     .userId(userId)
-                    .scope(Scope.valueOf(eventRequest.getScope()))
-                    .type(EventType.valueOf(eventRequest.getType()))
-                    .clubId(eventRequest.getClubId())
-                    .title(eventRequest.getTitle())
-                    .content(eventRequest.getContent())
-                    .tags(eventRequest.getTags())
-                    .images(eventRequest.getImages())
-                    .location(eventRequest.getLocation())
-                    .capacity(eventRequest.getCapacity())
-                    .startsAt(eventRequest.getStartsAt())
-                    .endsAt(eventRequest.getEndsAt())
+                    .scope(Scope.valueOf(eventUpdateRequest.getScope()))
+                    .type(EventType.valueOf(eventUpdateRequest.getType()))
+                    .clubId(eventUpdateRequest.getClubId())
+                    .title(eventUpdateRequest.getTitle())
+                    .content(eventUpdateRequest.getContent())
+                    .tags(eventUpdateRequest.getTags())
+                    .images(eventUpdateRequest.getImages())
+                    .location(eventUpdateRequest.getLocation())
+                    .capacity(eventUpdateRequest.getCapacity())
+                    .startsAt(eventUpdateRequest.getStartsAt())
+                    .endsAt(eventUpdateRequest.getEndsAt())
                     .createdAt(LocalDateTime.now())
                     .updatedAt(LocalDateTime.now())
                     .build();
 
-            return eventRepo.saveEvent(newEvent);
+            Event savedEvent = eventRepo.saveEvent(newEvent);
+            return savedEvent.toDto();
         } catch (IllegalArgumentException e) {
             throw new InvalidRequestException("잘못된 요청 데이터");
         } catch (Exception e) {
@@ -50,41 +52,59 @@ public class EventService {
     }
 
     public EventDto getEvent(Long eventId) {
-        return eventRepo.findById(eventId)
+        Event event = eventRepo.findById(eventId)
                 .orElseThrow(() -> new NotFoundException("행사 조회 실패"));
+        return event.toDto();
     }
 
     public List<EventDto> getEvents() {
         try {
-            return eventRepo.findAll();
+            // 구현 이유 : 코드 유연성과 재사용성 / 나중에 일부 필드만 담은 dto만 필요할 때 유연한 구조
+            List<Event> events = eventRepo.findAll();
+            return events.stream().map(Event::toDto).toList();
         } catch (Exception e) {
             throw new RuntimeException("행사 전체 조회 실패");
         }
     }
 
-    public EventDto updateEvent(Long eventId, EventRequest eventRequest) {
-        EventDto eventDto = eventRepo.findById(eventId)
+    public EventDto updateEvent(Long eventId, EventUpdateRequest eventUpdateRequest) {
+        Event event = eventRepo.findById(eventId)
                 .orElseThrow(() -> new NotFoundException("행사 조회 실패"));
 
         try {
-            Scope newScope = eventRequest.getScope() != null ? Scope.valueOf(eventRequest.getScope()) : eventDto.getScope();
-            EventType newType = eventRequest.getType() != null ? EventType.valueOf(eventRequest.getType()) : eventDto.getType();
+            if (eventUpdateRequest.getScope() != null) {
+                event.setScope(Scope.valueOf(eventUpdateRequest.getScope()));
+            }
+            if (eventUpdateRequest.getType() != null) {
+                event.setType(EventType.valueOf(eventUpdateRequest.getType()));
+            }
+            if (eventUpdateRequest.getTitle() != null) {
+                event.setTitle(eventUpdateRequest.getTitle());
+            }
+            if (eventUpdateRequest.getContent() != null) {
+                event.setContent(eventUpdateRequest.getContent());
+            }
+            if (eventUpdateRequest.getTags() != null) {
+                event.setTags(eventUpdateRequest.getTags());
+            }
+            if (eventUpdateRequest.getImages() != null) {
+                event.setImages(eventUpdateRequest.getImages());
+            }
+            if (eventUpdateRequest.getLocation() != null) {
+                event.setLocation(eventUpdateRequest.getLocation());
+            }
+            if (eventUpdateRequest.getCapacity() != null) {
+                event.setCapacity(eventUpdateRequest.getCapacity());
+            }
+            if (eventUpdateRequest.getStartsAt() != null) {
+                event.setStartsAt(eventUpdateRequest.getStartsAt());
+            }
+            if (eventUpdateRequest.getEndsAt() != null) {
+                event.setEndsAt(eventUpdateRequest.getEndsAt());
+            }
+            event.setUpdatedAt(LocalDateTime.now());
 
-            EventDto updatedEvent = eventDto.toBuilder()
-                    .scope(newScope)
-                    .type(newType)
-                    .title(eventRequest.getTitle() != null ? eventRequest.getTitle() : eventDto.getTitle())
-                    .content(eventRequest.getContent() != null ? eventRequest.getContent() : eventDto.getContent())
-                    .tags(eventRequest.getTags() != null ? eventRequest.getTags() : eventDto.getTags())
-                    .images(eventRequest.getImages() != null ? eventRequest.getImages() : eventDto.getImages())
-                    .location(eventRequest.getLocation() != null ? eventRequest.getLocation() : eventDto.getLocation())
-                    .capacity(eventRequest.getCapacity() != null ? eventRequest.getCapacity() : eventDto.getCapacity())
-                    .startsAt(eventRequest.getStartsAt() != null ? eventRequest.getStartsAt() : eventDto.getStartsAt())
-                    .endsAt(eventRequest.getEndsAt() != null ? eventRequest.getEndsAt() : eventDto.getEndsAt())
-                    .updatedAt(LocalDateTime.now())
-                    .build();
-
-            return eventRepo.saveEvent(updatedEvent);
+            return eventRepo.saveEvent(event).toDto();
         } catch (IllegalArgumentException e) {
             throw new InvalidRequestException("잘못된 요청 데이터");
         } catch (Exception e) {

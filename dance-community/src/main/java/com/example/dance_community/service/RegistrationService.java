@@ -2,6 +2,7 @@ package com.example.dance_community.service;
 
 import com.example.dance_community.dto.event.EventDto;
 import com.example.dance_community.dto.registration.RegistrationDto;
+import com.example.dance_community.entity.Event;
 import com.example.dance_community.exception.ConflictException;
 import com.example.dance_community.exception.NotFoundException;
 import com.example.dance_community.repository.EventRepo;
@@ -22,7 +23,7 @@ public class RegistrationService {
     }
 
     public RegistrationDto createRegistration(Long userId, Long eventId) {
-        EventDto eventDto = eventRepo.findById(eventId)
+        Event event = eventRepo.findById(eventId)
                 .orElseThrow(() -> new NotFoundException("행사 조회 실패"));
 
         boolean alreadyRegistered = registrationRepo.findRegistration(
@@ -34,8 +35,8 @@ public class RegistrationService {
         }
 
         try {
-            eventDto.incrementParticipants();
-            eventRepo.saveEvent(eventDto);
+            event.incrementParticipants();
+            eventRepo.saveEvent(event);
 
             RegistrationDto newRegistration = RegistrationDto.builder()
                     .eventId(eventId)
@@ -76,7 +77,7 @@ public class RegistrationService {
     }
 
     public RegistrationDto cancelRegistration(Long userId, Long eventId) {
-        EventDto event = eventRepo.findById(eventId)
+        Event event = eventRepo.findById(eventId)
                 .orElseThrow(() -> new NotFoundException("행사 조회 실패"));
 
         RegistrationDto registration = registrationRepo.findRegistration(userId, eventId)
