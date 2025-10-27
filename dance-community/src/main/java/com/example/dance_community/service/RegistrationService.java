@@ -1,6 +1,5 @@
 package com.example.dance_community.service;
 
-import com.example.dance_community.dto.event.EventDto;
 import com.example.dance_community.dto.registration.RegistrationDto;
 import com.example.dance_community.entity.Event;
 import com.example.dance_community.exception.ConflictException;

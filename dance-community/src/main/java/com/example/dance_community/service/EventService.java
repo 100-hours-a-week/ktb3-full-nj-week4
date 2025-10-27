@@ -1,10 +1,9 @@
 package com.example.dance_community.service;
 
-import com.example.dance_community.dto.event.EventDto;
+import com.example.dance_community.dto.event.EventCreateRequest;
+import com.example.dance_community.dto.event.EventResponse;
 import com.example.dance_community.dto.event.EventUpdateRequest;
 import com.example.dance_community.entity.Event;
-import com.example.dance_community.enums.EventType;
-import com.example.dance_community.enums.Scope;
 import com.example.dance_community.exception.InvalidRequestException;
 import com.example.dance_community.exception.NotFoundException;
 import com.example.dance_community.repository.EventRepo;
@@ -23,27 +22,17 @@ public class EventService {
         this.eventRepo = eventRepo;
     }
 
-    public EventDto createEvent(Long userId, EventUpdateRequest eventUpdateRequest) {
+    public EventResponse createEvent(Long userId, EventCreateRequest eventCreateRequest) {
         try {
-            Event newEvent = Event.builder()
+            Event newEvent = eventCreateRequest.to();
+            newEvent = newEvent.toBuilder()
                     .userId(userId)
-                    .scope(Scope.valueOf(eventUpdateRequest.getScope()))
-                    .type(EventType.valueOf(eventUpdateRequest.getType()))
-                    .clubId(eventUpdateRequest.getClubId())
-                    .title(eventUpdateRequest.getTitle())
-                    .content(eventUpdateRequest.getContent())
-                    .tags(eventUpdateRequest.getTags())
-                    .images(eventUpdateRequest.getImages())
-                    .location(eventUpdateRequest.getLocation())
-                    .capacity(eventUpdateRequest.getCapacity())
-                    .startsAt(eventUpdateRequest.getStartsAt())
-                    .endsAt(eventUpdateRequest.getEndsAt())
+                    .currentParticipants(0L)
                     .createdAt(LocalDateTime.now())
                     .updatedAt(LocalDateTime.now())
                     .build();
-
             Event savedEvent = eventRepo.saveEvent(newEvent);
-            return savedEvent.toDto();
+            return EventResponse.from(savedEvent);
         } catch (IllegalArgumentException e) {
             throw new InvalidRequestException("잘못된 요청 데이터");
         } catch (Exception e) {
@@ -51,60 +40,36 @@ public class EventService {
         }
     }
 
-    public EventDto getEvent(Long eventId) {
+    public EventResponse getEvent(Long eventId) {
         Event event = eventRepo.findById(eventId)
                 .orElseThrow(() -> new NotFoundException("행사 조회 실패"));
-        return event.toDto();
+        return EventResponse.from(event);
     }
 
-    public List<EventDto> getEvents() {
+    public List<EventResponse> getEvents() {
         try {
             // 구현 이유 : 코드 유연성과 재사용성 / 나중에 일부 필드만 담은 dto만 필요할 때 유연한 구조
             List<Event> events = eventRepo.findAll();
-            return events.stream().map(Event::toDto).toList();
+            return events.stream().map((event)->EventResponse.from(event)).toList();
         } catch (Exception e) {
             throw new RuntimeException("행사 전체 조회 실패");
         }
     }
 
-    public EventDto updateEvent(Long eventId, EventUpdateRequest eventUpdateRequest) {
+    public EventResponse updateEvent(Long eventId, EventUpdateRequest eventUpdateRequest) {
         Event event = eventRepo.findById(eventId)
                 .orElseThrow(() -> new NotFoundException("행사 조회 실패"));
 
         try {
-            if (eventUpdateRequest.getScope() != null) {
-                event.setScope(Scope.valueOf(eventUpdateRequest.getScope()));
-            }
-            if (eventUpdateRequest.getType() != null) {
-                event.setType(EventType.valueOf(eventUpdateRequest.getType()));
-            }
-            if (eventUpdateRequest.getTitle() != null) {
-                event.setTitle(eventUpdateRequest.getTitle());
-            }
-            if (eventUpdateRequest.getContent() != null) {
-                event.setContent(eventUpdateRequest.getContent());
-            }
-            if (eventUpdateRequest.getTags() != null) {
-                event.setTags(eventUpdateRequest.getTags());
-            }
-            if (eventUpdateRequest.getImages() != null) {
-                event.setImages(eventUpdateRequest.getImages());
-            }
-            if (eventUpdateRequest.getLocation() != null) {
-                event.setLocation(eventUpdateRequest.getLocation());
-            }
-            if (eventUpdateRequest.getCapacity() != null) {
-                event.setCapacity(eventUpdateRequest.getCapacity());
-            }
-            if (eventUpdateRequest.getStartsAt() != null) {
-                event.setStartsAt(eventUpdateRequest.getStartsAt());
-            }
-            if (eventUpdateRequest.getEndsAt() != null) {
-                event.setEndsAt(eventUpdateRequest.getEndsAt());
-            }
-            event.setUpdatedAt(LocalDateTime.now());
+            event.updateDetails(eventUpdateRequest.title(), eventUpdateRequest.content(),
+                    eventUpdateRequest.tags(), eventUpdateRequest.images());
+            event.updateLocation(eventUpdateRequest.locationName(), eventUpdateRequest.locationAddress(),
+                    eventUpdateRequest.locationLink());
+            event.updateCapacity(eventUpdateRequest.capacity());
+            event.updateSchedule(eventUpdateRequest.startsAt(), eventUpdateRequest.endsAt());
+            event.updateTime();
 
-            return eventRepo.saveEvent(event).toDto();
+            return EventResponse.from(event);
         } catch (IllegalArgumentException e) {
             throw new InvalidRequestException("잘못된 요청 데이터");
         } catch (Exception e) {
