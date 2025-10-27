@@ -4,6 +4,7 @@ import com.example.dance_community.dto.event.EventCreateRequest;
 import com.example.dance_community.dto.event.EventResponse;
 import com.example.dance_community.dto.event.EventUpdateRequest;
 import com.example.dance_community.entity.Event;
+import com.example.dance_community.exception.ConflictException;
 import com.example.dance_community.exception.InvalidRequestException;
 import com.example.dance_community.exception.NotFoundException;
 import com.example.dance_community.repository.EventRepo;
@@ -20,6 +21,11 @@ public class EventService {
     @Autowired
     public EventService(EventRepo eventRepo) {
         this.eventRepo = eventRepo;
+    }
+
+    private Event checkEventExists(Long eventId) {
+        return eventRepo.findById(eventId)
+                .orElseThrow(() -> new NotFoundException("행사 조회 실패"));
     }
 
     public EventResponse createEvent(Long userId, EventCreateRequest eventCreateRequest) {
@@ -41,8 +47,7 @@ public class EventService {
     }
 
     public EventResponse getEvent(Long eventId) {
-        Event event = eventRepo.findById(eventId)
-                .orElseThrow(() -> new NotFoundException("행사 조회 실패"));
+        Event event = this.checkEventExists(eventId);
         return EventResponse.from(event);
     }
 
@@ -57,8 +62,7 @@ public class EventService {
     }
 
     public EventResponse updateEvent(Long eventId, EventUpdateRequest eventUpdateRequest) {
-        Event event = eventRepo.findById(eventId)
-                .orElseThrow(() -> new NotFoundException("행사 조회 실패"));
+        Event event = this.checkEventExists(eventId);
 
         try {
             event.updateDetails(eventUpdateRequest.title(), eventUpdateRequest.content(),
@@ -78,9 +82,32 @@ public class EventService {
     }
 
     public void deleteEvent(Long eventId) {
-        eventRepo.findById(eventId)
-                .orElseThrow(() -> new NotFoundException("행사 삭제 실패"));
-
+        this.checkEventExists(eventId);
         eventRepo.deleteById(eventId);
+    }
+
+    public void validateCanRegister(Long eventId) {
+        Event event = this.checkEventExists(eventId);
+
+        if (event.getCapacity() != null &&
+                event.getCurrentParticipants() >= event.getCapacity()) {
+            throw new ConflictException("행사 정원 초과");
+        }
+
+        // TODO: 추가 검증 추가(행사 시작 전 파악/취소 행사 파악 등)
+    }
+
+    public void incrementParticipants(Long eventId) {
+        Event event = this.checkEventExists(eventId);
+
+        event.incrementParticipants();
+        eventRepo.saveEvent(event);
+    }
+
+    public void decrementParticipants(Long eventId) {
+        Event event = this.checkEventExists(eventId);
+
+        event.decrementParticipants();
+        eventRepo.saveEvent(event);
     }
 }
