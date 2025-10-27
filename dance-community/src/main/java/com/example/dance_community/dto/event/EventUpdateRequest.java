@@ -1,13 +1,11 @@
 package com.example.dance_community.dto.event;
 
 import com.example.dance_community.entity.Event;
-import com.example.dance_community.validation.ValidScopeTypeEvent;
 import jakarta.validation.constraints.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-@ValidScopeTypeEvent
 public record EventUpdateRequest(
         // Details
         @NotBlank(message = "행사 제목 미입력")

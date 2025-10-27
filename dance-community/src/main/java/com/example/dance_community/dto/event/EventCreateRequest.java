@@ -5,12 +5,10 @@ import com.example.dance_community.enums.Scope;
 import com.example.dance_community.validation.ValidScopeTypeEvent;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.Builder;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Builder(toBuilder = true)
 @ValidScopeTypeEvent
 public record EventCreateRequest(
         // Classification(수정 불가)

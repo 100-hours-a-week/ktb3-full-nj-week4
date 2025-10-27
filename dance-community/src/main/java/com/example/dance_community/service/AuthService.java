@@ -1,10 +1,9 @@
 package com.example.dance_community.service;
 
 import com.example.dance_community.dto.auth.*;
-import com.example.dance_community.dto.user.UserDto;
+import com.example.dance_community.entity.User;
 import com.example.dance_community.exception.AuthException;
 import com.example.dance_community.exception.ConflictException;
-import com.example.dance_community.exception.NotFoundException;
 import com.example.dance_community.repository.UserRepo;
 import com.example.dance_community.jwt.JwtUtil;
 import org.mindrot.jbcrypt.BCrypt;
@@ -27,18 +26,19 @@ public class AuthService {
             throw new ConflictException("이메일 중복");
         }
 
-        UserDto createUser = UserDto.builder()
+        User user = User.builder()
                 .email(signupRequest.getEmail())
-                .password(BCrypt.hashpw(signupRequest.getPassword(), BCrypt.gensalt()))
+                .password(signupRequest.getPassword())
                 .username(signupRequest.getUsername())
                 .build();
+        user.hashedPassword();
 
-        UserDto newUser = userRepo.saveUser(createUser);
+        User newUser = userRepo.saveUser(user);
         return new AuthDto(newUser.getUserId());
     }
 
     public AuthDto login(LoginRequest loginRequest) {
-        UserDto user = userRepo.findByEmail(loginRequest.getEmail())
+        User user = userRepo.findByEmail(loginRequest.getEmail())
                 .orElseThrow(() -> new AuthException("등록되지 않은 이메일"));
 
         if (!BCrypt.checkpw(loginRequest.getPassword(), user.getPassword())) {

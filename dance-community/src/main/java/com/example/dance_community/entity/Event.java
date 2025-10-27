@@ -1,6 +1,5 @@
 package com.example.dance_community.entity;
 
-import com.example.dance_community.dto.event.EventCreateRequest;
 import com.example.dance_community.enums.EventType;
 import com.example.dance_community.enums.Scope;
 import lombok.*;

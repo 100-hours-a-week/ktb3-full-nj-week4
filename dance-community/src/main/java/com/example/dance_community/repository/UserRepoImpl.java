@@ -1,8 +1,7 @@
 package com.example.dance_community.repository;
 
-import com.example.dance_community.dto.user.UserDto;
+import com.example.dance_community.entity.User;
 import jakarta.annotation.PostConstruct;
-import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
@@ -11,31 +10,30 @@ import java.util.concurrent.atomic.AtomicLong;
 
 @Repository
 public class UserRepoImpl implements UserRepo {
-    private final ConcurrentHashMap<Long, UserDto> idToUserMap = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<Long, User> idToUserMap = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, Long> emailToIdMap = new ConcurrentHashMap<>();
     private final static AtomicLong userIdGen = new AtomicLong(0);
 
     @PostConstruct
     public void initData() {
-        UserDto defaultUser = UserDto.builder()
+        User defaultUser = User.builder()
                 .email("user@example.com")
-                .password(BCrypt.hashpw("string", BCrypt.gensalt()))
+                .password("string")
                 .username("tester")
                 .build();
-
+        defaultUser.hashedPassword();
         this.saveUser(defaultUser);
     }
 
     @Override
-    public UserDto saveUser(UserDto userDto){
-        if(userDto.getUserId() == null){
-            userDto = userDto.toBuilder()
-                    .userId(userIdGen.incrementAndGet())
-                    .build();
+    public User saveUser(User user){
+        if(user.getUserId() == null){
+            Long id = userIdGen.incrementAndGet();
+            user = user.toBuilder().userId(id).build();
         }
-        idToUserMap.put(userDto.getUserId(), userDto);
-        emailToIdMap.put(userDto.getEmail(),userDto.getUserId());
-        return userDto;
+        idToUserMap.put(user.getUserId(), user);
+        emailToIdMap.put(user.getEmail(), user.getUserId());
+        return user;
     }
 
     @Override
@@ -44,20 +42,20 @@ public class UserRepoImpl implements UserRepo {
     }
 
     @Override
-    public Optional<UserDto> findById(Long userId){
+    public Optional<User> findById(Long userId){
         return Optional.ofNullable(idToUserMap.get(userId));
     }
 
     @Override
-    public Optional<UserDto> findByEmail(String email) {
+    public Optional<User> findByEmail(String email) {
         Long userId = emailToIdMap.get(email);
-        if (userId == null) return Optional.empty();
+        if (userId == null) return null;
         return findById(userId);
     }
 
     @Override
     public void deleteUser(Long userId) {
-        UserDto removedUser = idToUserMap.remove(userId);
+        User removedUser = idToUserMap.remove(userId);
         if (removedUser != null) {
             emailToIdMap.remove(removedUser.getEmail());
         }

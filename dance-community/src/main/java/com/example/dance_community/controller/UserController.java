@@ -1,8 +1,9 @@
 package com.example.dance_community.controller;
 
 import com.example.dance_community.dto.ApiResponse;
-import com.example.dance_community.dto.user.UserDto;
-import com.example.dance_community.dto.user.UserRequest;
+import com.example.dance_community.dto.user.UserCreateRequest;
+import com.example.dance_community.dto.user.UserResponse;
+import com.example.dance_community.dto.user.UserUpdateRequest;
 import com.example.dance_community.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -21,23 +22,23 @@ public class UserController {
 
     @Operation(summary = "내 정보 조회", description = "사용자의 정보를 불러옵니다.")
     @GetMapping("/me")
-    public ResponseEntity<ApiResponse<UserDto>> getUser(HttpServletRequest request) {
-        UserDto userDto = userService.getUserById(Long.valueOf((String) request.getAttribute("userId")));
-        return ResponseEntity.ok(new ApiResponse<>("내 정보 조회 성공", userDto));
+    public ResponseEntity<ApiResponse<UserResponse>> getUser(HttpServletRequest request) {
+        UserResponse userResponse = userService.getUserById(Long.valueOf((String) request.getAttribute("userId")));
+        return ResponseEntity.ok(new ApiResponse<>("내 정보 조회 성공", userResponse));
     }
 
     @Operation(summary = "회원 정보 조회", description = "회원 id를 통해 정보를 불러옵니다.")
     @GetMapping("/{userId}")
-    public ResponseEntity<ApiResponse<UserDto>> getUser(@PathVariable Long userId) {
-        UserDto userDto = userService.getUserById(userId);
-        return ResponseEntity.ok(new ApiResponse<>("회원 정보 조회 성공", userDto));
+    public ResponseEntity<ApiResponse<UserResponse>> getUser(@PathVariable Long userId) {
+        UserResponse userResponse = userService.getUserById(userId);
+        return ResponseEntity.ok(new ApiResponse<>("회원 정보 조회 성공", userResponse));
     }
 
     @Operation(summary = "내 정보 수정", description = "사용자 정보를 수정합니다.")
     @PatchMapping()
-    public ResponseEntity<ApiResponse<UserDto>> updateUser(HttpServletRequest request, @RequestBody UserRequest userRequest) {
-        UserDto userDto = userService.updateUser(Long.valueOf((String) request.getAttribute("userId")), userRequest);
-        return ResponseEntity.ok(new ApiResponse<>("회원 정보 조회 수정", userDto));
+    public ResponseEntity<ApiResponse<UserResponse>> updateUser(HttpServletRequest request, @RequestBody UserUpdateRequest userUpdateRequest) {
+        UserResponse userResponse = userService.updateUser(Long.valueOf((String) request.getAttribute("userId")), userUpdateRequest);
+        return ResponseEntity.ok(new ApiResponse<>("회원 정보 조회 수정", userResponse));
     }
 
     @Operation(summary = "탈퇴", description = "사용자 정보를 삭제합니다.")
