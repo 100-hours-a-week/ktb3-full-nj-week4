@@ -1,5 +1,6 @@
 package com.example.dance_community.controller;
 
+import com.example.dance_community.auth.GetUserId;
 import com.example.dance_community.dto.ApiResponse;
 import com.example.dance_community.dto.post.PostDto;
 import com.example.dance_community.dto.post.PostRequest;
@@ -24,8 +25,8 @@ public class PostController {
 
     @Operation(summary = "게시글 생성", description = "게시글을 새로 작성합니다.")
     @PostMapping()
-    public ResponseEntity<ApiResponse<PostDto>> createPost(HttpServletRequest request, @Valid @RequestBody PostRequest postRequest) {
-        PostDto postDto = postService.createPost(Long.valueOf((String) request.getAttribute("userId")), postRequest);
+    public ResponseEntity<ApiResponse<PostDto>> createPost(@GetUserId Long userId, @Valid @RequestBody PostRequest postRequest) {
+        PostDto postDto = postService.createPost(userId, postRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResponse<>("게시글 생성 성공", postDto));
     }
 

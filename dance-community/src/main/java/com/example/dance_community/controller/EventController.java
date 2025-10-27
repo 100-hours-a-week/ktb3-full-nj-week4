@@ -1,5 +1,6 @@
 package com.example.dance_community.controller;
 
+import com.example.dance_community.auth.GetUserId;
 import com.example.dance_community.dto.ApiResponse;
 import com.example.dance_community.dto.event.EventCreateRequest;
 import com.example.dance_community.dto.event.EventResponse;
@@ -25,8 +26,8 @@ public class EventController {
 
     @Operation(summary = "행사 생성", description = "행사를 새로 만듭니다.")
     @PostMapping()
-    public ResponseEntity<ApiResponse<EventResponse>> createEvent(HttpServletRequest request, @Valid @RequestBody EventCreateRequest eventCreateRequest) {
-        EventResponse eventResponse = eventService.createEvent(Long.valueOf((String) request.getAttribute("userId")), eventCreateRequest);
+    public ResponseEntity<ApiResponse<EventResponse>> createEvent(@GetUserId Long userId, @Valid @RequestBody EventCreateRequest eventCreateRequest) {
+        EventResponse eventResponse = eventService.createEvent(userId, eventCreateRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResponse<>("행사 생성 성공", eventResponse));
     }
 
@@ -44,7 +45,7 @@ public class EventController {
         return ResponseEntity.ok(new ApiResponse<>("행사 전체 조회 성공", eventResponseList));
     }
 
-    @Operation(summary = "내 행사 수정", description = "사용자의 행사 정보를 수정합니다.")
+    @Operation(summary = "행사 수정", description = "사용자의 행사 정보를 수정합니다.")
     @PatchMapping("/{eventId}")
     public ResponseEntity<ApiResponse<EventResponse>> updateEvent(@PathVariable Long eventId, @Valid @RequestBody EventUpdateRequest eventUpdateRequest) {
         EventResponse eventResponse = eventService.updateEvent(eventId, eventUpdateRequest);

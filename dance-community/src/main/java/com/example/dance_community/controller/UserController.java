@@ -1,5 +1,6 @@
 package com.example.dance_community.controller;
 
+import com.example.dance_community.auth.GetUserId;
 import com.example.dance_community.dto.ApiResponse;
 import com.example.dance_community.dto.user.UserCreateRequest;
 import com.example.dance_community.dto.user.UserResponse;
@@ -22,8 +23,8 @@ public class UserController {
 
     @Operation(summary = "내 정보 조회", description = "사용자의 정보를 불러옵니다.")
     @GetMapping("/me")
-    public ResponseEntity<ApiResponse<UserResponse>> getUser(HttpServletRequest request) {
-        UserResponse userResponse = userService.getUserById(Long.valueOf((String) request.getAttribute("userId")));
+    public ResponseEntity<ApiResponse<UserResponse>> getMe(@GetUserId Long userId) {
+        UserResponse userResponse = userService.getUserById(userId);
         return ResponseEntity.ok(new ApiResponse<>("내 정보 조회 성공", userResponse));
     }
 
@@ -36,16 +37,16 @@ public class UserController {
 
     @Operation(summary = "내 정보 수정", description = "사용자 정보를 수정합니다.")
     @PatchMapping()
-    public ResponseEntity<ApiResponse<UserResponse>> updateUser(HttpServletRequest request, @RequestBody UserUpdateRequest userUpdateRequest) {
-        UserResponse userResponse = userService.updateUser(Long.valueOf((String) request.getAttribute("userId")), userUpdateRequest);
+    public ResponseEntity<ApiResponse<UserResponse>> updateUser(@GetUserId Long userId, @RequestBody UserUpdateRequest userUpdateRequest) {
+        UserResponse userResponse = userService.updateUser(userId, userUpdateRequest);
         return ResponseEntity.ok(new ApiResponse<>("회원 정보 조회 수정", userResponse));
     }
 
     @Operation(summary = "탈퇴", description = "사용자 정보를 삭제합니다.")
     @DeleteMapping()
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public ResponseEntity<Object> deleteUser(HttpServletRequest request) {
-        userService.deleteCurrentUser(Long.valueOf((String) request.getAttribute("userId")));
+    public ResponseEntity<Object> deleteUser(@GetUserId Long userId) {
+        userService.deleteCurrentUser(userId);
         return ResponseEntity.noContent().build();
     }
 }

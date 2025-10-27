@@ -1,5 +1,6 @@
 package com.example.dance_community.controller;
 
+import com.example.dance_community.auth.GetUserId;
 import com.example.dance_community.dto.ApiResponse;
 import com.example.dance_community.dto.auth.*;
 import com.example.dance_community.service.AuthService;
@@ -35,8 +36,8 @@ public class AuthController {
 
     @Operation(summary = "토큰 재발급", description = "토큰이 만료됐을 때 재발급합니다.")
     @PostMapping("/refresh")
-    public ResponseEntity<ApiResponse<AuthDto>> refresh(HttpServletRequest request) {
-        AuthDto authDto = authService.refreshAccessToken(Long.valueOf((String) request.getAttribute("userId")));
+    public ResponseEntity<ApiResponse<AuthDto>> refresh(@GetUserId Long userId) {
+        AuthDto authDto = authService.refreshAccessToken(userId);
         return ResponseEntity.ok(new ApiResponse<>("토큰 재발급 성공", authDto));
     }
 }

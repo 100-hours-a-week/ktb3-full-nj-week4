@@ -38,7 +38,7 @@ public class JwtInterceptor implements HandlerInterceptor {
             throw new AuthException("사용자 인증 실패");
         }
 
-        req.setAttribute("userId", String.valueOf(userId));
+        req.setAttribute("userId", userId);
         return true;
     }
 }
