@@ -24,7 +24,7 @@ public class UserRepoImpl implements UserRepo {
     public User saveUser(User user){
         if(user.getUserId() == null){
             Long id = userIdGen.incrementAndGet();
-            user = user.toBuilder().userId(id).build();
+            //user = user.toBuilder().userId(id).build();
         }
         idToUserMap.put(user.getUserId(), user);
         emailToIdMap.put(user.getEmail(), user.getUserId());

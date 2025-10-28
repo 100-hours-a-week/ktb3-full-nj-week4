@@ -31,11 +31,12 @@ public class UserService {
         User user = userRepo.findById(userId)
                 .orElseThrow(() -> new NotFoundException("등록되지 않은 사용자"));
 
-        User updatedUser = user.toBuilder()
-                .password(userUpdateRequest.password() != null ? passwordEncoder.encode(userUpdateRequest.password()) : user.getPassword())
-                .username(userUpdateRequest.username() != null ? userUpdateRequest.username() : user.getUsername())
-                .profileImage(userUpdateRequest.profileImage() != null ? userUpdateRequest.profileImage() : user.getProfileImage())
-                .build();
+        User updatedUser = user.updateUser(
+                passwordEncoder.encode(userUpdateRequest.password()),
+                userUpdateRequest.username(),
+                userUpdateRequest.profileImage()
+        );
+
         return UserResponse.from(userRepo.saveUser(updatedUser));
     }
 
