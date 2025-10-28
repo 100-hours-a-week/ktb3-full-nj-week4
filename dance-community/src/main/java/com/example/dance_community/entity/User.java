@@ -39,7 +39,7 @@ public class User {
         if (password == null || password.isBlank()) throw new IllegalArgumentException("비밀번호 미입력");
         if (username == null || username.isBlank()) throw new IllegalArgumentException("사용자 이름 미입력");
         this.email = email;
-        this.password = hashedPassword(password);
+        this.password = password;
         this.username = username;
     }
 
@@ -49,11 +49,6 @@ public class User {
         if (profileImage != null) this.profileImage = profileImage;
 
         return this;
-    }
-
-    /// TODO : 서비스 계층으로 옮기기? 또는 유틸성 클래스 생성 또는 패스워드 암호화 전담 클래스 생성 또는 AOP 적용 또는 필터 적용 또는 인터셉터 적용
-    private String hashedPassword(String password) {
-        return BCrypt.hashpw(password, BCrypt.gensalt());
     }
 
     /// 5. 생성일/삭제여부 초기화 누락

@@ -1,6 +1,7 @@
 package com.example.dance_community.service;
 
 import com.example.dance_community.dto.auth.*;
+import com.example.dance_community.encoder.PasswordEncoder;
 import com.example.dance_community.entity.User;
 import com.example.dance_community.exception.AuthException;
 import com.example.dance_community.exception.ConflictException;
@@ -14,11 +15,13 @@ import org.springframework.stereotype.Service;
 public class AuthService {
     private final UserRepo userRepo;
     private final JwtUtil jwtUtil;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public AuthService(UserRepo userRepo, JwtUtil jwtUtil) {
+    public AuthService(UserRepo userRepo, JwtUtil jwtUtil, PasswordEncoder passwordEncoder) {
         this.userRepo = userRepo;
         this.jwtUtil = jwtUtil;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public AuthDto signup(SignupRequest signupRequest){
@@ -26,7 +29,8 @@ public class AuthService {
             throw new ConflictException("이메일 중복");
         }
 
-        User user = new User(signupRequest.getEmail(), signupRequest.getPassword(), signupRequest.getUsername());
+        String encodedPassword = passwordEncoder.encode(signupRequest.getPassword());
+        User user = new User(signupRequest.getEmail(), encodedPassword, signupRequest.getUsername());
         User newUser = userRepo.saveUser(user);
         return new AuthDto(newUser.getUserId());
     }
@@ -35,7 +39,9 @@ public class AuthService {
         User user = userRepo.findByEmail(loginRequest.getEmail())
                 .orElseThrow(() -> new AuthException("등록되지 않은 이메일"));
 
-        if (!BCrypt.checkpw(loginRequest.getPassword(), user.getPassword())) {
+        String encodedPassword = passwordEncoder.encode(loginRequest.getPassword());
+
+        if (!BCrypt.checkpw(encodedPassword, user.getPassword())) {
             throw new AuthException("비밀번호 미일치");
         }
 
