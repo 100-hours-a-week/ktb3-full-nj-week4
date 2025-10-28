@@ -26,13 +26,7 @@ public class AuthService {
             throw new ConflictException("이메일 중복");
         }
 
-        User user = User.builder()
-                .email(signupRequest.getEmail())
-                .password(signupRequest.getPassword())
-                .username(signupRequest.getUsername())
-                .build();
-        user.hashedPassword();
-
+        User user = new User(signupRequest.getEmail(), signupRequest.getPassword(), signupRequest.getUsername());
         User newUser = userRepo.saveUser(user);
         return new AuthDto(newUser.getUserId());
     }

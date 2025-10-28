@@ -16,12 +16,7 @@ public class UserRepoImpl implements UserRepo {
 
     @PostConstruct
     public void initData() {
-        User defaultUser = User.builder()
-                .email("user@example.com")
-                .password("string")
-                .username("tester")
-                .build();
-        defaultUser.hashedPassword();
+        User defaultUser = new User("user@example.com","string", "tester");
         this.saveUser(defaultUser);
     }
 

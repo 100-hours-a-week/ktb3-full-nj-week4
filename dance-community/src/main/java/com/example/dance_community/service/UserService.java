@@ -32,7 +32,6 @@ public class UserService {
                 .username(userUpdateRequest.username() != null ? userUpdateRequest.username() : user.getUsername())
                 .profileImage(userUpdateRequest.profileImage() != null ? userUpdateRequest.profileImage() : user.getProfileImage())
                 .build();
-        updatedUser.hashedPassword();
         return UserResponse.from(userRepo.saveUser(updatedUser));
     }
 
