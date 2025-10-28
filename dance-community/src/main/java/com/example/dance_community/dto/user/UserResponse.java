@@ -1,5 +1,7 @@
 package com.example.dance_community.dto.user;
 
+import com.example.dance_community.entity.User;
+
 import java.time.LocalDateTime;
 
 public record UserResponse(
@@ -7,13 +9,15 @@ public record UserResponse(
         String username,
         String profileImage,
         LocalDateTime createdAt,
-        Boolean isDeleted) {
-    public static UserResponse from(com.example.dance_community.entity.User entity) {
+        Boolean isDeleted
+) {
+    public static UserResponse from(User user) {
         return new UserResponse(
-                entity.getEmail(),
-                entity.getUsername(),
-                entity.getProfileImage(),
-                entity.getCreatedAt(),
-                entity.getIsDeleted()
+                user.getEmail(),
+                user.getUsername(),
+                user.getProfileImage(),
+                user.getCreatedAt(),
+                user.getIsDeleted()
         );
-}}
+    }
+}

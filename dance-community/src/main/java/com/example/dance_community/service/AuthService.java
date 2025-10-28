@@ -1,6 +1,7 @@
 package com.example.dance_community.service;
 
 import com.example.dance_community.dto.auth.*;
+import com.example.dance_community.dto.user.UserResponse;
 import com.example.dance_community.encoder.PasswordEncoder;
 import com.example.dance_community.entity.User;
 import com.example.dance_community.exception.AuthException;
@@ -19,33 +20,36 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
 
     @Transactional
-    public AuthDto signup(SignupRequest signupRequest){
-        if (userRepository.existsByEmail(signupRequest.getEmail())) {
+    public UserResponse signup(SignupRequest signupRequest){
+        if (userRepository.existsByEmail(signupRequest.email())) {
             throw new ConflictException("이메일 중복");
         }
-        User user = new User(signupRequest.getEmail(), passwordEncoder.encode(signupRequest.getPassword()), signupRequest.getUsername());
+        User user = new User(signupRequest.email(), passwordEncoder.encode(signupRequest.password()), signupRequest.username());
         User newUser = userRepository.save(user);
-        return new AuthDto(newUser.getUserId());
+        return UserResponse.from(newUser);
     }
 
-    public AuthDto login(LoginRequest loginRequest) {
-        User user = userRepository.findByEmail(loginRequest.getEmail())
+    public AuthResponse login(LoginRequest loginRequest) {
+        User user = userRepository.findByEmail(loginRequest.email())
                 .orElseThrow(() -> new AuthException("등록되지 않은 이메일"));
 
-        if (!passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
+        if (!passwordEncoder.matches(loginRequest.password(), user.getPassword())) {
             throw new AuthException("비밀번호 미일치");
         }
 
         String accessToken = jwtUtil.generateAccessToken(user.getUserId());
         String refreshToken = jwtUtil.generateRefreshToken(user.getUserId());
 
-        return new AuthDto(user.getUserId(), accessToken, refreshToken);
+        return new AuthResponse(UserResponse.from(user), accessToken, refreshToken);
     }
 
-    public AuthDto refreshAccessToken(Long userId) {
+    public AuthResponse refreshAccessToken(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new AuthException("등록되지 않은 사용자"));
+
         String newAccessToken = jwtUtil.generateAccessToken(userId);
         String newRefreshToken = jwtUtil.generateRefreshToken(userId);
 
-        return new AuthDto(userId, newAccessToken, newRefreshToken);
+        return new AuthResponse(UserResponse.from(user), newAccessToken, newRefreshToken);
     }
 }
