@@ -1,7 +1,7 @@
 package com.example.dance_community.jwt;
 
 import com.example.dance_community.exception.AuthException;
-import com.example.dance_community.repository.UserRepo;
+import com.example.dance_community.repository.in_memory.UserRepo;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.stereotype.Component;

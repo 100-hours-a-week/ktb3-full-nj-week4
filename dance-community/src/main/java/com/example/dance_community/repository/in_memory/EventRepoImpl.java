@@ -1,4 +1,4 @@
-package com.example.dance_community.repository;
+package com.example.dance_community.repository.in_memory;
 
 import com.example.dance_community.entity.Event;
 import com.example.dance_community.enums.EventType;

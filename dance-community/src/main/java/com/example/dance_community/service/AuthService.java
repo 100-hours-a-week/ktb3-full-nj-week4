@@ -5,43 +5,34 @@ import com.example.dance_community.encoder.PasswordEncoder;
 import com.example.dance_community.entity.User;
 import com.example.dance_community.exception.AuthException;
 import com.example.dance_community.exception.ConflictException;
-import com.example.dance_community.repository.UserRepo;
 import com.example.dance_community.jwt.JwtUtil;
-import org.mindrot.jbcrypt.BCrypt;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.dance_community.repository.jpa.UserRepository;
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class AuthService {
-    private final UserRepo userRepo;
+    private final UserRepository userRepository;
     private final JwtUtil jwtUtil;
     private final PasswordEncoder passwordEncoder;
 
-    @Autowired
-    public AuthService(UserRepo userRepo, JwtUtil jwtUtil, PasswordEncoder passwordEncoder) {
-        this.userRepo = userRepo;
-        this.jwtUtil = jwtUtil;
-        this.passwordEncoder = passwordEncoder;
-    }
-
+    @Transactional
     public AuthDto signup(SignupRequest signupRequest){
-        if (userRepo.findByEmail(signupRequest.getEmail()).isPresent()){
+        if (userRepository.existsByEmail(signupRequest.getEmail())) {
             throw new ConflictException("이메일 중복");
         }
-
-        String encodedPassword = passwordEncoder.encode(signupRequest.getPassword());
-        User user = new User(signupRequest.getEmail(), encodedPassword, signupRequest.getUsername());
-        User newUser = userRepo.saveUser(user);
+        User user = new User(signupRequest.getEmail(), passwordEncoder.encode(signupRequest.getPassword()), signupRequest.getUsername());
+        User newUser = userRepository.save(user);
         return new AuthDto(newUser.getUserId());
     }
 
     public AuthDto login(LoginRequest loginRequest) {
-        User user = userRepo.findByEmail(loginRequest.getEmail())
+        User user = userRepository.findByEmail(loginRequest.getEmail())
                 .orElseThrow(() -> new AuthException("등록되지 않은 이메일"));
 
-        String encodedPassword = passwordEncoder.encode(loginRequest.getPassword());
-
-        if (!BCrypt.checkpw(encodedPassword, user.getPassword())) {
+        if (!passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
             throw new AuthException("비밀번호 미일치");
         }
 

@@ -3,7 +3,7 @@ package com.example.dance_community.service;
 import com.example.dance_community.dto.registration.RegistrationDto;
 import com.example.dance_community.exception.ConflictException;
 import com.example.dance_community.exception.NotFoundException;
-import com.example.dance_community.repository.RegistrationRepo;
+import com.example.dance_community.repository.in_memory.RegistrationRepo;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

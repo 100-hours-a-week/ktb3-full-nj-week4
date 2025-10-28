@@ -7,7 +7,7 @@ import com.example.dance_community.entity.Event;
 import com.example.dance_community.exception.ConflictException;
 import com.example.dance_community.exception.InvalidRequestException;
 import com.example.dance_community.exception.NotFoundException;
-import com.example.dance_community.repository.EventRepo;
+import com.example.dance_community.repository.in_memory.EventRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
