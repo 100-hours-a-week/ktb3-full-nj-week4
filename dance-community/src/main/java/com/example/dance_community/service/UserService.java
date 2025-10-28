@@ -36,7 +36,7 @@ public class UserService {
     @Transactional
     public void deleteCurrentUser(Long userId) {
         User user = this.getUserEntityById(userId);
-        user.deleteUser();
+        user.delete();
     }
 
     private User getUserEntityById(Long userId) {
