@@ -2,7 +2,6 @@ package com.example.dance_community.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.mindrot.jbcrypt.BCrypt;
 import java.time.LocalDateTime;
 
 @Entity
@@ -10,7 +9,7 @@ import java.time.LocalDateTime;
 @Builder(toBuilder = true)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-@Table(name = "user")
+@Table(name = "users")
 public class User {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userId;
@@ -33,7 +32,6 @@ public class User {
     @Column(nullable = false)
     private Boolean isDeleted;
 
-    /// 유효성 검사 어디서 할지? 서비스? 레포?
     public User(String email, String password, String username) {
         if (email == null || email.isBlank()) throw new IllegalArgumentException("이메일 미입력");
         if (password == null || password.isBlank()) throw new IllegalArgumentException("비밀번호 미입력");
@@ -41,6 +39,8 @@ public class User {
         this.email = email;
         this.password = password;
         this.username = username;
+        this.createdAt = LocalDateTime.now();
+        this.isDeleted = false;
     }
 
     /// TODO : 유효성 검사 서비스 계층으로 옮기기?

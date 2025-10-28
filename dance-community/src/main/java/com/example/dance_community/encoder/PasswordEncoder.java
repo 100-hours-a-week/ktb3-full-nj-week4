@@ -1,9 +1,6 @@
 package com.example.dance_community.encoder;
 
-import org.mindrot.jbcrypt.BCrypt;
-
-public class PasswordEncoder {
-    public static String encode(String password) {
-        return BCrypt.hashpw(password, BCrypt.gensalt());
-    }
+public interface PasswordEncoder {
+    String encode(String rawPassword);
+    boolean matches(String rawPassword, String encodedPassword);
 }
