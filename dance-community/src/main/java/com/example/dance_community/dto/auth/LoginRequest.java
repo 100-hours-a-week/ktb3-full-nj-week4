@@ -1,27 +1,14 @@
 package com.example.dance_community.dto.auth;
 
+import jakarta.validation.constraints.*;
+import lombok.Getter;
+
+@Getter
 public class LoginRequest {
+    @Email(message = "이메일 형식 오류")
+    @NotBlank(message = "이메일 미입력")
     private String email;
+
+    @NotBlank(message = "비밀번호 미입력")
     private String password;
-
-    public LoginRequest() {
-    }
-    public LoginRequest(String email, String password) {
-        this.email = email;
-        this.password = password;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-    public void setPassword(String password) {
-        this.password = password;
-    }
 }
