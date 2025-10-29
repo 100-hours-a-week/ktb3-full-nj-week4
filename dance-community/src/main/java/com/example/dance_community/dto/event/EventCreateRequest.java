@@ -1,7 +1,7 @@
 package com.example.dance_community.dto.event;
 
-import com.example.dance_community.enums.EventType;
-import com.example.dance_community.enums.Scope;
+import com.example.dance_community.entity.enums.EventType;
+import com.example.dance_community.entity.enums.Scope;
 import com.example.dance_community.validation.ValidScopeTypeEvent;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

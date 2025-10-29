@@ -1,7 +1,7 @@
 package com.example.dance_community.dto.event;
 
-import com.example.dance_community.enums.EventType;
-import com.example.dance_community.enums.Scope;
+import com.example.dance_community.entity.enums.EventType;
+import com.example.dance_community.entity.enums.Scope;
 
 import java.time.LocalDateTime;
 import java.util.List;

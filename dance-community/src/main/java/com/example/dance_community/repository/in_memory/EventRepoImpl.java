@@ -1,8 +1,8 @@
 package com.example.dance_community.repository.in_memory;
 
 import com.example.dance_community.entity.Event;
-import com.example.dance_community.enums.EventType;
-import com.example.dance_community.enums.Scope;
+import com.example.dance_community.entity.enums.EventType;
+import com.example.dance_community.entity.enums.Scope;
 import jakarta.annotation.PostConstruct;
 import org.springframework.stereotype.Repository;
 
