@@ -11,7 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 @Repository
-public class PostRepository{
+public class PostRepoImpl implements PostRepo{
     private final Map<Long, PostDto> postMap = new ConcurrentHashMap<>();
     private final AtomicLong postId = new AtomicLong(0);
 
@@ -32,6 +32,7 @@ public class PostRepository{
         this.savePost(defaultPost);
     }
 
+    @Override
     public PostDto savePost(PostDto postDto) {
         if (postDto.getPostId() == null) {
             postDto = postDto.toBuilder()
@@ -43,14 +44,17 @@ public class PostRepository{
         return postDto;
     }
 
+    @Override
     public Optional<PostDto> findById(Long postId) {
         return Optional.ofNullable(postMap.get(postId));
     }
 
+    @Override
     public List<PostDto> findAll() {
         return new ArrayList<>(postMap.values());
     }
 
+    @Override
     public void deleteById(Long id) {
         postMap.remove(id);
     }

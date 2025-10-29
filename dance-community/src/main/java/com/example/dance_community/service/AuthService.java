@@ -1,44 +1,44 @@
 package com.example.dance_community.service;
 
 import com.example.dance_community.dto.auth.*;
-import com.example.dance_community.dto.user.UserDto;
+import com.example.dance_community.entity.User;
 import com.example.dance_community.exception.AuthException;
 import com.example.dance_community.exception.ConflictException;
-import com.example.dance_community.exception.NotFoundException;
-import com.example.dance_community.repository.UserRepository;
+import com.example.dance_community.repository.UserRepo;
 import com.example.dance_community.jwt.JwtUtil;
 import org.mindrot.jbcrypt.BCrypt;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class AuthService {
-    private final UserRepository userRepository;
+    private final UserRepo userRepo;
     private final JwtUtil jwtUtil;
 
-    public AuthService(UserRepository userRepository, JwtUtil jwtUtil) {
-        this.userRepository = userRepository;
+    @Autowired
+    public AuthService(UserRepo userRepo, JwtUtil jwtUtil) {
+        this.userRepo = userRepo;
         this.jwtUtil = jwtUtil;
     }
 
-
-
     public AuthDto signup(SignupRequest signupRequest){
-        if (userRepository.findByEmail(signupRequest.getEmail()).isPresent()){
+        if (userRepo.findByEmail(signupRequest.getEmail()).isPresent()){
             throw new ConflictException("이메일 중복");
         }
 
-        UserDto user = UserDto.builder()
+        User user = User.builder()
                 .email(signupRequest.getEmail())
-                .password(BCrypt.hashpw(signupRequest.getPassword(), BCrypt.gensalt()))
+                .password(signupRequest.getPassword())
                 .username(signupRequest.getUsername())
                 .build();
+        user.hashedPassword();
 
-        userRepository.saveUser(user);
-        return new AuthDto(user.getUserId());
+        User newUser = userRepo.saveUser(user);
+        return new AuthDto(newUser.getUserId());
     }
 
     public AuthDto login(LoginRequest loginRequest) {
-        UserDto user = userRepository.findByEmail(loginRequest.getEmail())
+        User user = userRepo.findByEmail(loginRequest.getEmail())
                 .orElseThrow(() -> new AuthException("등록되지 않은 이메일"));
 
         if (!BCrypt.checkpw(loginRequest.getPassword(), user.getPassword())) {
@@ -52,10 +52,6 @@ public class AuthService {
     }
 
     public AuthDto refreshAccessToken(Long userId) {
-        if (userRepository.findById(userId).isEmpty()) {
-            throw new NotFoundException("사용자 인증 실패");
-        }
-
         String newAccessToken = jwtUtil.generateAccessToken(userId);
         String newRefreshToken = jwtUtil.generateRefreshToken(userId);
 

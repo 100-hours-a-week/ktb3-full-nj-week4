@@ -1,11 +1,19 @@
 package com.example.dance_community.dto.user;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import java.time.LocalDateTime;
 
-@Getter
-@AllArgsConstructor
-public class UserResponse {
-    private String message;
-    private UserDto data;
-}
+public record UserResponse(
+        String email,
+        String username,
+        String profileImage,
+        LocalDateTime createdAt,
+        Boolean isDeleted) {
+    public static UserResponse from(com.example.dance_community.entity.User entity) {
+        return new UserResponse(
+                entity.getEmail(),
+                entity.getUsername(),
+                entity.getProfileImage(),
+                entity.getCreatedAt(),
+                entity.getIsDeleted()
+        );
+}}

@@ -1,53 +1,42 @@
 package com.example.dance_community.service;
 
-import com.example.dance_community.dto.user.UserDto;
-import com.example.dance_community.dto.user.UserRequest;
-import com.example.dance_community.exception.InvalidRequestException;
+import com.example.dance_community.dto.user.UserResponse;
+import com.example.dance_community.dto.user.UserUpdateRequest;
+import com.example.dance_community.entity.User;
 import com.example.dance_community.exception.NotFoundException;
-import com.example.dance_community.repository.UserRepository;
-import org.mindrot.jbcrypt.BCrypt;
+import com.example.dance_community.repository.UserRepo;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 
 @Service
 public class UserService {
-    private final UserRepository userRepository;
+    private final UserRepo userRepo;
 
-    public UserService(UserRepository userRepository) {
-        this.userRepository = userRepository;
+    @Autowired
+    public UserService(UserRepo userRepo) {
+        this.userRepo = userRepo;
     }
 
-    private UserDto getUser(Long userId) {
-        return userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException("사용자 인증 실패"));
+    public UserResponse getUserById(Long userId) {
+        User user = userRepo.findById(userId)
+                .orElseThrow(() -> new NotFoundException("등록되지 않은 사용자"));
+        return UserResponse.from(user);
     }
 
-    public UserDto getUserById(Long userId) {
-        return UserDto.changePassword(getUser(userId));
-    }
-
-    public UserDto updateUser(Long userId, UserRequest userRequest) {
-        UserDto userDto = getUser(userId);
-
-        String newPassword = userRequest.getPassword() != null
-                ? BCrypt.hashpw(userRequest.getPassword(), BCrypt.gensalt())
-                : userDto.getPassword();
-
-        UserDto updatedUser = userDto.toBuilder()
-                .password(newPassword)
-                .username(userRequest.getUsername() != null ? userRequest.getUsername() : userDto.getUsername())
-                .clubId(userRequest.getClubId() != null ? userRequest.getClubId() : userDto.getClubId())
-                .profileImage(userRequest.getProfileImage() != null ? userRequest.getProfileImage() : userDto.getProfileImage())
+    public UserResponse updateUser(Long userId, UserUpdateRequest userUpdateRequest) {
+        User user = userRepo.findById(userId)
+                .orElseThrow(() -> new NotFoundException("등록되지 않은 사용자"));
+        User updatedUser = user.toBuilder()
+                .password(userUpdateRequest.password() != null ? userUpdateRequest.password() : user.getPassword())
+                .username(userUpdateRequest.username() != null ? userUpdateRequest.username() : user.getUsername())
+                .profileImage(userUpdateRequest.profileImage() != null ? userUpdateRequest.profileImage() : user.getProfileImage())
                 .build();
-
-        userRepository.saveUser(updatedUser);
-        return UserDto.changePassword(updatedUser);
+        updatedUser.hashedPassword();
+        return UserResponse.from(userRepo.saveUser(updatedUser));
     }
 
     public void deleteCurrentUser(Long userId) {
-        getUser(userId);
-        userRepository.deleteUser(userId);
+        userRepo.deleteUser(userId);
     }
 }
-
-
-//TODO : @Transactional 반영하기 서비스에서만 쓰는건지? 수정? 삭제?

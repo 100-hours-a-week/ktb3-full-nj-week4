@@ -9,7 +9,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Repository
-public class RegistrationRepository {
+public class RegistrationRepoImpl implements RegistrationRepo{
     private final Map<Long, Map<Long, RegistrationDto>> userRegistrationMap = new ConcurrentHashMap<>();
     private final Map<Long, Map<Long, RegistrationDto>> eventRegistrationMap = new ConcurrentHashMap<>();
 
@@ -25,6 +25,7 @@ public class RegistrationRepository {
         this.saveRegistration(newRegistration);
     }
 
+    @Override
     public RegistrationDto saveRegistration(RegistrationDto dto) {
         userRegistrationMap.computeIfAbsent(dto.getUserId(), k -> new ConcurrentHashMap<>())
                 .put(dto.getEventId(), dto);
@@ -33,16 +34,20 @@ public class RegistrationRepository {
         return dto;
     }
 
+    @Override
     public Optional<RegistrationDto> findRegistration(Long userId, Long eventId) {
-        Map<Long, RegistrationDto> map = userRegistrationMap.get(userId);
-        return Optional.ofNullable(map.get(eventId));
+        return Optional.ofNullable(
+                userRegistrationMap.getOrDefault(userId, Collections.emptyMap()).get(eventId)
+        );
     }
 
+    @Override
     public List<RegistrationDto> findEventsByUser(Long userId) {
         Collection<RegistrationDto> values = userRegistrationMap.getOrDefault(userId, Collections.emptyMap()).values();
         return new ArrayList<>(values);
     }
 
+    @Override
     public List<RegistrationDto> findUsersByEvent(Long eventId) {
         Collection<RegistrationDto> values = eventRegistrationMap.getOrDefault(eventId, Collections.emptyMap()).values();
         return new ArrayList<>(values);

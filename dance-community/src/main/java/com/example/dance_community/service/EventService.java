@@ -1,12 +1,14 @@
 package com.example.dance_community.service;
 
-import com.example.dance_community.dto.event.EventDto;
-import com.example.dance_community.dto.event.EventRequest;
-import com.example.dance_community.enums.EventType;
-import com.example.dance_community.enums.Scope;
+import com.example.dance_community.dto.event.EventCreateRequest;
+import com.example.dance_community.dto.event.EventResponse;
+import com.example.dance_community.dto.event.EventUpdateRequest;
+import com.example.dance_community.entity.Event;
+import com.example.dance_community.exception.ConflictException;
 import com.example.dance_community.exception.InvalidRequestException;
 import com.example.dance_community.exception.NotFoundException;
-import com.example.dance_community.repository.EventRepository;
+import com.example.dance_community.repository.EventRepo;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -14,32 +16,29 @@ import java.util.List;
 
 @Service
 public class EventService {
-    private final EventRepository eventRepository;
+    private final EventRepo eventRepo;
 
-    public EventService(EventRepository eventRepository) {
-        this.eventRepository = eventRepository;
+    @Autowired
+    public EventService(EventRepo eventRepo) {
+        this.eventRepo = eventRepo;
     }
 
-    public EventDto createEvent(Long userId, EventRequest eventRequest) {
+    private Event checkEventExists(Long eventId) {
+        return eventRepo.findById(eventId)
+                .orElseThrow(() -> new NotFoundException("행사 조회 실패"));
+    }
+
+    public EventResponse createEvent(Long userId, EventCreateRequest eventCreateRequest) {
         try {
-            EventDto newEvent = EventDto.builder()
+            Event newEvent = eventCreateRequest.to();
+            newEvent = newEvent.toBuilder()
                     .userId(userId)
-                    .scope(Scope.valueOf(eventRequest.getScope()))
-                    .type(EventType.valueOf(eventRequest.getType()))
-                    .clubId(eventRequest.getClubId())
-                    .title(eventRequest.getTitle())
-                    .content(eventRequest.getContent())
-                    .tags(eventRequest.getTags())
-                    .images(eventRequest.getImages())
-                    .location(eventRequest.getLocation())
-                    .capacity(eventRequest.getCapacity())
-                    .startsAt(eventRequest.getStartsAt())
-                    .endsAt(eventRequest.getEndsAt())
+                    .currentParticipants(0L)
                     .createdAt(LocalDateTime.now())
                     .updatedAt(LocalDateTime.now())
                     .build();
-
-            return eventRepository.saveEvent(newEvent);
+            Event savedEvent = eventRepo.saveEvent(newEvent);
+            return EventResponse.from(savedEvent);
         } catch (IllegalArgumentException e) {
             throw new InvalidRequestException("잘못된 요청 데이터");
         } catch (Exception e) {
@@ -47,42 +46,34 @@ public class EventService {
         }
     }
 
-    public EventDto getEvent(Long eventId) {
-        return eventRepository.findById(eventId)
-                .orElseThrow(() -> new NotFoundException("행사 조회 실패"));
+    public EventResponse getEvent(Long eventId) {
+        Event event = this.checkEventExists(eventId);
+        return EventResponse.from(event);
     }
 
-    public List<EventDto> getEvents() {
+    public List<EventResponse> getEvents() {
         try {
-            return eventRepository.findAll();
+            // 구현 이유 : 코드 유연성과 재사용성 / 나중에 일부 필드만 담은 dto만 필요할 때 유연한 구조
+            List<Event> events = eventRepo.findAll();
+            return events.stream().map((event)->EventResponse.from(event)).toList();
         } catch (Exception e) {
             throw new RuntimeException("행사 전체 조회 실패");
         }
     }
 
-    public EventDto updateEvent(Long eventId, EventRequest eventRequest) {
-        EventDto eventDto = eventRepository.findById(eventId)
-                .orElseThrow(() -> new NotFoundException("행사 조회 실패"));
+    public EventResponse updateEvent(Long eventId, EventUpdateRequest eventUpdateRequest) {
+        Event event = this.checkEventExists(eventId);
 
         try {
-            Scope newScope = eventRequest.getScope() != null ? Scope.valueOf(eventRequest.getScope()) : eventDto.getScope();
-            EventType newType = eventRequest.getType() != null ? EventType.valueOf(eventRequest.getType()) : eventDto.getType();
+            event.updateDetails(eventUpdateRequest.title(), eventUpdateRequest.content(),
+                    eventUpdateRequest.tags(), eventUpdateRequest.images());
+            event.updateLocation(eventUpdateRequest.locationName(), eventUpdateRequest.locationAddress(),
+                    eventUpdateRequest.locationLink());
+            event.updateCapacity(eventUpdateRequest.capacity());
+            event.updateSchedule(eventUpdateRequest.startsAt(), eventUpdateRequest.endsAt());
+            event.updateTime();
 
-            EventDto updatedEvent = eventDto.toBuilder()
-                    .scope(newScope)
-                    .type(newType)
-                    .title(eventRequest.getTitle() != null ? eventRequest.getTitle() : eventDto.getTitle())
-                    .content(eventRequest.getContent() != null ? eventRequest.getContent() : eventDto.getContent())
-                    .tags(eventRequest.getTags() != null ? eventRequest.getTags() : eventDto.getTags())
-                    .images(eventRequest.getImages() != null ? eventRequest.getImages() : eventDto.getImages())
-                    .location(eventRequest.getLocation() != null ? eventRequest.getLocation() : eventDto.getLocation())
-                    .capacity(eventRequest.getCapacity() != null ? eventRequest.getCapacity() : eventDto.getCapacity())
-                    .startsAt(eventRequest.getStartsAt() != null ? eventRequest.getStartsAt() : eventDto.getStartsAt())
-                    .endsAt(eventRequest.getEndsAt() != null ? eventRequest.getEndsAt() : eventDto.getEndsAt())
-                    .updatedAt(LocalDateTime.now())
-                    .build();
-
-            return eventRepository.saveEvent(updatedEvent);
+            return EventResponse.from(event);
         } catch (IllegalArgumentException e) {
             throw new InvalidRequestException("잘못된 요청 데이터");
         } catch (Exception e) {
@@ -91,9 +82,32 @@ public class EventService {
     }
 
     public void deleteEvent(Long eventId) {
-        eventRepository.findById(eventId)
-                .orElseThrow(() -> new NotFoundException("행사 삭제 실패"));
+        this.checkEventExists(eventId);
+        eventRepo.deleteById(eventId);
+    }
 
-        eventRepository.deleteById(eventId);
+    public void validateCanRegister(Long eventId) {
+        Event event = this.checkEventExists(eventId);
+
+        if (event.getCapacity() != null &&
+                event.getCurrentParticipants() >= event.getCapacity()) {
+            throw new ConflictException("행사 정원 초과");
+        }
+
+        // TODO: 추가 검증 추가(행사 시작 전 파악/취소 행사 파악 등)
+    }
+
+    public void incrementParticipants(Long eventId) {
+        Event event = this.checkEventExists(eventId);
+
+        event.incrementParticipants();
+        eventRepo.saveEvent(event);
+    }
+
+    public void decrementParticipants(Long eventId) {
+        Event event = this.checkEventExists(eventId);
+
+        event.decrementParticipants();
+        eventRepo.saveEvent(event);
     }
 }

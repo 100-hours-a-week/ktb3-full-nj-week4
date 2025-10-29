@@ -1,7 +1,6 @@
 package com.example.dance_community.repository;
 
-import com.example.dance_community.dto.event.EventDto;
-import com.example.dance_community.dto.event.Location;
+import com.example.dance_community.entity.Event;
 import com.example.dance_community.enums.EventType;
 import com.example.dance_community.enums.Scope;
 import jakarta.annotation.PostConstruct;
@@ -13,19 +12,13 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 @Repository
-public class EventRepository{
-    private final Map<Long, EventDto> eventMap = new ConcurrentHashMap<>();
+public class EventRepoImpl implements EventRepo{
+    private final Map<Long, Event> eventMap = new ConcurrentHashMap<>();
     private final AtomicLong eventId = new AtomicLong(0);
 
     @PostConstruct
     public void initData() {
-        Location location = Location.builder()
-                .name("스테핀 스튜디오")
-                .address("서울 서초구 방배천로6길 3-4 B1층")
-                .link("https://naver.me/GdyG7ZUn")
-                .build();
-
-        EventDto defaultEvent = EventDto.builder()
+        Event defaultEvent = Event.builder()
                 .eventId(eventId.incrementAndGet())
                 .userId(1L)
                 .scope(Scope.GLOBAL)
@@ -35,7 +28,9 @@ public class EventRepository{
                 .content("대학씬 최고 행사 파티락이 열립니다!")
                 .startsAt(LocalDateTime.now())
                 .endsAt(LocalDateTime.now())
-                .location(location)
+                .locationName("스테핀 스튜디오")
+                .locationAddress("서울 서초구 방배천로6길 3-4 B1층")
+                .locationLink("https://naver.me/GdyG7ZUn")
                 .capacity(30L)
                 .currentParticipants(29L)
                 .tags(Arrays.asList("locking", "beginner"))
@@ -46,25 +41,26 @@ public class EventRepository{
         this.saveEvent(defaultEvent);
     }
 
-    public EventDto saveEvent(EventDto eventDto) {
-        if (eventDto.getEventId() == null) {
-            eventDto = eventDto.toBuilder()
-                    .eventId(eventId.incrementAndGet())
-                    .createdAt(LocalDateTime.now())
-                    .build();
+    @Override
+    public Event saveEvent(Event event) {
+        if (event.getEventId() == null) {
+            event.toBuilder().eventId(eventId.incrementAndGet());
         }
-        eventMap.put(eventDto.getEventId(), eventDto);
-        return eventDto;
+        eventMap.put(event.getEventId(), event);
+        return event;
     }
 
-    public Optional<EventDto> findById(Long eventId) {
+    @Override
+    public Optional<Event> findById(Long eventId) {
         return Optional.ofNullable(eventMap.get(eventId));
     }
 
-    public List<EventDto> findAll() {
+    @Override
+    public List<Event> findAll() {
         return new ArrayList<>(eventMap.values());
     }
 
+    @Override
     public void deleteById(Long id) {
         eventMap.remove(id);
     }
