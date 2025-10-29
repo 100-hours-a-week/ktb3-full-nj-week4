@@ -3,7 +3,6 @@ package com.example.dance_community.controller;
 import com.example.dance_community.auth.GetUserId;
 import com.example.dance_community.dto.ApiResponse;
 import com.example.dance_community.dto.auth.*;
-import com.example.dance_community.dto.user.UserResponse;
 import com.example.dance_community.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -22,9 +21,9 @@ public class AuthController {
 
     @Operation(summary = "회원가입", description = "이메일, 비밀번호, 사용자 이름을 입력 받아 회원가입합니다.")
     @PostMapping("/signup")
-    public ResponseEntity<ApiResponse<UserResponse>> signup(@Valid @RequestBody SignupRequest signupRequest) {
-        UserResponse userResponse = authService.signup(signupRequest);
-        return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResponse<>("회원가입 성공", userResponse));
+    public ResponseEntity<ApiResponse<AuthResponse>> signup(@Valid @RequestBody SignupRequest signupRequest) {
+        AuthResponse authResponse = authService.signup(signupRequest);
+        return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResponse<>("회원가입 성공", authResponse));
     }
 
     @Operation(summary = "로그인", description = "이메일과 비밀번호를 입력 받아 로그인합니다.")

@@ -20,13 +20,17 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
 
     @Transactional
-    public UserResponse signup(SignupRequest signupRequest){
+    public AuthResponse signup(SignupRequest signupRequest){
         if (userRepository.existsByEmail(signupRequest.email())) {
             throw new ConflictException("이메일 중복");
         }
-        User user = new User(signupRequest.email(), passwordEncoder.encode(signupRequest.password()), signupRequest.username());
+        User user = User.builder()
+                .email(signupRequest.email())
+                .password(passwordEncoder.encode(signupRequest.password()))
+                .username(signupRequest.username())
+                .build();
         User newUser = userRepository.save(user);
-        return UserResponse.from(newUser);
+        return new AuthResponse(UserResponse.from(user), "", "");
     }
 
     public AuthResponse login(LoginRequest loginRequest) {
