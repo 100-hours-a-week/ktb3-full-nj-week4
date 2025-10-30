@@ -13,7 +13,7 @@ import lombok.*;
         uniqueConstraints = {
                 @UniqueConstraint(
                         name = "unique_user_club",
-                        columnNames = {"userId", "clubId"}  // 중복 가입 방지
+                        columnNames = {"userId", "clubId"}  // Unique 설정 -> 중복 가입 방지
                 )
         }
 )
@@ -38,6 +38,7 @@ public class ClubMember extends BaseEntity{
     @Column(nullable = false)
     private UserStatus status;
 
+    // CREATE
     @Builder
     private ClubMember(User user, Club club, ClubRole role, UserStatus status) {
         validateClubMember(user, club, role, status);
@@ -47,6 +48,22 @@ public class ClubMember extends BaseEntity{
         this.status = status;
     }
 
+    // READ
+    public boolean hasManagementPermission() {
+        return this.role == ClubRole.LEADER || this.role == ClubRole.MANAGER;
+    }
+
+    // UPDATE
+    public void changeRole(ClubRole newRole) {
+        if (newRole == null) throw new IllegalArgumentException("클럽 멤버 - 역할 미입력");
+        this.role = newRole;
+    }
+    public void changeStatus(UserStatus newStatus) {
+        if (newStatus == null) throw new IllegalArgumentException("클럽 멤버 - 상태 미입력");
+        this.status = newStatus;
+    }
+
+    // Check Methods
     private void validateClubMember(User user, Club club, ClubRole role, UserStatus status) {
         if (user == null) {
             throw new IllegalArgumentException("클럽 멤버 - 사용자 미입력");
@@ -60,19 +77,5 @@ public class ClubMember extends BaseEntity{
         if (status == null) {
             throw new IllegalArgumentException("클럽 멤버 - 상태 미입력");
         }
-    }
-
-    public void changeRole(ClubRole newRole) {
-        if (newRole == null) throw new IllegalArgumentException("클럽 멤버 - 역할 미입력");
-        this.role = newRole;
-    }
-
-    public void changeStatus(UserStatus newStatus) {
-        if (newStatus == null) throw new IllegalArgumentException("클럽 멤버 - 상태 미입력");
-        this.status = newStatus;
-    }
-
-    public boolean hasManagementPermission() {
-        return this.role == ClubRole.LEADER || this.role == ClubRole.MANAGER;
     }
 }

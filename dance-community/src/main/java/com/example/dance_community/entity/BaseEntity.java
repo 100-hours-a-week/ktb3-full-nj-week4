@@ -22,6 +22,7 @@ public abstract class BaseEntity {
         this.isDeleted = false;
     }
 
+    // DELETE
     public void delete() {
         this.isDeleted = true;
     }
