@@ -1,4 +1,4 @@
-package com.example.dance_community.repository;
+package com.example.dance_community.repository.in_memory;
 
 import com.example.dance_community.entity.User;
 import jakarta.annotation.PostConstruct;
@@ -16,12 +16,7 @@ public class UserRepoImpl implements UserRepo {
 
     @PostConstruct
     public void initData() {
-        User defaultUser = User.builder()
-                .email("user@example.com")
-                .password("string")
-                .username("tester")
-                .build();
-        defaultUser.hashedPassword();
+        User defaultUser = new User("user@example.com","string", "tester");
         this.saveUser(defaultUser);
     }
 
@@ -29,7 +24,7 @@ public class UserRepoImpl implements UserRepo {
     public User saveUser(User user){
         if(user.getUserId() == null){
             Long id = userIdGen.incrementAndGet();
-            user = user.toBuilder().userId(id).build();
+            //user = user.toBuilder().userId(id).build();
         }
         idToUserMap.put(user.getUserId(), user);
         emailToIdMap.put(user.getEmail(), user.getUserId());

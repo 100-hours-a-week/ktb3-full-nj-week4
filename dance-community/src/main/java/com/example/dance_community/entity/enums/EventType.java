@@ -1,4 +1,4 @@
-package com.example.dance_community.enums;
+package com.example.dance_community.entity.enums;
 
 public enum EventType {
     WORKSHOP,

@@ -2,10 +2,10 @@ package com.example.dance_community.service;
 
 import com.example.dance_community.dto.post.PostDto;
 import com.example.dance_community.dto.post.PostRequest;
-import com.example.dance_community.enums.Scope;
+import com.example.dance_community.entity.enums.Scope;
 import com.example.dance_community.exception.InvalidRequestException;
 import com.example.dance_community.exception.NotFoundException;
-import com.example.dance_community.repository.PostRepo;
+import com.example.dance_community.repository.in_memory.PostRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

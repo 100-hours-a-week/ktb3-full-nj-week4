@@ -1,7 +1,7 @@
 package com.example.dance_community.validation;
 
 import com.example.dance_community.dto.post.PostRequest;
-import com.example.dance_community.enums.Scope;
+import com.example.dance_community.entity.enums.Scope;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 

@@ -2,13 +2,11 @@ package com.example.dance_community.controller;
 
 import com.example.dance_community.auth.GetUserId;
 import com.example.dance_community.dto.ApiResponse;
-import com.example.dance_community.dto.user.UserCreateRequest;
 import com.example.dance_community.dto.user.UserResponse;
 import com.example.dance_community.dto.user.UserUpdateRequest;
 import com.example.dance_community.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

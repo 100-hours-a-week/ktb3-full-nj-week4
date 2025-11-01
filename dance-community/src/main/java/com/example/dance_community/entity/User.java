@@ -1,35 +1,54 @@
 package com.example.dance_community.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import org.mindrot.jbcrypt.BCrypt;
+import jakarta.persistence.*;
+import lombok.*;
 
-import java.time.LocalDateTime;
-
+@Entity
 @Getter
-@Builder(toBuilder = true)
-@NoArgsConstructor
-@AllArgsConstructor
-public class User {
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(name = "users")
+public class User extends BaseEntity{
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userId;
-    private String email;
-    private String password;
-    private String username;
-    private String profileImage;
-    private LocalDateTime createdAt;
-    private Boolean isDeleted;
 
-    public void hashedPassword() {
-        this.password = BCrypt.hashpw(this.password, BCrypt.gensalt());
+    @Column(nullable = false, unique = true, length = 100, updatable = false)
+    private String email;
+
+    @Column(nullable = false)
+    private String password;
+
+    @Column(nullable = false, length = 50)
+    private String username;
+
+    private String profileImage;
+
+    @Builder
+    public User(String email, String password, String username) {
+        checkNullOrBlank(email, "이메일");
+        checkNullOrBlank(password, "비밀번호");
+        checkNullOrBlank(username, "사용자 이름");
+
+        this.email = email;
+        this.password = password;
+        this.username = username;
     }
 
-    public User updateDetails(String password, String username, String profileImage) {
-        return this.toBuilder()
-                .password(password)
-                .username(username)
-                .profileImage(profileImage)
-                .build();
+    public User updateUser(String password, String username, String profileImage) {
+        checkNullOrBlank(password, "비밀번호");
+        checkNullOrBlank(username, "사용자 이름");
+        if(profileImage == null) {throw new IllegalArgumentException("프로필 사진 미입력");}
+
+        this.username = username;
+        this.password = password;
+        this.profileImage = profileImage;
+
+        return this;
+    }
+
+    private void checkNullOrBlank(String value, String fieldName) {
+        if (value == null || value.isBlank()) {
+            throw new IllegalArgumentException(fieldName+" 미입력");
+        }
     }
 }
