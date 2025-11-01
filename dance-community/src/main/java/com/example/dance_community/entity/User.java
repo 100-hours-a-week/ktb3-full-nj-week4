@@ -57,13 +57,6 @@ public class User extends BaseEntity{
         return this;
     }
 
-    // Check Methods
-    private void checkNullOrBlank(String value, String fieldName) {
-        if (value == null || value.isBlank()) {
-            throw new IllegalArgumentException(fieldName+" 미입력");
-        }
-    }
-
     // Convenience Methods for ClubMember->Club
     public void AddClub(Club club, ClubRole role, UserStatus status) {
         ClubMember newClubMember = ClubMember.builder()
@@ -78,5 +71,12 @@ public class User extends BaseEntity{
     public void removeClub(Club club) {
         clubs.removeIf(m -> m.getClub().equals(club));
         club.getMembers().removeIf(m -> m.getUser().equals(this));
+    }
+
+    // Check Methods
+    private void checkNullOrBlank(String value, String fieldName) {
+        if (value == null || value.isBlank()) {
+            throw new IllegalArgumentException(fieldName+" 미입력");
+        }
     }
 }
