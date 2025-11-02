@@ -54,7 +54,7 @@ public class Post extends BaseEntity{
             name = "post_images",
             joinColumns = @JoinColumn(name = "post_id")
     )
-    @Column(name = "image_url")
+    @Column(name = "image")
     private List<String> images = new ArrayList<>();
 
     // 수정 일시
