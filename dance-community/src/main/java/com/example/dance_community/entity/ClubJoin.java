@@ -41,7 +41,7 @@ public class ClubJoin extends BaseEntity{
     // CREATE
     @Builder
     private ClubJoin(User user, Club club, ClubRole role, ClubJoinStatus status) {
-        validateClubMember(user, club, role, status);
+        validateClubJoin(user, club, role, status);
         this.user = user;
         this.club = club;
         this.role = role;
@@ -55,27 +55,27 @@ public class ClubJoin extends BaseEntity{
 
     // UPDATE
     public void changeRole(ClubRole newRole) {
-        if (newRole == null) throw new IllegalArgumentException("클럽 멤버 - 역할 미입력");
+        if (newRole == null) throw new IllegalArgumentException("클럽 가입 - 역할 미입력");
         this.role = newRole;
     }
     public void changeStatus(ClubJoinStatus newStatus) {
-        if (newStatus == null) throw new IllegalArgumentException("클럽 멤버 - 상태 미입력");
+        if (newStatus == null) throw new IllegalArgumentException("클럽 가입 - 상태 미입력");
         this.status = newStatus;
     }
 
     // Check Methods
-    private void validateClubMember(User user, Club club, ClubRole role, ClubJoinStatus status) {
+    private void validateClubJoin(User user, Club club, ClubRole role, ClubJoinStatus status) {
         if (user == null) {
-            throw new IllegalArgumentException("클럽 멤버 - 사용자 미입력");
+            throw new IllegalArgumentException("클럽 가입 - 사용자 미입력");
         }
         if (club == null) {
-            throw new IllegalArgumentException("클럽 멤버 - 클럽 미입력");
+            throw new IllegalArgumentException("클럽 가입 - 클럽 미입력");
         }
         if (role == null) {
-            throw new IllegalArgumentException("클럽 멤버 - 역할 미입력");
+            throw new IllegalArgumentException("클럽 가입 - 역할 미입력");
         }
         if (status == null) {
-            throw new IllegalArgumentException("클럽 멤버 - 상태 미입력");
+            throw new IllegalArgumentException("클럽 가입 - 상태 미입력");
         }
     }
 }
