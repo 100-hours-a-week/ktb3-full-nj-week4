@@ -1,6 +1,6 @@
 package com.example.dance_community.repository.in_memory;
 
-import com.example.dance_community.dto.post.PostDto;
+import com.example.dance_community.dto.post.PostCreateRequest;
 import com.example.dance_community.entity.enums.Scope;
 import jakarta.annotation.PostConstruct;
 import org.springframework.stereotype.Repository;
@@ -12,12 +12,12 @@ import java.util.concurrent.atomic.AtomicLong;
 
 @Repository
 public class PostRepoImpl implements PostRepo{
-    private final Map<Long, PostDto> postMap = new ConcurrentHashMap<>();
+    private final Map<Long, PostCreateRequest> postMap = new ConcurrentHashMap<>();
     private final AtomicLong postId = new AtomicLong(0);
 
     @PostConstruct
     public void initData() {
-        PostDto defaultPost = PostDto.builder()
+        PostCreateRequest defaultPost = PostCreateRequest.builder()
                 .postId(postId.incrementAndGet())
                 .userId(1L)
                 .scope(Scope.CLUB)
@@ -33,24 +33,24 @@ public class PostRepoImpl implements PostRepo{
     }
 
     @Override
-    public PostDto savePost(PostDto postDto) {
-        if (postDto.getPostId() == null) {
-            postDto = postDto.toBuilder()
+    public PostCreateRequest savePost(PostCreateRequest postCreateRequest) {
+        if (postCreateRequest.getPostId() == null) {
+            postCreateRequest = postCreateRequest.toBuilder()
                     .postId(postId.incrementAndGet())
                     .createdAt(LocalDateTime.now())
                     .build();
         }
-        postMap.put(postDto.getPostId(), postDto);
-        return postDto;
+        postMap.put(postCreateRequest.getPostId(), postCreateRequest);
+        return postCreateRequest;
     }
 
     @Override
-    public Optional<PostDto> findById(Long postId) {
+    public Optional<PostCreateRequest> findById(Long postId) {
         return Optional.ofNullable(postMap.get(postId));
     }
 
     @Override
-    public List<PostDto> findAll() {
+    public List<PostCreateRequest> findAll() {
         return new ArrayList<>(postMap.values());
     }
 
