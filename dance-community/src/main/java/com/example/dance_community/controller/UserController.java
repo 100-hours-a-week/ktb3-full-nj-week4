@@ -43,7 +43,7 @@ public class UserController {
     @Operation(summary = "탈퇴", description = "사용자 정보를 삭제합니다.")
     @DeleteMapping()
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public ResponseEntity<Object> deleteUser(@GetUserId Long userId) {
+    public ResponseEntity<Void> deleteUser(@GetUserId Long userId) {
         userService.deleteUser(userId);
         return ResponseEntity.noContent().build();
     }
