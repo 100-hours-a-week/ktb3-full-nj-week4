@@ -1,84 +1,89 @@
 package com.example.dance_community.service;
 
 import com.example.dance_community.dto.post.PostCreateRequest;
+import com.example.dance_community.dto.post.PostResponse;
 import com.example.dance_community.dto.post.PostUpdateRequest;
+import com.example.dance_community.entity.Club;
+import com.example.dance_community.entity.Post;
+import com.example.dance_community.entity.User;
 import com.example.dance_community.entity.enums.Scope;
 import com.example.dance_community.exception.InvalidRequestException;
 import com.example.dance_community.exception.NotFoundException;
+import com.example.dance_community.repository.jpa.ClubRepository;
 import com.example.dance_community.repository.jpa.PostRepository;
+import com.example.dance_community.repository.jpa.UserRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class PostService {
     private final PostRepository postRepository;
+    private final UserRepository userRepository;
+    private final ClubRepository clubRepository;
 
-    public PostCreateRequest createPost(Long userId, PostUpdateRequest postUpdateRequest) {
-        try {
-            PostCreateRequest newPost = PostCreateRequest.builder()
-                    .userId(userId)
-                    .scope(Scope.valueOf(postUpdateRequest.getScope()))
-                    .clubId(postUpdateRequest.getClubId())
-                    .title(postUpdateRequest.getTitle())
-                    .content(postUpdateRequest.getContent())
-                    .tags(postUpdateRequest.getTags())
-                    .images(postUpdateRequest.getImages())
-                    .build();
+    @Transactional
+    public PostResponse createPost(Long userId, PostCreateRequest request) {
+        User author = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("사용자를 찾을 수 없습니다"));
 
-            return postRepository.savePost(newPost);
-        } catch (IllegalArgumentException e) {
-            throw new InvalidRequestException("잘못된 요청 데이터");
-        } catch (Exception e) {
-            throw new RuntimeException("행사 생성 실패");
+        Club club = null;
+        if (request.getScope() == Scope.CLUB.toString()) {
+            if (request.getClubId() == null) {
+                throw new InvalidRequestException("공개 범위 : 클럽 -> 클럽 값 필요");
+            }
+            club = clubRepository.findById(request.getClubId())
+                    .orElseThrow(() -> new NotFoundException("클럽을 찾을 수 없습니다"));
         }
+
+        Post post = Post.builder()
+                .author(author)
+                .scope(Scope.valueOf(request.getScope().toUpperCase()))
+                .club(club)
+                .title(request.getTitle())
+                .content(request.getContent())
+                .tags(request.getTags())
+                .images(request.getImages())
+                .build();
+
+        Post newPost = postRepository.save(post);
+        return PostResponse.from(newPost);
     }
 
-    public PostCreateRequest getPost(Long postId) {
-        return postRepo.findById(postId)
-                .orElseThrow(() -> new NotFoundException("게시글 조회 실패"));
+    public PostResponse getPost(Long postId) {
+        Post post = getPostEntityById(postId);
+        return PostResponse.from(post);
     }
 
-    public List<PostCreateRequest> getPosts() {
-        try {
-            return postRepo.findAll();
-        } catch (Exception e) {
-            throw new RuntimeException("게시글 전체 조회 실패");
-        }
+    public List<PostResponse> getPosts() {
+        List<Post> posts = postRepository.findAll();
+        return posts.stream().map(PostResponse::from).toList();
     }
 
-    public PostCreateRequest updatePost(Long postId, PostUpdateRequest postUpdateRequest) {
-        PostCreateRequest postCreateRequest = postRepo.findById(postId)
-                .orElseThrow(() -> new NotFoundException("게시글 조회 실패"));
+    @Transactional
+    public PostResponse updatePost(Long postId, PostUpdateRequest request) {
+        Post post = getPostEntityById(postId);
 
-        try {
-            Scope newScope = postUpdateRequest.getScope() != null ? Scope.valueOf(postUpdateRequest.getScope()) : postCreateRequest.getScope();
+        post.updatePost(
+                request.getTitle(),
+                request.getContent(),
+                request.getTags(),
+                request.getImages()
+        );
 
-            PostCreateRequest updatedPost = postCreateRequest.toBuilder()
-                    .scope(newScope)
-                    .title(postUpdateRequest.getTitle() != null ? postUpdateRequest.getTitle() : postCreateRequest.getTitle())
-                    .content(postUpdateRequest.getContent() != null ? postUpdateRequest.getContent() : postCreateRequest.getContent())
-                    .tags(postUpdateRequest.getTags() != null ? postUpdateRequest.getTags() : postCreateRequest.getTags())
-                    .images(postUpdateRequest.getImages() != null ? postUpdateRequest.getImages() : postCreateRequest.getImages())
-                    .updatedAt(LocalDateTime.now())
-                    .build();
-
-            postRepo.savePost(updatedPost);
-            return updatedPost;
-        } catch (IllegalArgumentException e) {
-            throw new InvalidRequestException("잘못된 요청 데이터");
-        } catch (Exception e) {
-            throw new RuntimeException("게시글 수정 실패");
-        }
+        return PostResponse.from(post);
     }
-
 
     public void deletePost(Long postId) {
-        postRepo.findById(postId)
-                .orElseThrow(() -> new NotFoundException("게시글 삭제 실패"));
-        postRepo.deleteById(postId);
+        Post post = getPostEntityById(postId);
+        post.delete();
+    }
+
+    private Post getPostEntityById(Long postId) {
+        return postRepository.findById(postId)
+                .orElseThrow(() -> new NotFoundException("게시물을 찾을 수 없습니다"));
     }
 }

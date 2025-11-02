@@ -22,14 +22,14 @@ public class UserController {
     @Operation(summary = "내 정보 조회", description = "사용자의 정보를 불러옵니다.")
     @GetMapping("/me")
     public ResponseEntity<ApiResponse<UserResponse>> getMe(@GetUserId Long userId) {
-        UserResponse userResponse = userService.getUserById(userId);
+        UserResponse userResponse = userService.getUser(userId);
         return ResponseEntity.ok(new ApiResponse<>("내 정보 조회 성공", userResponse));
     }
 
     @Operation(summary = "회원 정보 조회", description = "회원 id를 통해 정보를 불러옵니다.")
     @GetMapping("/{userId}")
     public ResponseEntity<ApiResponse<UserResponse>> getUser(@PathVariable Long userId) {
-        UserResponse userResponse = userService.getUserById(userId);
+        UserResponse userResponse = userService.getUser(userId);
         return ResponseEntity.ok(new ApiResponse<>("회원 정보 조회 성공", userResponse));
     }
 
@@ -44,7 +44,7 @@ public class UserController {
     @DeleteMapping()
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public ResponseEntity<Object> deleteUser(@GetUserId Long userId) {
-        userService.deleteCurrentUser(userId);
+        userService.deleteUser(userId);
         return ResponseEntity.noContent().build();
     }
 }

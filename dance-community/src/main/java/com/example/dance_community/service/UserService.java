@@ -17,7 +17,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public UserResponse getUserById(Long userId) {
+    public UserResponse getUser(Long userId) {
         User user = this.getUserEntityById(userId);
         return UserResponse.from(user);
     }
@@ -34,7 +34,7 @@ public class UserService {
     }
 
     @Transactional
-    public void deleteCurrentUser(Long userId) {
+    public void deleteUser(Long userId) {
         User user = this.getUserEntityById(userId);
         user.delete();
     }
