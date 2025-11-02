@@ -1,7 +1,7 @@
 package com.example.dance_community.entity;
 
 import com.example.dance_community.entity.enums.ClubRole;
-import com.example.dance_community.entity.enums.UserStatus;
+import com.example.dance_community.entity.enums.ClubJoinStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -30,7 +30,7 @@ public class User extends BaseEntity{
     private String profileImage;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ClubMember> clubs = new ArrayList<>();
+    private List<ClubJoin> clubs = new ArrayList<>();
 
     // CREATE
     @Builder
@@ -58,15 +58,15 @@ public class User extends BaseEntity{
     }
 
     // Convenience Methods for ClubMember->Club
-    public void AddClub(Club club, ClubRole role, UserStatus status) {
-        ClubMember newClubMember = ClubMember.builder()
+    public void AddClub(Club club, ClubRole role, ClubJoinStatus status) {
+        ClubJoin newClubJoin = ClubJoin.builder()
                 .user(this)
                 .club(club)
                 .role(role)
                 .status(status)
                 .build();
-        this.clubs.add(newClubMember);
-        club.getMembers().add(newClubMember);
+        this.clubs.add(newClubJoin);
+        club.getMembers().add(newClubJoin);
     }
     public void removeClub(Club club) {
         clubs.removeIf(m -> m.getClub().equals(club));

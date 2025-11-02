@@ -1,6 +1,6 @@
 package com.example.dance_community.entity.enums;
 
-public enum UserStatus {
+public enum ClubJoinStatus {
     WAITING("대기중"),
     REJECTED("거절됨"),
     ACTIVE("활동중"),
@@ -9,7 +9,7 @@ public enum UserStatus {
 
     private final String description;
 
-    UserStatus(String description) {
+    ClubJoinStatus(String description) {
         this.description = description;
     }
 

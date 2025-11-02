@@ -1,7 +1,7 @@
 package com.example.dance_community.entity;
 
+import com.example.dance_community.entity.enums.ClubJoinStatus;
 import com.example.dance_community.entity.enums.ClubRole;
-import com.example.dance_community.entity.enums.UserStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -9,7 +9,7 @@ import lombok.*;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(
-        name = "club_member",
+        name = "club_joins",
         uniqueConstraints = {
                 @UniqueConstraint(
                         name = "unique_user_club",
@@ -17,10 +17,10 @@ import lombok.*;
                 )
         }
 )
-public class ClubMember extends BaseEntity{
+public class ClubJoin extends BaseEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long clubMemberId;
+    private Long ClubJoinId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userId", nullable = false)
@@ -36,11 +36,11 @@ public class ClubMember extends BaseEntity{
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private UserStatus status;
+    private ClubJoinStatus status;
 
     // CREATE
     @Builder
-    private ClubMember(User user, Club club, ClubRole role, UserStatus status) {
+    private ClubJoin(User user, Club club, ClubRole role, ClubJoinStatus status) {
         validateClubMember(user, club, role, status);
         this.user = user;
         this.club = club;
@@ -58,13 +58,13 @@ public class ClubMember extends BaseEntity{
         if (newRole == null) throw new IllegalArgumentException("클럽 멤버 - 역할 미입력");
         this.role = newRole;
     }
-    public void changeStatus(UserStatus newStatus) {
+    public void changeStatus(ClubJoinStatus newStatus) {
         if (newStatus == null) throw new IllegalArgumentException("클럽 멤버 - 상태 미입력");
         this.status = newStatus;
     }
 
     // Check Methods
-    private void validateClubMember(User user, Club club, ClubRole role, UserStatus status) {
+    private void validateClubMember(User user, Club club, ClubRole role, ClubJoinStatus status) {
         if (user == null) {
             throw new IllegalArgumentException("클럽 멤버 - 사용자 미입력");
         }

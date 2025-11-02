@@ -21,7 +21,7 @@ public class Post extends BaseEntity{
 
     // 작성자
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false ,updatable = false)
+    @JoinColumn(name = "userId", nullable = false ,updatable = false)
     private User author;
 
     // 공개 범위
@@ -31,7 +31,7 @@ public class Post extends BaseEntity{
 
     // 클럽 ID (Scope.CLUB일 때 대상 클럽)
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "club_id", updatable = false)
+    @JoinColumn(name = "clubId", updatable = false)
     private Club club;
 
     // 게시물 관련 내용 (제목, 내용, 태그, 이미지)
@@ -44,7 +44,7 @@ public class Post extends BaseEntity{
     @ElementCollection
     @CollectionTable(
             name = "post_tags",
-            joinColumns = @JoinColumn(name = "post_id")
+            joinColumns = @JoinColumn(name = "postId")
     )
     @Column(name = "tag")
     private List<String> tags = new ArrayList<>();
@@ -52,7 +52,7 @@ public class Post extends BaseEntity{
     @ElementCollection
     @CollectionTable(
             name = "post_images",
-            joinColumns = @JoinColumn(name = "post_id")
+            joinColumns = @JoinColumn(name = "postId")
     )
     @Column(name = "image")
     private List<String> images = new ArrayList<>();
