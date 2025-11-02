@@ -34,7 +34,7 @@ public class User extends BaseEntity{
 
     // CREATE
     @Builder
-    public User(String email, String password, String username) {
+    public User(String email, String password, String username, String profileImage) {
         checkNullOrBlank(email, "이메일");
         checkNullOrBlank(password, "비밀번호");
         checkNullOrBlank(username, "사용자 이름");
@@ -42,13 +42,13 @@ public class User extends BaseEntity{
         this.email = email;
         this.password = password;
         this.username = username;
+        this.profileImage = profileImage;
     }
 
     // UPDATE
     public User updateUser(String password, String username, String profileImage) {
         checkNullOrBlank(password, "비밀번호");
         checkNullOrBlank(username, "사용자 이름");
-        if(profileImage == null) {throw new IllegalArgumentException("프로필 사진 미입력");}
 
         this.username = username;
         this.password = password;

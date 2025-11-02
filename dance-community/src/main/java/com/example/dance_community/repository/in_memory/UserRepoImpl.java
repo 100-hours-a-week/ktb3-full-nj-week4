@@ -16,7 +16,7 @@ public class UserRepoImpl implements UserRepo {
 
     @PostConstruct
     public void initData() {
-        User defaultUser = new User("user@example.com","string", "tester");
+        User defaultUser = new User("user@example.com","string", "tester", "default_profile.png");
         this.saveUser(defaultUser);
     }
 
