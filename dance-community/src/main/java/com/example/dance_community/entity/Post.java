@@ -1,8 +1,6 @@
 package com.example.dance_community.entity;
 
-import com.example.dance_community.entity.enums.ClubRole;
 import com.example.dance_community.entity.enums.Scope;
-import com.example.dance_community.entity.enums.UserStatus;
 import jakarta.persistence.*;
 import lombok.*;
 

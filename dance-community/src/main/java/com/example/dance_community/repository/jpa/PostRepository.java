@@ -1,0 +1,12 @@
+package com.example.dance_community.repository.jpa;
+
+import com.example.dance_community.entity.Post;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+
+@Repository
+public interface PostRepository extends JpaRepository<Post, Long> {
+    List<Post> findByAuthor_UserId(Long userId);
+}
