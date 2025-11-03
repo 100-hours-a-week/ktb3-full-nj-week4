@@ -8,7 +8,7 @@ import lombok.*;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(
-        name = "registration",
+        name = "event_joins",
         uniqueConstraints = {
                 @UniqueConstraint(
                         name = "unique_user_event",
@@ -19,7 +19,7 @@ import lombok.*;
 public class EventJoin extends BaseEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long registrationId;
+    private Long eventJoinId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userId", nullable = false)

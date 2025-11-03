@@ -72,9 +72,9 @@ public class Event extends BaseEntity{
     @Column(nullable = false)
     private Long capacity;
 
-    // 현재 참가 인원
-    @Column(nullable = false)
-    private Long currentParticipants;
+    // 행사 참가자 목록
+    @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<EventJoin> eventJoins = new ArrayList<>();
 
     // 행사 일시 (시작, 종료 시간)
     @Column(nullable = false)
@@ -89,10 +89,9 @@ public class Event extends BaseEntity{
     @Builder
     private Event(User author, Scope scope, Club club, EventType type,
                   String title, String content, List<String> tags, List<String> images,
-                  String locationName, String locationAddress, String locationLink,
-                  Long capacity, Long currentParticipants,
+                  String locationName, String locationAddress, String locationLink, Long capacity,
                   LocalDateTime startsAt, LocalDateTime endsAt) {
-        validateEvent(author, scope, club, type, title, content, capacity, currentParticipants, startsAt, endsAt);
+        validateEvent(author, scope, club, type, title, content, capacity, startsAt, endsAt);
 
         this.author = author;
         this.scope = scope;
@@ -106,15 +105,13 @@ public class Event extends BaseEntity{
         this.locationAddress = locationAddress;
         this.locationLink = locationLink;
         this.capacity = capacity;
-        this.currentParticipants = currentParticipants;
         this.startsAt = startsAt;
         this.endsAt = endsAt;
     }
 
     // UPDATE
     public Event updatePost(String title, String content, List<String> tags, List<String> images,
-                            String locationName, String locationAddress, String locationLink,
-                            Long capacity, Long currentParticipants,
+                            String locationName, String locationAddress, String locationLink, Long capacity,
                             LocalDateTime startsAt, LocalDateTime endsAt) {
         checkNullOrBlank(title, "제목");
         checkNullOrBlank(content, "내용");
@@ -128,7 +125,6 @@ public class Event extends BaseEntity{
         this.locationAddress = locationAddress;
         this.locationLink = locationLink;
         this.capacity = capacity;
-        this.currentParticipants = currentParticipants;
         this.startsAt = startsAt;
         this.endsAt = endsAt;
         this.updatedAt = LocalDateTime.now();
@@ -143,8 +139,7 @@ public class Event extends BaseEntity{
         }
     }
     private void validateEvent(User author, Scope scope, Club club, EventType type,
-                               String title, String content,
-                               Long capacity, Long currentParticipants,
+                               String title, String content, Long capacity,
                                LocalDateTime startsAt, LocalDateTime endsAt) {
         if (author == null) {
             throw new IllegalArgumentException("작성자 미입력");
@@ -165,9 +160,6 @@ public class Event extends BaseEntity{
         checkNullOrBlank(content, "내용");
         if (capacity == null || capacity <= 0) {
             throw new IllegalArgumentException("행사 총 수용 인원 미입력 또는 0 이하");
-        }
-        if (currentParticipants == null || currentParticipants < 0) {
-            throw new IllegalArgumentException("현재 참가 인원 미입력 또는 음수");
         }
         if (startsAt == null) {
             throw new IllegalArgumentException("행사 시작 일시 미입력");
