@@ -1,13 +1,13 @@
 package com.example.dance_community.repository.in_memory;
 
-import com.example.dance_community.dto.registration.RegistrationDto;
+import com.example.dance_community.dto.eventJoin.EventJoinDto;
 
 import java.util.List;
 import java.util.Optional;
 
 public interface RegistrationRepo {
-    RegistrationDto saveRegistration(RegistrationDto dto);
-    Optional<RegistrationDto> findRegistration(Long userId, Long eventId);
-    List<RegistrationDto> findEventsByUser(Long userId);
-    List<RegistrationDto> findUsersByEvent(Long eventId);
+    EventJoinDto saveRegistration(EventJoinDto dto);
+    Optional<EventJoinDto> findRegistration(Long userId, Long eventId);
+    List<EventJoinDto> findEventsByUser(Long userId);
+    List<EventJoinDto> findUsersByEvent(Long eventId);
 }

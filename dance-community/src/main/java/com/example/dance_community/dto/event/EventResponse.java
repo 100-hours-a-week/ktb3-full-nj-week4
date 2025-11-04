@@ -1,64 +1,49 @@
 package com.example.dance_community.dto.event;
 
-import com.example.dance_community.entity.enums.EventType;
-import com.example.dance_community.entity.enums.Scope;
-
-import java.time.LocalDateTime;
-import java.util.List;
+import com.example.dance_community.entity.Event;
 
 public record EventResponse(
-        // Identifiers(수정 불가)
         Long eventId,
-        Long userId,
-
-        // Classification(수정 불가)
-        Scope scope,
+        Long hostId,
+        String hostName,
+        String scope,
         Long clubId,
-        EventType type,
-
-        // Details
+        String clubName,
+        String type,
         String title,
         String content,
-        List<String>tags,
-        List<String> images,
-
-        // Location
+        java.util.List<String> tags,
+        java.util.List<String> images,
         String locationName,
         String locationAddress,
         String locationLink,
-
-        // Capacity
         Long capacity,
-        Long currentParticipants,
-
-        // Schedule
-        LocalDateTime startsAt,
-        LocalDateTime endsAt,
-
-        // Timestamps
-        LocalDateTime createdAt,
-        LocalDateTime updatedAt
+        java.time.LocalDateTime startsAt,
+        java.time.LocalDateTime endsAt,
+        java.time.LocalDateTime createdAt,
+        java.time.LocalDateTime updatedAt
 ) {
-    public static EventResponse from(com.example.dance_community.entity.Event entity) {
+    public static EventResponse from(Event event) {
         return new EventResponse(
-                entity.getEventId(),
-                entity.getUserId(),
-                entity.getScope(),
-                entity.getClubId(),
-                entity.getType(),
-                entity.getTitle(),
-                entity.getContent(),
-                entity.getTags(),
-                entity.getImages(),
-                entity.getLocationName(),
-                entity.getLocationAddress(),
-                entity.getLocationLink(),
-                entity.getCapacity(),
-                entity.getCurrentParticipants(),
-                entity.getStartsAt(),
-                entity.getEndsAt(),
-                entity.getCreatedAt(),
-                entity.getUpdatedAt()
+                event.getEventId(),
+                event.getHost().getUserId(),
+                event.getHost().getUsername(),
+                event.getScope().name(),
+                event.getClub() != null ? event.getClub().getClubId() : null,
+                event.getClub() != null ? event.getClub().getClubName() : null,
+                event.getType().name(),
+                event.getTitle(),
+                event.getContent(),
+                event.getTags(),
+                event.getImages(),
+                event.getLocationName(),
+                event.getLocationAddress(),
+                event.getLocationLink(),
+                event.getCapacity(),
+                event.getStartsAt(),
+                event.getEndsAt(),
+                event.getCreatedAt(),
+                event.getUpdatedAt()
         );
     }
 }

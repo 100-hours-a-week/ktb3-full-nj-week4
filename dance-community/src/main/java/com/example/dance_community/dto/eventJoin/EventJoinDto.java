@@ -1,4 +1,4 @@
-package com.example.dance_community.dto.registration;
+package com.example.dance_community.dto.eventJoin;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 @Getter
 @Builder(toBuilder = true)
 @AllArgsConstructor
-public class RegistrationDto {
+public class EventJoinDto {
     private Long eventId;
     private Long userId;
 

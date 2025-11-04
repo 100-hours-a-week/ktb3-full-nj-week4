@@ -1,11 +1,6 @@
 package com.example.dance_community.dto.post;
 
-import com.example.dance_community.entity.Club;
 import com.example.dance_community.entity.Post;
-import com.example.dance_community.entity.User;
-import com.example.dance_community.entity.enums.Scope;
-import kotlin.ULong;
-
 import java.time.LocalDateTime;
 import java.util.List;
 
