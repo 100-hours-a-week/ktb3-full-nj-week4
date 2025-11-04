@@ -27,14 +27,13 @@ public class PostService {
     public PostResponse createPost(Long userId, PostCreateRequest request) {
         User author = userService.getActiveUser(userId);
 
-        Club club;
-        if (request.getScope() == Scope.CLUB.toString()) {
-            if (request.getClubId() == null) {
-                throw new InvalidRequestException("공개 범위 : 클럽 -> 클럽 값 필요");
+        Club club = null;
+        if (Scope.CLUB.toString().equals(request.getScope())) {
+            Long clubId = request.getClubId();
+            if (clubId == null) {
+                throw new InvalidRequestException("공개 범위가 CLUB일 경우 clubId가 필요");
             }
-            club = ClubService.getActiveClub(request.getClubId());
-        } else {
-            club = null;
+            club = ClubService.getActiveClub(clubId);
         }
 
         Post post = Post.builder()

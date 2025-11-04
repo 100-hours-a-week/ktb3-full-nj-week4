@@ -114,7 +114,7 @@ public class Event extends BaseEntity{
     }
 
     // UPDATE
-    public Event updatePost(String title, String content, List<String> tags, List<String> images,
+    public Event updateEvent(String title, String content, List<String> tags, List<String> images,
                             String locationName, String locationAddress, String locationLink, Long capacity,
                             LocalDateTime startsAt, LocalDateTime endsAt) {
         checkNullOrBlank(title, "제목");
