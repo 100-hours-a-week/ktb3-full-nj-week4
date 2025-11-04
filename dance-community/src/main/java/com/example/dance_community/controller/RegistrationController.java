@@ -17,7 +17,7 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/registration")
 @RequiredArgsConstructor
-@Tag(name = "5_Registration", description = "행사 신청 관련 API")
+@Tag(name = "6_Registration", description = "행사 신청 관련 API")
 public class RegistrationController {
 
     private final RegistrationService service;
