@@ -1,0 +1,12 @@
+package com.example.dance_community.repository.jpa;
+
+import com.example.dance_community.entity.Event;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+
+@Repository
+public interface EventRepository extends JpaRepository<Event, Long> {
+    List<Event> findByOrganizer_ClubId(Long clubId);
+}
