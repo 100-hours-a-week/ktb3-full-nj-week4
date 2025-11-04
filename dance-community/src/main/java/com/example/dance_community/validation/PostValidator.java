@@ -1,21 +1,21 @@
 package com.example.dance_community.validation;
 
-import com.example.dance_community.dto.post.PostUpdateRequest;
+import com.example.dance_community.dto.post.PostCreateRequest;
 import com.example.dance_community.entity.enums.Scope;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 
-public class PostValidator implements ConstraintValidator<ValidScopePost, PostUpdateRequest> {
+public class PostValidator implements ConstraintValidator<ValidScopePost, PostCreateRequest> {
 
     @Override
-    public boolean isValid(PostUpdateRequest postUpdateRequest, ConstraintValidatorContext context) {
+    public boolean isValid(PostCreateRequest postCreateRequest, ConstraintValidatorContext context) {
         try {
-            Scope.valueOf(postUpdateRequest.getScope().toUpperCase());
+            Scope.valueOf(postCreateRequest.getScope().toUpperCase());
         } catch (IllegalArgumentException e) {
             return false;
         }
 
-        if ("CLUB".equalsIgnoreCase(postUpdateRequest.getScope()) && postUpdateRequest.getClubId() == null) {
+        if ("CLUB".equalsIgnoreCase(postCreateRequest.getScope()) && postCreateRequest.getClubId() == null) {
             return false;
         }
 

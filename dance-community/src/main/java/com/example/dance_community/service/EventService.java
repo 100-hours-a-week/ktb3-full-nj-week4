@@ -9,7 +9,7 @@ import com.example.dance_community.entity.User;
 import com.example.dance_community.entity.enums.Scope;
 import com.example.dance_community.exception.InvalidRequestException;
 import com.example.dance_community.exception.NotFoundException;
-import com.example.dance_community.repository.in_memory.EventRepo;
+import com.example.dance_community.repository.jpa.EventRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -18,7 +18,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class EventService {
-    private final EventRepo eventRepo;
+    private final EventRepository eventRepository;
     private final UserService userService;
     private final ClubService ClubService;
 
@@ -50,7 +50,7 @@ public class EventService {
                 .endsAt(request.getEndsAt())
                 .build();
 
-        Event newEvent = eventRepo.saveEvent(event);
+        Event newEvent = eventRepository.save(event);
         return EventResponse.from(newEvent);
     }
 
@@ -61,7 +61,7 @@ public class EventService {
 
     public List<EventResponse> getEvents() {
         // 구현 이유 : 코드 유연성과 재사용성 / 나중에 일부 필드만 담은 dto만 필요할 때 유연한 구조
-        List<Event> events = eventRepo.findAll();
+        List<Event> events = eventRepository.findAll();
         return events.stream().map(EventResponse::from).toList();
     }
 
@@ -86,11 +86,11 @@ public class EventService {
 
     public void deleteEvent(Long eventId) {
         this.getActiveEvent(eventId);
-        eventRepo.deleteById(eventId);
+        eventRepository.deleteById(eventId);
     }
 
     Event getActiveEvent(Long eventId) {
-        return eventRepo.findById(eventId)
+        return eventRepository.findById(eventId)
                 .orElseThrow(() -> new NotFoundException("행사 조회 실패"));
     }
 }

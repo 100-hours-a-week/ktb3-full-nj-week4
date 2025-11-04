@@ -25,7 +25,7 @@ public class EventJoinService {
         User user = userService.getActiveUser(userId);
         Event event = eventService.getActiveEvent(request.getEventId());
 
-        if (eventJoinRepository.existsByEventAndUser(user, event)) {
+        if (eventJoinRepository.existsByEventAndParticipant(user, event)) {
             throw new ConflictException("이미 신청한 행사");
         }
 
@@ -42,7 +42,7 @@ public class EventJoinService {
     public List<EventJoinResponse> getUserEvents(Long userId) {
         User user = userService.getActiveUser(userId);
 
-        List<EventJoin> eventJoins = eventJoinRepository.findByUser(user);
+        List<EventJoin> eventJoins = eventJoinRepository.findByParticipant(user);
         return eventJoins.stream()
                 .map(EventJoinResponse::from)
                 .toList();
@@ -62,17 +62,17 @@ public class EventJoinService {
         User user = userService.getActiveUser(userId);
         Event event = eventService.getActiveEvent(eventId);
 
-        if (!eventJoinRepository.existsByEventAndUser(user, event)) {
+        if (!eventJoinRepository.existsByEventAndParticipant(user, event)) {
             throw new InvalidRequestException("신청하지 않은 행사");
         }
 
-        eventJoinRepository.deleteByEventAndUser(user, event);
+        eventJoinRepository.deleteByEventAndParticipant(user, event);
     }
 
     public boolean isEventJoin(Long userId, Long eventId) {
         User user = userService.getActiveUser(userId);
         Event event = eventService.getActiveEvent(eventId);
 
-        return eventJoinRepository.existsByEventAndUser(user, event);
+        return eventJoinRepository.existsByEventAndParticipant(user, event);
     }
 }

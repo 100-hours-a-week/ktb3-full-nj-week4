@@ -21,23 +21,23 @@ public class AuthService {
 
     @Transactional
     public AuthResponse signup(SignupRequest signupRequest){
-        if (userRepository.existsByEmail(signupRequest.email())) {
+        if (userRepository.existsByEmail(signupRequest.getEmail())) {
             throw new ConflictException("이메일 중복");
         }
         User user = User.builder()
-                .email(signupRequest.email())
-                .password(passwordEncoder.encode(signupRequest.password()))
-                .username(signupRequest.username())
+                .email(signupRequest.getEmail())
+                .password(passwordEncoder.encode(signupRequest.getPassword()))
+                .username(signupRequest.getUsername())
                 .build();
         User newUser = userRepository.save(user);
         return new AuthResponse(UserResponse.from(user), "", "");
     }
 
     public AuthResponse login(LoginRequest loginRequest) {
-        User user = userRepository.findByEmail(loginRequest.email())
+        User user = userRepository.findByEmail(loginRequest.getEmail())
                 .orElseThrow(() -> new AuthException("등록되지 않은 이메일"));
 
-        if (!passwordEncoder.matches(loginRequest.password(), user.getPassword())) {
+        if (!passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
             throw new AuthException("비밀번호 미일치");
         }
 

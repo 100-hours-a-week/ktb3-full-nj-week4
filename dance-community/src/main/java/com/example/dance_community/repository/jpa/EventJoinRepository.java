@@ -12,9 +12,9 @@ import java.util.List;
 public interface EventJoinRepository extends JpaRepository<EventJoin, Long> {
     List<EventJoin> findByEvent(Event event);
 
-    List<EventJoin> findByUser(User user);
+    List<EventJoin> findByParticipant(User user);
 
-    boolean existsByEventAndUser(User user, Event event);
+    boolean existsByEventAndParticipant(User user, Event event);
 
-    void deleteByEventAndUser(User user, Event event);
+    void deleteByEventAndParticipant(User user, Event event);
 }

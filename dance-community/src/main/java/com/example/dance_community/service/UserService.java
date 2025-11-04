@@ -26,9 +26,9 @@ public class UserService {
     public UserResponse updateUser(Long userId, UserUpdateRequest userUpdateRequest) {
         User user = this.getActiveUser(userId);
         user.updateUser(
-                userUpdateRequest.username(),
-                passwordEncoder.encode(userUpdateRequest.password()),
-                userUpdateRequest.profileImage()
+                userUpdateRequest.getUsername(),
+                passwordEncoder.encode(userUpdateRequest.getPassword()),
+                userUpdateRequest.getProfileImage()
         );
         return UserResponse.from(user);
     }
