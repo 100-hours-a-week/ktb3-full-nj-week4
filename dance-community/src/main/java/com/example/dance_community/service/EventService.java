@@ -89,7 +89,7 @@ public class EventService {
         eventRepo.deleteById(eventId);
     }
 
-    private Event getActiveEvent(Long eventId) {
+    Event getActiveEvent(Long eventId) {
         return eventRepo.findById(eventId)
                 .orElseThrow(() -> new NotFoundException("행사 조회 실패"));
     }

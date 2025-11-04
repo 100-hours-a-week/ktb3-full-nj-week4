@@ -1,83 +1,78 @@
 package com.example.dance_community.service;
 
-import com.example.dance_community.dto.eventJoin.EventJoinDto;
+import com.example.dance_community.dto.eventJoin.EventJoinCreateRequest;
+import com.example.dance_community.dto.eventJoin.EventJoinResponse;
+import com.example.dance_community.entity.*;
+import com.example.dance_community.entity.enums.EventJoinStatus;
 import com.example.dance_community.exception.ConflictException;
-import com.example.dance_community.exception.NotFoundException;
-import com.example.dance_community.repository.in_memory.RegistrationRepo;
+import com.example.dance_community.exception.InvalidRequestException;
+import com.example.dance_community.repository.jpa.EventJoinRepository;
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class EventJoinService {
-    private final RegistrationRepo registrationRepo;
+    private final EventJoinRepository eventJoinRepository;
+    private final UserService userService;
     private final EventService eventService;
 
-    public EventJoinService(RegistrationRepo registrationRepo, EventService eventService) {
-        this.registrationRepo = registrationRepo;
-        this.eventService = eventService;
-    }
+    @Transactional
+    public EventJoinResponse createEventJoin(Long userId, EventJoinCreateRequest request) {
+        User user = userService.getActiveUser(userId);
+        Event event = eventService.getActiveEvent(request.getEventId());
 
-    public EventJoinDto createRegistration(Long userId, Long eventId) {
-        eventService.validateCanRegister(eventId);
-
-        boolean alreadyRegistered = registrationRepo
-                .findRegistration(eventId, userId)
-                .filter(r -> r.isSuccess())
-                .isPresent();
-        if (alreadyRegistered) {
-            throw new ConflictException("중복 신청 거부");
+        if (eventJoinRepository.existsByEventAndUser(user, event)) {
+            throw new ConflictException("이미 신청한 행사");
         }
 
-        EventJoinDto newRegistration = EventJoinDto.builder()
-                .eventId(eventId)
-                .userId(userId)
-                .isSuccess(true)
+        EventJoin newEventJoin = EventJoin.builder()
+                .participant(user)
+                .event(event)
+                .status(EventJoinStatus.valueOf(request.getStatus()))
                 .build();
-        EventJoinDto saved = registrationRepo.saveRegistration(newRegistration);
 
-        eventService.incrementParticipants(eventId);
-        return saved;
+        EventJoin savedEventJoin = eventJoinRepository.save(newEventJoin);
+        return EventJoinResponse.from(savedEventJoin);
     }
 
-    public EventJoinDto getRegistration(Long userId, Long eventId) {
-        return registrationRepo.findRegistration(userId, eventId)
-                .orElseThrow(() -> new NotFoundException("행사 신청 조회 실패"));
+    public List<EventJoinResponse> getUserEvents(Long userId) {
+        User user = userService.getActiveUser(userId);
+
+        List<EventJoin> eventJoins = eventJoinRepository.findByUser(user);
+        return eventJoins.stream()
+                .map(EventJoinResponse::from)
+                .toList();
     }
 
-    public List<EventJoinDto> getAllEventRegistrations(Long userId) {
-        try {
-            return registrationRepo.findEventsByUser(userId).stream()
-                    .filter(r -> r.isSuccess())
-                    .toList();
-        } catch (Exception e) {
-            throw new RuntimeException("신청한 행사 내역 조회 실패");
-        }
+    public List<EventJoinResponse> getEventUsers(Long eventId) {
+        Event event = eventService.getActiveEvent(eventId);
+
+        List<EventJoin> eventJoins = eventJoinRepository.findByEvent(event);
+        return eventJoins.stream()
+                .map(EventJoinResponse::from)
+                .toList();
     }
 
-    public List<EventJoinDto> getAllUserRegistrations(Long eventId) {
-        try {
-            return registrationRepo.findUsersByEvent(eventId).stream()
-                    .filter(r -> r.isSuccess())
-                    .toList();
-        } catch (Exception e) {
-            throw new RuntimeException("행사 신청 인원 조회 실패");
-        }
-    }
+    @Transactional
+    public void deleteEventJoin(Long userId, Long eventId) {
+        User user = userService.getActiveUser(userId);
+        Event event = eventService.getActiveEvent(eventId);
 
-    public EventJoinDto cancelRegistration(Long userId, Long eventId) {
-        EventJoinDto registration = registrationRepo.findRegistration(userId, eventId)
-                .orElseThrow(() -> new NotFoundException("행사 신청 조회 실패"));
-
-        if (!registration.isSuccess()) {
-            throw new ConflictException("이미 취소 완료");
+        if (!eventJoinRepository.existsByEventAndUser(user, event)) {
+            throw new InvalidRequestException("신청하지 않은 행사");
         }
 
-        eventService.decrementParticipants(eventId);
+        eventJoinRepository.deleteByEventAndUser(user, event);
+    }
 
-        EventJoinDto canceledRegistration = registration.toBuilder()
-                .isSuccess(false)
-                .build();
-        return registrationRepo.saveRegistration(canceledRegistration);
+    public boolean isEventJoin(Long userId, Long eventId) {
+        User user = userService.getActiveUser(userId);
+        Event event = eventService.getActiveEvent(eventId);
+
+        return eventJoinRepository.existsByEventAndUser(user, event);
     }
 }
