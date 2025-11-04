@@ -9,11 +9,11 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-public class RegistrationService {
+public class EventJoinService {
     private final RegistrationRepo registrationRepo;
     private final EventService eventService;
 
-    public RegistrationService(RegistrationRepo registrationRepo, EventService eventService) {
+    public EventJoinService(RegistrationRepo registrationRepo, EventService eventService) {
         this.registrationRepo = registrationRepo;
         this.eventService = eventService;
     }

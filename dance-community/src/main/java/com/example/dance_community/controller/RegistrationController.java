@@ -3,7 +3,7 @@ package com.example.dance_community.controller;
 import com.example.dance_community.auth.GetUserId;
 import com.example.dance_community.dto.ApiResponse;
 import com.example.dance_community.dto.eventJoin.EventJoinDto;
-import com.example.dance_community.service.RegistrationService;
+import com.example.dance_community.service.EventJoinService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +20,7 @@ import java.util.Optional;
 @Tag(name = "6_Registration", description = "행사 신청 관련 API")
 public class RegistrationController {
 
-    private final RegistrationService service;
+    private final EventJoinService service;
 
     @Operation(summary = "행사 신청", description = "행사 id를 통해 행사에 신청합니다.")
     @PostMapping("/{eventId}")

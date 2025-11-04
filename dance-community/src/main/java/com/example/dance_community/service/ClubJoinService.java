@@ -72,4 +72,11 @@ public class ClubJoinService {
 
         clubJoinRepository.deleteByClubAndUser(user, club);
     }
+
+    public boolean isClubJoin(Long userId, Long clubId) {
+        User user = userService.getActiveUser(userId);
+        Club club = clubService.getActiveClub(clubId);
+
+        return clubJoinRepository.existsByClubAndUser(user, club);
+    }
 }

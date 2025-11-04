@@ -2,18 +2,28 @@ package com.example.dance_community.dto.clubJoin;
 
 import com.example.dance_community.entity.ClubJoin;
 
+import java.time.LocalDateTime;
+
 public record ClubJoinResponse (
-        Long clubId,
+        Long clubJoinId,
         Long userId,
+        String userName,
+        Long clubId,
+        String clubName,
         String role,
-        String status
+        String status,
+        LocalDateTime createdAt
 ){
     public static ClubJoinResponse from(ClubJoin clubJoin) {
         return new ClubJoinResponse(
-                clubJoin.getClub().getClubId(),
+                clubJoin.getClubJoinId(),
                 clubJoin.getUser().getUserId(),
+                clubJoin.getUser().getUsername(),
+                clubJoin.getClub().getClubId(),
+                clubJoin.getClub().getClubName(),
                 clubJoin.getRole().name(),
-                clubJoin.getStatus().name()
+                clubJoin.getStatus().name(),
+                clubJoin.getCreatedAt()
         );
     }
 }
