@@ -49,7 +49,8 @@ public class Club extends BaseEntity{
     }
 
     // UPDATE
-    public Club updateClub(String description) {
+    public Club updateClub(String clubName, String description) {
+        this.clubName = clubName;
         this.description = description;
         return this;
     }

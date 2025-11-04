@@ -1,7 +1,11 @@
 package com.example.dance_community.dto.club;
 
 import jakarta.validation.constraints.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
+@Getter
+@AllArgsConstructor
 public class ClubUpdateRequest {
     @NotBlank(message = "클럽 이름 미입력")
     private String clubName;

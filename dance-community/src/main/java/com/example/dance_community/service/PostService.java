@@ -9,9 +9,7 @@ import com.example.dance_community.entity.User;
 import com.example.dance_community.entity.enums.Scope;
 import com.example.dance_community.exception.InvalidRequestException;
 import com.example.dance_community.exception.NotFoundException;
-import com.example.dance_community.repository.jpa.ClubRepository;
 import com.example.dance_community.repository.jpa.PostRepository;
-import com.example.dance_community.repository.jpa.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,21 +20,21 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PostService {
     private final PostRepository postRepository;
-    private final UserRepository userRepository;
-    private final ClubRepository clubRepository;
+    private final UserService userService;
+    private final ClubService ClubService;
 
     @Transactional
     public PostResponse createPost(Long userId, PostCreateRequest request) {
-        User author = userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException("사용자를 찾을 수 없습니다"));
+        User author = userService.getActiveUser(userId);
 
-        Club club = null;
+        Club club;
         if (request.getScope() == Scope.CLUB.toString()) {
             if (request.getClubId() == null) {
                 throw new InvalidRequestException("공개 범위 : 클럽 -> 클럽 값 필요");
             }
-            club = clubRepository.findById(request.getClubId())
-                    .orElseThrow(() -> new NotFoundException("클럽을 찾을 수 없습니다"));
+            club = ClubService.getActiveClub(request.getClubId());
+        } else {
+            club = null;
         }
 
         Post post = Post.builder()
@@ -54,7 +52,7 @@ public class PostService {
     }
 
     public PostResponse getPost(Long postId) {
-        Post post = getPostEntityById(postId);
+        Post post = getActivePost(postId);
         return PostResponse.from(post);
     }
 
@@ -65,7 +63,7 @@ public class PostService {
 
     @Transactional
     public PostResponse updatePost(Long postId, PostUpdateRequest request) {
-        Post post = getPostEntityById(postId);
+        Post post = getActivePost(postId);
 
         post.updatePost(
                 request.getTitle(),
@@ -78,11 +76,11 @@ public class PostService {
     }
 
     public void deletePost(Long postId) {
-        Post post = getPostEntityById(postId);
+        Post post = getActivePost(postId);
         post.delete();
     }
 
-    private Post getPostEntityById(Long postId) {
+    private Post getActivePost(Long postId) {
         return postRepository.findById(postId)
                 .orElseThrow(() -> new NotFoundException("게시물을 찾을 수 없습니다"));
     }

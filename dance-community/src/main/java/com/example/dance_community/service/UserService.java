@@ -18,13 +18,13 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
 
     public UserResponse getUser(Long userId) {
-        User user = this.getUserEntityById(userId);
+        User user = this.getActiveUser(userId);
         return UserResponse.from(user);
     }
 
     @Transactional
     public UserResponse updateUser(Long userId, UserUpdateRequest userUpdateRequest) {
-        User user = this.getUserEntityById(userId);
+        User user = this.getActiveUser(userId);
         user.updateUser(
                 userUpdateRequest.username(),
                 passwordEncoder.encode(userUpdateRequest.password()),
@@ -35,11 +35,11 @@ public class UserService {
 
     @Transactional
     public void deleteUser(Long userId) {
-        User user = this.getUserEntityById(userId);
+        User user = this.getActiveUser(userId);
         user.delete();
     }
 
-    private User getUserEntityById(Long userId) {
+    public User getActiveUser(Long userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("등록되지 않은 사용자"));
     }
