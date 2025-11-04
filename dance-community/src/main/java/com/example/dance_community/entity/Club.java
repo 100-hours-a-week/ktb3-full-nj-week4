@@ -54,7 +54,7 @@ public class Club extends BaseEntity{
         return this;
     }
 
-    // Convenience Methods for ClubMember->User
+    // Convenience Methods for ClubJoin
     public void addMember(User user, ClubRole role, ClubJoinStatus status) {
         ClubJoin newClubJoin = ClubJoin.builder()
                 .user(user)

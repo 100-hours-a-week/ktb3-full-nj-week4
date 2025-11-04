@@ -1,5 +1,6 @@
 package com.example.dance_community.entity;
 
+import com.example.dance_community.entity.enums.EventJoinStatus;
 import com.example.dance_community.entity.enums.EventType;
 import com.example.dance_community.entity.enums.Scope;
 import jakarta.persistence.*;
@@ -134,6 +135,21 @@ public class Event extends BaseEntity{
         this.updatedAt = LocalDateTime.now();
 
         return this;
+    }
+
+    // Convenience Methods for EventJoin
+    public void addParticipant(User user, EventJoinStatus status) {
+        EventJoin newEventJoin = EventJoin.builder()
+                .participant(user)
+                .event(this)
+                .status(status)
+                .build();
+        this.participants.add(newEventJoin);
+        user.getEventJoins().add(newEventJoin);
+    }
+    public void removeParticipant(User user) {
+        participants.removeIf(m -> m.getParticipant().equals(user));
+        user.getEventJoins().removeIf(m -> m.getEvent().equals(this));
     }
 
     // Check Methods
