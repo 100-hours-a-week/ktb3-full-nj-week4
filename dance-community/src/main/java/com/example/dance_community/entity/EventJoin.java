@@ -23,7 +23,7 @@ public class EventJoin extends BaseEntity{
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userId", nullable = false)
-    private User user;
+    private User participant;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "eventId", nullable = false)
@@ -35,9 +35,9 @@ public class EventJoin extends BaseEntity{
 
     // CREATE
     @Builder
-    private EventJoin(User user, Event event, EventJoinStatus status) {
-        validateEventJoin(user, event, status);
-        this.user = user;
+    private EventJoin(User participant, Event event, EventJoinStatus status) {
+        validateEventJoin(participant, event, status);
+        this.participant = participant;
         this.event = event;
         this.status = status;
     }

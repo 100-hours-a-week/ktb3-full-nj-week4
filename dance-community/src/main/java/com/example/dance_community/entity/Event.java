@@ -23,7 +23,7 @@ public class Event extends BaseEntity{
     // 작성자
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userId", nullable = false ,updatable = false)
-    private User author;
+    private User host;
 
     // 공개 범위
     @Enumerated(EnumType.STRING)
@@ -74,7 +74,7 @@ public class Event extends BaseEntity{
 
     // 행사 참가자 목록
     @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<EventJoin> eventJoins = new ArrayList<>();
+    private List<EventJoin> participants = new ArrayList<>();
 
     // 행사 일시 (시작, 종료 시간)
     @Column(nullable = false)
@@ -87,13 +87,13 @@ public class Event extends BaseEntity{
 
     // CREATE
     @Builder
-    private Event(User author, Scope scope, Club club, EventType type,
+    private Event(User host, Scope scope, Club club, EventType type,
                   String title, String content, List<String> tags, List<String> images,
                   String locationName, String locationAddress, String locationLink, Long capacity,
                   LocalDateTime startsAt, LocalDateTime endsAt) {
-        validateEvent(author, scope, club, type, title, content, capacity, startsAt, endsAt);
+        validateEvent(host, scope, club, type, title, content, capacity, startsAt, endsAt);
 
-        this.author = author;
+        this.host = host;
         this.scope = scope;
         this.club = club;
         this.type = type;
@@ -107,6 +107,10 @@ public class Event extends BaseEntity{
         this.capacity = capacity;
         this.startsAt = startsAt;
         this.endsAt = endsAt;
+    }
+    public Event setHost(User host) {
+        this.host = host;
+        return this;
     }
 
     // UPDATE
@@ -138,11 +142,11 @@ public class Event extends BaseEntity{
             throw new IllegalArgumentException(fieldName+" 미입력");
         }
     }
-    private void validateEvent(User author, Scope scope, Club club, EventType type,
+    private void validateEvent(User host, Scope scope, Club club, EventType type,
                                String title, String content, Long capacity,
                                LocalDateTime startsAt, LocalDateTime endsAt) {
-        if (author == null) {
-            throw new IllegalArgumentException("작성자 미입력");
+        if (host == null) {
+            throw new IllegalArgumentException("주최자 미입력");
         }
         if (scope == null) {
             throw new IllegalArgumentException("공개 범위 미입력");

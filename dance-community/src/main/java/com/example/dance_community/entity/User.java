@@ -2,6 +2,7 @@ package com.example.dance_community.entity;
 
 import com.example.dance_community.entity.enums.ClubRole;
 import com.example.dance_community.entity.enums.ClubJoinStatus;
+import com.example.dance_community.entity.enums.EventJoinStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -31,6 +32,9 @@ public class User extends BaseEntity{
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ClubJoin> clubs = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Post> posts = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Event> events = new ArrayList<>();
@@ -63,8 +67,8 @@ public class User extends BaseEntity{
         return this;
     }
 
-    // Convenience Methods for ClubMember->Club
-    public void AddClub(Club club, ClubRole role, ClubJoinStatus status) {
+    // Convenience Methods for ClubJoin
+    public void addClubJoin(Club club, ClubRole role, ClubJoinStatus status) {
         ClubJoin newClubJoin = ClubJoin.builder()
                 .user(this)
                 .club(club)
@@ -74,9 +78,44 @@ public class User extends BaseEntity{
         this.clubs.add(newClubJoin);
         club.getMembers().add(newClubJoin);
     }
-    public void removeClub(Club club) {
+    public void removeClubJoin(Club club) {
         clubs.removeIf(m -> m.getClub().equals(club));
         club.getMembers().removeIf(m -> m.getUser().equals(this));
+    }
+
+    // Convenience Methods for Post
+    public void addPost(Post post) {
+        this.posts.add(post);
+        post.setAuthor(this);
+    }
+    public void removePost(Post post) {
+        this.posts.remove(post);
+        post.setAuthor(null);
+    }
+
+    // Convenience Methods for Event
+    public void addEvent(Event event) {
+        this.events.add(event);
+        event.setHost(this);
+    }
+    public void removeEvent(Event event) {
+        this.events.remove(event);
+        event.setHost(null);
+    }
+
+    // Convenience Methods for EventJoin
+    public void addEventJoin(Event event, EventJoinStatus status) {
+        EventJoin newEventJoin = EventJoin.builder()
+                .participant(this)
+                .event(event)
+                .status(status)
+                .build();
+        this.eventJoins.add(newEventJoin);
+        event.getParticipants().add(newEventJoin);
+    }
+    public void removeEventJoin(Event event) {
+        eventJoins.removeIf(ej -> ej.getEvent().equals(event));
+        event.getParticipants().removeIf(ej -> ej.getParticipant().equals(this));
     }
 
     // Check Methods
