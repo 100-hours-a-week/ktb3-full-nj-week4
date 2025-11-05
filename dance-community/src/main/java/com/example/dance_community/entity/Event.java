@@ -5,6 +5,8 @@ import com.example.dance_community.entity.enums.EventType;
 import com.example.dance_community.entity.enums.Scope;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -14,6 +16,8 @@ import java.util.List;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "events")
+@Where(clause = "is_deleted = false")
+@SQLDelete(sql = "UPDATE events SET is_deleted = true WHERE event_id = ?")
 public class Event extends BaseEntity{
     // 행사 ID
     @Id
