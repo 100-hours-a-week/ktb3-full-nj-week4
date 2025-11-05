@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +20,7 @@ import java.util.List;
 @RequestMapping("/club-joins")
 @RequiredArgsConstructor
 @Tag(name = "4_ClubJoin", description = "클럽 가입 관련 API")
+@Slf4j
 public class ClubJoinController {
     private final ClubJoinService clubJoinService;
 
@@ -44,17 +46,17 @@ public class ClubJoinController {
     }
 
     @Operation(summary = "클럽 가입 확인", description = "특정 사용자가 특정 클럽의 멤버인지 확인합니다.")
-    @GetMapping("/check/{postId}")
-    public ResponseEntity<Boolean> checkMembership(@GetUserId Long userId, @PathVariable Long postId) {
-        boolean isMember = clubJoinService.isClubJoin(userId, postId);
+    @GetMapping("/check/{clubId}")
+    public ResponseEntity<Boolean> checkMembership(@GetUserId Long userId, @PathVariable Long clubId) {
+        boolean isMember = clubJoinService.isClubJoin(userId, clubId);
         return ResponseEntity.ok(isMember);
     }
 
     @Operation(summary = "클럽 탈퇴", description = "클럽에서 탈퇴합니다.")
     @DeleteMapping("/{clubId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public ResponseEntity<Void> deleteClubJoin(@GetUserId Long userId, @PathVariable Long postId) {
-        clubJoinService.deleteClubJoin(userId, postId);
+    public ResponseEntity<Void> deleteClubJoin(@GetUserId Long userId, @PathVariable Long clubId) {
+        clubJoinService.deleteClubJoin(userId, clubId);
         return ResponseEntity.noContent().build();
     }
 }

@@ -28,7 +28,7 @@ public class ClubJoinService {
         User user = userService.getActiveUser(userId);
         Club club = clubService.getActiveClub(request.getClubId());
 
-        if (clubJoinRepository.existsByClubAndUser(user, club)) {
+        if (clubJoinRepository.existsByUserAndClub(user, club)) {
             throw new ConflictException("이미 가입한 클럽");
         }
 
@@ -66,17 +66,17 @@ public class ClubJoinService {
         User user = userService.getActiveUser(userId);
         Club club = clubService.getActiveClub(clubId);
 
-        if (!clubJoinRepository.existsByClubAndUser(user, club)) {
+        if (!clubJoinRepository.existsByUserAndClub(user, club)) {
             throw new InvalidRequestException("가입하지 않은 클럽");
         }
 
-        clubJoinRepository.deleteByClubAndUser(user, club);
+        clubJoinRepository.deleteByUserAndClub(user, club);
     }
 
     public boolean isClubJoin(Long userId, Long clubId) {
         User user = userService.getActiveUser(userId);
         Club club = clubService.getActiveClub(clubId);
 
-        return clubJoinRepository.existsByClubAndUser(user, club);
+        return clubJoinRepository.existsByUserAndClub(user, club);
     }
 }

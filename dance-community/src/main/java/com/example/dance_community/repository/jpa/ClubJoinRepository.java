@@ -14,7 +14,7 @@ public interface ClubJoinRepository extends JpaRepository<ClubJoin, Long> {
 
     List<ClubJoin> findByUser(User user);
 
-    boolean existsByClubAndUser(User user, Club club);
+    boolean existsByUserAndClub(User user, Club club);
 
-    void deleteByClubAndUser(User user, Club club);
+    void deleteByUserAndClub(User user, Club club);
 }

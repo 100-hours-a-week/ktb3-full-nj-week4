@@ -28,8 +28,8 @@ public class EventUpdateRequest{
     Long capacity;
 
     // 행사 일시 (시작, 종료 시간)
-    @NotBlank(message = "행사 시작시간 미입력")
+    @NotNull(message = "행사 시작시간 미입력")
     LocalDateTime startsAt;
-    @NotBlank(message = "행사 종료시간 미입력")
+    @NotNull(message = "행사 종료시간 미입력")
     LocalDateTime endsAt;
 }

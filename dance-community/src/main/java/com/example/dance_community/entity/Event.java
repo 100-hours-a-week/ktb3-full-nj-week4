@@ -26,7 +26,7 @@ public class Event extends BaseEntity{
 
     // 작성자
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "userId", nullable = false ,updatable = false)
+    @JoinColumn(name = "user_id", nullable = false ,updatable = false)
     private User host;
 
     // 공개 범위
@@ -36,7 +36,7 @@ public class Event extends BaseEntity{
 
     // 클럽 ID (Scope.CLUB일 때 대상 클럽)
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "clubId", updatable = false)
+    @JoinColumn(name = "club_id", updatable = false)
     private Club club;
 
     // 행사 유형

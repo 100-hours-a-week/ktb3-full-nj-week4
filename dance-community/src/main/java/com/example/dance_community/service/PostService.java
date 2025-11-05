@@ -74,8 +74,9 @@ public class PostService {
         return PostResponse.from(post);
     }
 
+    @Transactional
     public void deletePost(Long postId) {
-        Post post = getActivePost(postId);
+        Post post = this.getActivePost(postId);
         post.delete();
     }
 

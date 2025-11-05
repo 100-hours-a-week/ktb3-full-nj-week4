@@ -14,7 +14,7 @@ public interface EventJoinRepository extends JpaRepository<EventJoin, Long> {
 
     List<EventJoin> findByParticipant(User user);
 
-    boolean existsByEventAndParticipant(User user, Event event);
+    boolean existsByParticipantAndEvent(User user, Event event);
 
-    void deleteByEventAndParticipant(User user, Event event);
+    void deleteByParticipantAndEvent(User user, Event event);
 }

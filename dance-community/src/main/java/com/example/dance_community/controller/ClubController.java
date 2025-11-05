@@ -58,7 +58,6 @@ public class ClubController {
         return ResponseEntity.ok(new ApiResponse<>("클럽 수정 성공", clubResponse));
     }
 
-
     @Operation(summary = "클럽 삭제", description = "클럽 id를 통해 정보를 삭제합니다.")
     @DeleteMapping("/{clubId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)

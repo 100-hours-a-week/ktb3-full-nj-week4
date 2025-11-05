@@ -12,7 +12,7 @@ import lombok.*;
         uniqueConstraints = {
                 @UniqueConstraint(
                         name = "unique_user_event",
-                        columnNames = {"userId", "eventId"}  // Unique 설정 -> 중복 신청 방지
+                        columnNames = {"user_id", "event_id"}  // Unique 설정 -> 중복 신청 방지
                 )
         }
 )
@@ -22,11 +22,11 @@ public class EventJoin extends BaseEntity{
     private Long eventJoinId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "userId", nullable = false)
+    @JoinColumn(name = "user_id", nullable = false)
     private User participant;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "eventId", nullable = false)
+    @JoinColumn(name = "event_id", nullable = false)
     private Event event;
 
     @Enumerated(EnumType.STRING)

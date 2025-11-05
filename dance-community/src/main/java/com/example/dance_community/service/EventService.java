@@ -6,10 +6,12 @@ import com.example.dance_community.dto.event.EventUpdateRequest;
 import com.example.dance_community.entity.Club;
 import com.example.dance_community.entity.Event;
 import com.example.dance_community.entity.User;
+import com.example.dance_community.entity.enums.EventType;
 import com.example.dance_community.entity.enums.Scope;
 import com.example.dance_community.exception.InvalidRequestException;
 import com.example.dance_community.exception.NotFoundException;
 import com.example.dance_community.repository.jpa.EventRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -38,6 +40,7 @@ public class EventService {
                 .host(host)
                 .scope(Scope.valueOf(request.getScope().toUpperCase()))
                 .club(club)
+                .type(EventType.valueOf(request.getType().toUpperCase()))
                 .title(request.getTitle())
                 .content(request.getContent())
                 .tags(request.getTags())
@@ -84,9 +87,10 @@ public class EventService {
         return EventResponse.from(event);
     }
 
+    @Transactional
     public void deleteEvent(Long eventId) {
-        this.getActiveEvent(eventId);
-        eventRepository.deleteById(eventId);
+        Event event = getActiveEvent(eventId);
+        event.delete();
     }
 
     Event getActiveEvent(Long eventId) {

@@ -49,6 +49,7 @@ public class ClubService {
         return ClubResponse.from(club);
     }
 
+    @Transactional
     public void deleteClub(Long clubId) {
         Club club = getActiveClub(clubId);
         club.delete();
