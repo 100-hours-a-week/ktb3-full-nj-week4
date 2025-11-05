@@ -6,7 +6,7 @@ import com.example.dance_community.entity.enums.EventJoinStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
+import org.hibernate.annotations.SQLRestriction;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,7 +15,7 @@ import java.util.List;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "users")
-@Where(clause = "is_deleted = false")
+@SQLRestriction("is_deleted = false")
 @SQLDelete(sql = "UPDATE users SET is_deleted = true WHERE user_id = ?")
 public class User extends BaseEntity{
     @Id

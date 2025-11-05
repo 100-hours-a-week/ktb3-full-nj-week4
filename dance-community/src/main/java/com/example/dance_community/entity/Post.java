@@ -4,7 +4,7 @@ import com.example.dance_community.entity.enums.Scope;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
+import org.hibernate.annotations.SQLRestriction;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -14,7 +14,7 @@ import java.util.List;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "posts")
-@Where(clause = "is_deleted = false")
+@SQLRestriction("is_deleted = false")
 @SQLDelete(sql = "UPDATE posts SET is_deleted = true WHERE post_id = ?")
 public class Post extends BaseEntity{
 

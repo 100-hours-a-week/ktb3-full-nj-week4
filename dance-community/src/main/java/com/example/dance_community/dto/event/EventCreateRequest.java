@@ -1,7 +1,7 @@
 package com.example.dance_community.dto.event;
 
 import com.example.dance_community.validation.ValidScopeTypeEvent;
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -37,7 +37,7 @@ public class EventCreateRequest{
     String locationLink;
 
     // 행사 총 수용 인원
-    @NotBlank(message = "행사 총 수용 인원 미입력")
+    @NotNull(message = "행사 수용 인원 미입력")
     Long capacity;
 
     // 행사 일시 (시작, 종료 시간)

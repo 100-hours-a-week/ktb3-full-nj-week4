@@ -5,7 +5,7 @@ import com.example.dance_community.entity.enums.ClubRole;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
+import org.hibernate.annotations.SQLRestriction;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +14,7 @@ import java.util.List;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "clubs")
-@Where(clause = "is_deleted = false")
+@SQLRestriction("is_deleted = false")
 @SQLDelete(sql = "UPDATE clubs SET is_deleted = true WHERE club_id = ?")
 public class Club extends BaseEntity{
     @Id
