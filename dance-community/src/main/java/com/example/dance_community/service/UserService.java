@@ -2,41 +2,46 @@ package com.example.dance_community.service;
 
 import com.example.dance_community.dto.user.UserResponse;
 import com.example.dance_community.dto.user.UserUpdateRequest;
+import com.example.dance_community.encoder.PasswordEncoder;
 import com.example.dance_community.entity.User;
 import com.example.dance_community.exception.NotFoundException;
-import com.example.dance_community.repository.UserRepo;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.dance_community.repository.jpa.UserRepository;
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 
 @Service
+@RequiredArgsConstructor
 public class UserService {
-    private final UserRepo userRepo;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    @Autowired
-    public UserService(UserRepo userRepo) {
-        this.userRepo = userRepo;
-    }
-
-    public UserResponse getUserById(Long userId) {
-        User user = userRepo.findById(userId)
-                .orElseThrow(() -> new NotFoundException("등록되지 않은 사용자"));
+    public UserResponse getUser(Long userId) {
+        User user = this.getActiveUser(userId);
         return UserResponse.from(user);
     }
 
-    public UserResponse updateUser(Long userId, UserUpdateRequest userUpdateRequest) {
-        User user = userRepo.findById(userId)
-                .orElseThrow(() -> new NotFoundException("등록되지 않은 사용자"));
-        User updatedUser = user.toBuilder()
-                .password(userUpdateRequest.password() != null ? userUpdateRequest.password() : user.getPassword())
-                .username(userUpdateRequest.username() != null ? userUpdateRequest.username() : user.getUsername())
-                .profileImage(userUpdateRequest.profileImage() != null ? userUpdateRequest.profileImage() : user.getProfileImage())
-                .build();
-        updatedUser.hashedPassword();
-        return UserResponse.from(userRepo.saveUser(updatedUser));
+    @Transactional
+    public UserResponse updateUser(Long userId, UserUpdateRequest request) {
+        User user = this.getActiveUser(userId);
+
+        user.updateUser(
+                passwordEncoder.encode(request.getPassword()),
+                request.getUsername(),
+                request.getProfileImage()
+        );
+        return UserResponse.from(user);
     }
 
-    public void deleteCurrentUser(Long userId) {
-        userRepo.deleteUser(userId);
+    @Transactional
+    public void deleteUser(Long userId) {
+        User user = getActiveUser(userId);
+        user.delete();
+    }
+
+    public User getActiveUser(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("등록되지 않은 사용자"));
     }
 }

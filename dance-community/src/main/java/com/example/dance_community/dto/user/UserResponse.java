@@ -1,19 +1,23 @@
 package com.example.dance_community.dto.user;
 
+import com.example.dance_community.entity.User;
+
 import java.time.LocalDateTime;
 
 public record UserResponse(
+        Long userId,
         String email,
         String username,
         String profileImage,
-        LocalDateTime createdAt,
-        Boolean isDeleted) {
-    public static UserResponse from(com.example.dance_community.entity.User entity) {
+        LocalDateTime createdAt
+) {
+    public static UserResponse from(User user) {
         return new UserResponse(
-                entity.getEmail(),
-                entity.getUsername(),
-                entity.getProfileImage(),
-                entity.getCreatedAt(),
-                entity.getIsDeleted()
+                user.getUserId(),
+                user.getEmail(),
+                user.getUsername(),
+                user.getProfileImage(),
+                user.getCreatedAt()
         );
-}}
+    }
+}

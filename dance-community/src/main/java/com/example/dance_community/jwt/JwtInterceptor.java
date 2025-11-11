@@ -1,22 +1,19 @@
 package com.example.dance_community.jwt;
 
 import com.example.dance_community.exception.AuthException;
-import com.example.dance_community.repository.UserRepo;
+import com.example.dance_community.repository.jpa.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 @Component
+@RequiredArgsConstructor
 public class JwtInterceptor implements HandlerInterceptor {
 
     private final JwtUtil jwtUtil;
-    private final UserRepo userRepo;
-
-    public JwtInterceptor(JwtUtil jwtUtil, UserRepo userRepo) {
-        this.jwtUtil = jwtUtil;
-        this.userRepo = userRepo;
-    }
+    private final UserRepository userRepository;
 
     // 토큰 유효성 검사 로직
     @Override
@@ -34,7 +31,7 @@ public class JwtInterceptor implements HandlerInterceptor {
 
         Long userId = jwtUtil.getUserId(token);
 
-        if (userId == null || !userRepo.existsById(userId)) {
+        if (userId == null || !userRepository.existsById(userId)) {
             throw new AuthException("사용자 인증 실패");
         }
 

@@ -1,88 +1,87 @@
 package com.example.dance_community.service;
 
-import com.example.dance_community.dto.post.PostDto;
-import com.example.dance_community.dto.post.PostRequest;
-import com.example.dance_community.enums.Scope;
+import com.example.dance_community.dto.post.PostCreateRequest;
+import com.example.dance_community.dto.post.PostResponse;
+import com.example.dance_community.dto.post.PostUpdateRequest;
+import com.example.dance_community.entity.Club;
+import com.example.dance_community.entity.Post;
+import com.example.dance_community.entity.User;
+import com.example.dance_community.entity.enums.Scope;
 import com.example.dance_community.exception.InvalidRequestException;
 import com.example.dance_community.exception.NotFoundException;
-import com.example.dance_community.repository.PostRepo;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.dance_community.repository.jpa.PostRepository;
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class PostService {
-    private final PostRepo postRepo;
+    private final PostRepository postRepository;
+    private final UserService userService;
+    private final ClubService ClubService;
 
-    @Autowired
-    public PostService(PostRepo postRepo) {
-        this.postRepo = postRepo;
-    }
+    @Transactional
+    public PostResponse createPost(Long userId, PostCreateRequest request) {
+        User author = userService.getActiveUser(userId);
 
-    public PostDto createPost(Long userId, PostRequest postRequest) {
-        try {
-            PostDto newPost = PostDto.builder()
-                    .userId(userId)
-                    .scope(Scope.valueOf(postRequest.getScope()))
-                    .clubId(postRequest.getClubId())
-                    .title(postRequest.getTitle())
-                    .content(postRequest.getContent())
-                    .tags(postRequest.getTags())
-                    .images(postRequest.getImages())
-                    .build();
-
-            return postRepo.savePost(newPost);
-        } catch (IllegalArgumentException e) {
-            throw new InvalidRequestException("잘못된 요청 데이터");
-        } catch (Exception e) {
-            throw new RuntimeException("행사 생성 실패");
+        Club club = null;
+        if (Scope.CLUB.toString().equals(request.getScope())) {
+            Long clubId = request.getClubId();
+            if (clubId == null) {
+                throw new InvalidRequestException("공개 범위가 CLUB일 경우 clubId가 필요");
+            }
+            club = ClubService.getActiveClub(clubId);
         }
+
+        Post post = Post.builder()
+                .author(author)
+                .scope(Scope.valueOf(request.getScope().toUpperCase()))
+                .club(club)
+                .title(request.getTitle())
+                .content(request.getContent())
+                .tags(request.getTags())
+                .images(request.getImages())
+                .build();
+
+        Post newPost = postRepository.save(post);
+        return PostResponse.from(newPost);
     }
 
-    public PostDto getPost(Long postId) {
-        return postRepo.findById(postId)
-                .orElseThrow(() -> new NotFoundException("게시글 조회 실패"));
+    public PostResponse getPost(Long postId) {
+        Post post = getActivePost(postId);
+        return PostResponse.from(post);
     }
 
-    public List<PostDto> getPosts() {
-        try {
-            return postRepo.findAll();
-        } catch (Exception e) {
-            throw new RuntimeException("게시글 전체 조회 실패");
-        }
+    public List<PostResponse> getPosts() {
+        List<Post> posts = postRepository.findAll();
+        return posts.stream().map(PostResponse::from).toList();
     }
 
-    public PostDto updatePost(Long postId, PostRequest postRequest) {
-        PostDto postDto = postRepo.findById(postId)
-                .orElseThrow(() -> new NotFoundException("게시글 조회 실패"));
+    @Transactional
+    public PostResponse updatePost(Long postId, PostUpdateRequest request) {
+        Post post = getActivePost(postId);
 
-        try {
-            Scope newScope = postRequest.getScope() != null ? Scope.valueOf(postRequest.getScope()) : postDto.getScope();
+        post.updatePost(
+                request.getTitle(),
+                request.getContent(),
+                request.getTags(),
+                request.getImages()
+        );
 
-            PostDto updatedPost = postDto.toBuilder()
-                    .scope(newScope)
-                    .title(postRequest.getTitle() != null ? postRequest.getTitle() : postDto.getTitle())
-                    .content(postRequest.getContent() != null ? postRequest.getContent() : postDto.getContent())
-                    .tags(postRequest.getTags() != null ? postRequest.getTags() : postDto.getTags())
-                    .images(postRequest.getImages() != null ? postRequest.getImages() : postDto.getImages())
-                    .updatedAt(LocalDateTime.now())
-                    .build();
-
-            postRepo.savePost(updatedPost);
-            return updatedPost;
-        } catch (IllegalArgumentException e) {
-            throw new InvalidRequestException("잘못된 요청 데이터");
-        } catch (Exception e) {
-            throw new RuntimeException("게시글 수정 실패");
-        }
+        return PostResponse.from(post);
     }
 
-
+    @Transactional
     public void deletePost(Long postId) {
-        postRepo.findById(postId)
-                .orElseThrow(() -> new NotFoundException("게시글 삭제 실패"));
-        postRepo.deleteById(postId);
+        Post post = this.getActivePost(postId);
+        post.delete();
+    }
+
+    private Post getActivePost(Long postId) {
+        return postRepository.findById(postId)
+                .orElseThrow(() -> new NotFoundException("게시물을 찾을 수 없습니다"));
     }
 }

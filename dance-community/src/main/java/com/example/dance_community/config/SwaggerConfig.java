@@ -8,7 +8,7 @@ import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import org.springframework.context.annotation.Configuration;
 
 @OpenAPIDefinition(
-        info = @Info(title = "DANCE COMMUNITY API", version = "v1", description = "ㄹ"),
+        info = @Info(title = "DANCE COMMUNITY API", version = "v1", description = "춤을 사랑하는 사람들을 위한 커뮤니티입니다. 다음의 API를 참고해주세요!"),
         security = @SecurityRequirement(name = "bearerAuth")
 )
 @SecurityScheme(

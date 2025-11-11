@@ -1,7 +1,3 @@
-/**
- * JWT 토큰 발급 및 검증 구간
- */
-
 package com.example.dance_community.jwt;
 
 import io.jsonwebtoken.*;

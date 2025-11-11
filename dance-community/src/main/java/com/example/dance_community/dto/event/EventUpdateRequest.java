@@ -1,51 +1,35 @@
 package com.example.dance_community.dto.event;
 
-import com.example.dance_community.entity.Event;
 import jakarta.validation.constraints.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-public record EventUpdateRequest(
-        // Details
-        @NotBlank(message = "행사 제목 미입력")
-        String title,
-        @NotBlank(message = "행사 내용 미입력")
-        String content,
-        List<String> tags,
-        List<String> images,
+@Getter
+@AllArgsConstructor
+public class EventUpdateRequest{
+    // 행사 관련 내용 (제목, 내용, 태그, 이미지)
+    @NotBlank(message = "행사 제목 미입력")
+    String title;
+    @NotBlank(message = "행사 내용 미입력")
+    String content;
+    List<String> tags;
+    List<String> images;
 
-        // Location
-        @NotBlank(message = "행사 장소명 미입력")
-        String locationName,
-        @NotBlank(message = "행사 주소 미입력")
-        String locationAddress,
-        String locationLink,
+    // 행사 장소 정보 (이름, 주소, 링크)
+    String locationName;
+    String locationAddress;
+    String locationLink;
 
-        // Capacity
-        @NotNull(message = "행사 마감인원 미입력")
-        Long capacity,
-        Long currentParticipants,
+    // 행사 총 수용 인원
+    @NotNull(message = "행사 마감인원 미입력")
+    Long capacity;
 
-        // Schedule
-        @NotBlank(message = "행사 시작시간 미입력")
-        LocalDateTime startsAt,
-        @NotBlank(message = "행사 종료시간 미입력")
-        LocalDateTime endsAt
-){
-    public Event to(Event existingEvent) {
-        return existingEvent.toBuilder()
-                .title(this.title)
-                .content(this.content)
-                .tags(this.tags)
-                .images(this.images)
-                .locationName(this.locationName)
-                .locationAddress(this.locationAddress)
-                .locationLink(this.locationLink)
-                .capacity(this.capacity)
-                .currentParticipants(this.currentParticipants)
-                .startsAt(this.startsAt)
-                .endsAt(this.endsAt)
-                .build();
-    }
+    // 행사 일시 (시작, 종료 시간)
+    @NotNull(message = "행사 시작시간 미입력")
+    LocalDateTime startsAt;
+    @NotNull(message = "행사 종료시간 미입력")
+    LocalDateTime endsAt;
 }

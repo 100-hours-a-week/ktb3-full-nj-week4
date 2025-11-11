@@ -1,4 +1,4 @@
-package com.example.dance_community.auth; // 또는 jwt
+package com.example.dance_community.auth;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.core.MethodParameter;

@@ -1,8 +1,8 @@
 package com.example.dance_community.validation;
 
 import com.example.dance_community.dto.event.EventCreateRequest;
-import com.example.dance_community.enums.EventType;
-import com.example.dance_community.enums.Scope;
+import com.example.dance_community.entity.enums.EventType;
+import com.example.dance_community.entity.enums.Scope;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 
@@ -11,18 +11,18 @@ public class EventValidator implements ConstraintValidator<ValidScopeTypeEvent, 
     @Override
     public boolean isValid(EventCreateRequest eventCreateRequest, ConstraintValidatorContext context) {
         try {
-            Scope.valueOf(eventCreateRequest.scope().toUpperCase());
+            Scope.valueOf(eventCreateRequest.getScope().toUpperCase());
         } catch (IllegalArgumentException e) {
             return false;
         }
 
         try {
-            EventType.valueOf(eventCreateRequest.type().toUpperCase());
+            EventType.valueOf(eventCreateRequest.getType().toUpperCase());
         } catch (IllegalArgumentException e) {
             return false;
         }
 
-        if ("CLUB".equalsIgnoreCase(eventCreateRequest.scope()) && eventCreateRequest.clubId() == null) {
+        if ("CLUB".equalsIgnoreCase(eventCreateRequest.getScope()) && eventCreateRequest.getClubId() == null) {
             return false;
         }
 

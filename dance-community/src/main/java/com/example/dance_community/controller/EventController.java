@@ -8,7 +8,6 @@ import com.example.dance_community.dto.event.EventUpdateRequest;
 import com.example.dance_community.service.EventService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -20,7 +19,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/events")
 @RequiredArgsConstructor
-@Tag(name = "4_Event", description = "행사 관련 API")
+@Tag(name = "6_Event", description = "행사 관련 API")
 public class EventController {
     private final EventService eventService;
 
