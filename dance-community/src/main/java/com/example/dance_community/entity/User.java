@@ -29,7 +29,7 @@ public class User extends BaseEntity{
     private String password;
 
     @Column(nullable = false, length = 50)
-    private String username;
+    private String nickname;
 
     @Column(length = 255, columnDefinition = "TEXT")
     private String profileImage;
@@ -48,23 +48,23 @@ public class User extends BaseEntity{
 
     // CREATE
     @Builder
-    public User(String email, String password, String username, String profileImage) {
+    public User(String email, String password, String nickname, String profileImage) {
         checkNullOrBlank(email, "이메일");
         checkNullOrBlank(password, "비밀번호");
-        checkNullOrBlank(username, "사용자 이름");
+        checkNullOrBlank(nickname, "사용자 이름");
 
         this.email = email;
         this.password = password;
-        this.username = username;
+        this.nickname = nickname;
         this.profileImage = profileImage;
     }
 
     // UPDATE
-    public User updateUser(String password, String username, String profileImage) {
+    public User updateUser(String password, String nickname, String profileImage) {
         checkNullOrBlank(password, "비밀번호");
-        checkNullOrBlank(username, "사용자 이름");
+        checkNullOrBlank(nickname, "사용자 이름");
 
-        this.username = username;
+        this.nickname = nickname;
         this.password = password;
         this.profileImage = profileImage;
 

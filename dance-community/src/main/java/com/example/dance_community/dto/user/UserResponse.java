@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 public record UserResponse(
         Long userId,
         String email,
-        String username,
+        String nickname,
         String profileImage,
         LocalDateTime createdAt
 ) {
@@ -15,7 +15,7 @@ public record UserResponse(
         return new UserResponse(
                 user.getUserId(),
                 user.getEmail(),
-                user.getUsername(),
+                user.getNickname(),
                 user.getProfileImage(),
                 user.getCreatedAt()
         );

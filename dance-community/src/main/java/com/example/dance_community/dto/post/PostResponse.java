@@ -22,7 +22,7 @@ public record PostResponse(
         return new PostResponse(
                 post.getPostId(),
                 post.getAuthor().getUserId(),
-                post.getAuthor().getUsername(),
+                post.getAuthor().getNickname(),
                 post.getScope().name(),
                 post.getClub() != null ? post.getClub().getClubId() : null,
                 post.getClub() != null ? post.getClub().getClubName() : null,

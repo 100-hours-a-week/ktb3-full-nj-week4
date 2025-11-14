@@ -38,3 +38,7 @@ out/
 
 # application.yml
 /src/main/resources/application.yml
+
+# 업로드된 파일 제외 (추가!)
+uploads/
+!uploads/.gitkeep

@@ -16,7 +16,7 @@ public record EventJoinResponse(
         return new EventJoinResponse(
                 eventJoin.getEventJoinId(),
                 eventJoin.getParticipant().getUserId(),
-                eventJoin.getParticipant().getUsername(),
+                eventJoin.getParticipant().getNickname(),
                 eventJoin.getEvent().getEventId(),
                 eventJoin.getStatus().name(),
                 eventJoin.getCreatedAt()

@@ -27,7 +27,7 @@ public record EventResponse(
         return new EventResponse(
                 event.getEventId(),
                 event.getHost().getUserId(),
-                event.getHost().getUsername(),
+                event.getHost().getNickname(),
                 event.getScope().name(),
                 event.getClub() != null ? event.getClub().getClubId() : null,
                 event.getClub() != null ? event.getClub().getClubName() : null,

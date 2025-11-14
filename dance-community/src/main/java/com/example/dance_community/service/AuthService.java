@@ -27,7 +27,7 @@ public class AuthService {
         User user = User.builder()
                 .email(signupRequest.getEmail())
                 .password(passwordEncoder.encode(signupRequest.getPassword()))
-                .username(signupRequest.getUsername())
+                .nickname(signupRequest.getNickname())
                 .profileImage(signupRequest.getProfileImage())
                 .build();
         User newUser = userRepository.save(user);

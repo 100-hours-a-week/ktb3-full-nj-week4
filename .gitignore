@@ -1,1 +1,5 @@
 /.idea/
+
+# 업로드된 파일 제외 (추가!)
+uploads/
+!uploads/.gitkeep

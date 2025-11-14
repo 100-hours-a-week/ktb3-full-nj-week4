@@ -7,6 +7,6 @@ import lombok.Getter;
 @AllArgsConstructor
 public class UserUpdateRequest{
     String password;
-    String username;
+    String nickname;
     String profileImage;
 }

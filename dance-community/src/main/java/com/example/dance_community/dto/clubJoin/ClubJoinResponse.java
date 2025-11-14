@@ -18,7 +18,7 @@ public record ClubJoinResponse (
         return new ClubJoinResponse(
                 clubJoin.getClubJoinId(),
                 clubJoin.getUser().getUserId(),
-                clubJoin.getUser().getUsername(),
+                clubJoin.getUser().getNickname(),
                 clubJoin.getClub().getClubId(),
                 clubJoin.getClub().getClubName(),
                 clubJoin.getRole().name(),

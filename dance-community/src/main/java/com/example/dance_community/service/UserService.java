@@ -28,7 +28,7 @@ public class UserService {
 
         user.updateUser(
                 passwordEncoder.encode(request.getPassword()),
-                request.getUsername(),
+                request.getNickname(),
                 request.getProfileImage()
         );
         return UserResponse.from(user);

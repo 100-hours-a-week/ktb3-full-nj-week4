@@ -16,7 +16,7 @@ public class SignupRequest {
     String password;
 
     @NotBlank(message = "이름 미입력")
-    String username;
+    String nickname;
 
     String profileImage;
 }
