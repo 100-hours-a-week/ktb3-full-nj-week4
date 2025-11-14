@@ -17,4 +17,6 @@ public class SignupRequest {
 
     @NotBlank(message = "이름 미입력")
     String username;
+
+    String profileImage;
 }
