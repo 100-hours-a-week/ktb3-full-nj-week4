@@ -18,6 +18,11 @@ public class JwtInterceptor implements HandlerInterceptor {
     // 토큰 유효성 검사 로직
     @Override
     public boolean preHandle(HttpServletRequest req, HttpServletResponse res, Object handler) throws Exception {
+        // OPTIONS 요청은 바로 통과 (CORS Preflight)
+        if ("OPTIONS".equalsIgnoreCase(req.getMethod())) {
+            return true;
+        }
+
         String header = req.getHeader("Authorization");
 
         if (header == null || !header.startsWith("Bearer ")) {
