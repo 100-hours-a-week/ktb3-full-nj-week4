@@ -43,6 +43,32 @@ public class FileStorageService {
         }
     }
 
+    public String savePostImage(MultipartFile file) {
+        if (file == null || file.isEmpty()) {
+            throw new IllegalArgumentException("이미지 파일이 없습니다");
+        }
+
+        try {
+            String filename = generateFileName(file.getOriginalFilename());
+            Path uploadPath = Paths.get(fileProperties.getBaseDir(), fileProperties.getPostDir());
+
+            if (!Files.exists(uploadPath)) {
+                Files.createDirectories(uploadPath);
+            }
+
+            Path filePath = uploadPath.resolve(filename);
+            Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+
+            return String.format("/%s/%s/%s",
+                    fileProperties.getBaseDir(),
+                    fileProperties.getPostDir(),
+                    filename);
+
+        } catch (IOException e) {
+            throw new RuntimeException("게시글 이미지 저장 실패: " + e.getMessage(), e);
+        }
+    }
+
     public void deleteFile(String filePath) {
         if (filePath == null || filePath.equals(fileProperties.getDefaultProfile())) {
             return;
