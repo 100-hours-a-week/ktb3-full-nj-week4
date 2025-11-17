@@ -1,5 +1,6 @@
 package com.example.dance_community.service;
 
+import com.example.dance_community.dto.user.PasswordUpdateRequest;
 import com.example.dance_community.dto.user.UserResponse;
 import com.example.dance_community.dto.user.UserUpdateRequest;
 import com.example.dance_community.encoder.PasswordEncoder;
@@ -27,9 +28,19 @@ public class UserService {
         User user = this.getActiveUser(userId);
 
         user.updateUser(
-                passwordEncoder.encode(request.getPassword()),
                 request.getNickname(),
-                request.getProfileImage()
+                request.getProfileImage() == null ? user.getProfileImage() : request.getProfileImage()
+        );
+
+        return UserResponse.from(user);
+    }
+
+    @Transactional
+    public UserResponse updatePassword(Long userId, PasswordUpdateRequest request) {
+        User user = this.getActiveUser(userId);
+
+        user.updatePassword(
+                passwordEncoder.encode(request.getPassword())
         );
         return UserResponse.from(user);
     }

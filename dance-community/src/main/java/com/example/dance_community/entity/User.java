@@ -60,13 +60,17 @@ public class User extends BaseEntity{
     }
 
     // UPDATE
-    public User updateUser(String password, String nickname, String profileImage) {
-        checkNullOrBlank(password, "비밀번호");
+    public User updateUser(String nickname, String profileImage) {
         checkNullOrBlank(nickname, "사용자 이름");
 
         this.nickname = nickname;
-        this.password = password;
         this.profileImage = profileImage;
+
+        return this;
+    }
+    public User updatePassword(String password) {
+        checkNullOrBlank(password, "비밀번호");
+        this.password = password;
 
         return this;
     }
