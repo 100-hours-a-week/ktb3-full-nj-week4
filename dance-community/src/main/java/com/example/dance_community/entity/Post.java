@@ -83,17 +83,19 @@ public class Post extends BaseEntity{
     }
 
     // UPDATE
-    public Post updatePost(String title, String content, List<String> tags, List<String> images) {
+    public Post updatePost(String title, String content, List<String> tags) {
         checkNullOrBlank(title, "제목");
         checkNullOrBlank(content, "내용");
 
         this.title = title;
         this.content = content;
         this.tags = tags != null ? new ArrayList<>(tags) : new ArrayList<>();
-        this.images = images != null ? new ArrayList<>(images) : new ArrayList<>();
         this.updatedAt = LocalDateTime.now();
 
         return this;
+    }
+    public void updateImages(List<String> images) {
+        this.images = images;
     }
 
     // Check Methods

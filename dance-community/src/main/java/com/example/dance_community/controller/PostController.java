@@ -75,26 +75,28 @@ public class PostController {
     @PatchMapping(value = "/{postId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ApiResponse<PostResponse>> updatePost(
             @PathVariable Long postId,
+            @GetUserId Long userId,
             @RequestParam(value = "title", required = false) String title,
             @RequestParam(value = "content", required = false) String content,
             @RequestParam(value = "tags", required = false) List<String> tags,
-            @RequestParam(value = "images", required = false) List<MultipartFile> images
+            @RequestParam(value = "images", required = false) List<MultipartFile> images,
+            @RequestParam(value = "keepImages", required = false) List<String> keepImages
     ) {
-        List<String> imagePaths = null;
+        List<String> newImagePaths = null;
         if (images != null && !images.isEmpty()) {
-            imagePaths = new ArrayList<>();
+            newImagePaths = new ArrayList<>();
             for (MultipartFile image : images) {
                 String path = fileStorageService.savePostImage(image);
-                imagePaths.add(path);
+                newImagePaths.add(path);
             }
-            System.out.println("📷 새 이미지 " + imagePaths.size() + "개 저장 완료");
+            System.out.println("새 이미지 " + newImagePaths.size() + "개 저장 완료");
         }
 
-        PostUpdateRequest postUpdateRequest = new PostUpdateRequest(
-                title, content, tags, imagePaths
+        PostUpdateRequest request = new PostUpdateRequest(
+                title, content, tags, newImagePaths, keepImages
         );
 
-        PostResponse postResponse = postService.updatePost(postId, postUpdateRequest);
+        PostResponse postResponse = postService.updatePost(postId, userId, request);
         return ResponseEntity.ok(new ApiResponse<>("게시물 수정 성공", postResponse));
     }
 

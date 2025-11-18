@@ -16,5 +16,6 @@ public class PostUpdateRequest {
     private String content;
 
     private List<String> tags;
-    private List<String> images;
+    private List<String> newImagePaths;
+    private List<String> keepImages;
 }

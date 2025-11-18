@@ -7,6 +7,7 @@ import com.example.dance_community.entity.Club;
 import com.example.dance_community.entity.Post;
 import com.example.dance_community.entity.User;
 import com.example.dance_community.entity.enums.Scope;
+import com.example.dance_community.exception.AccessDeniedException;
 import com.example.dance_community.exception.InvalidRequestException;
 import com.example.dance_community.exception.NotFoundException;
 import com.example.dance_community.repository.jpa.PostRepository;
@@ -14,7 +15,9 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -22,6 +25,7 @@ public class PostService {
     private final PostRepository postRepository;
     private final UserService userService;
     private final ClubService ClubService;
+    private final FileStorageService fileStorageService;
 
     @Transactional
     public PostResponse createPost(Long userId, PostCreateRequest request) {
@@ -61,15 +65,21 @@ public class PostService {
     }
 
     @Transactional
-    public PostResponse updatePost(Long postId, PostUpdateRequest request) {
+    public PostResponse updatePost(Long postId, Long userId, PostUpdateRequest request) {
         Post post = getActivePost(postId);
+
+        if (!post.getAuthor().getUserId().equals(userId)) {
+            System.out.println("**************************************"+userId);
+            throw new AccessDeniedException("수정 권한이 없습니다");
+        }
 
         post.updatePost(
                 request.getTitle(),
                 request.getContent(),
-                request.getTags(),
-                request.getImages() == null ? post.getImages() : request.getImages()
+                request.getTags()
         );
+
+        handleImageUpdate(post, request.getNewImagePaths(), request.getKeepImages());
 
         return PostResponse.from(post);
     }
@@ -83,5 +93,58 @@ public class PostService {
     private Post getActivePost(Long postId) {
         return postRepository.findById(postId)
                 .orElseThrow(() -> new NotFoundException("게시물을 찾을 수 없습니다"));
+    }
+
+    private void handleImageUpdate(Post post, List<String> newImages, List<String> keepImages) {
+        // keepImages가 null이면 이미지 변경 안 함
+        if (keepImages == null) {
+            System.out.println("📷 이미지 변경 없음 - keepImages가 null");
+
+            // 새 이미지만 추가
+            if (newImages != null && !newImages.isEmpty()) {
+                List<String> currentImages = new ArrayList<>(post.getImages());
+                currentImages.addAll(newImages);
+                post.updateImages(currentImages);
+                System.out.println("📷 새 이미지만 추가: " + newImages.size() + "개");
+            }
+            return;
+        }
+
+        // keepImages가 빈 리스트면 모든 이미지 삭제
+        List<String> currentImages = post.getImages();
+        List<String> finalImages = new ArrayList<>();
+
+        if (keepImages.isEmpty()) {
+            // 모든 기존 이미지 삭제
+            System.out.println("🗑️ 모든 기존 이미지 삭제 요청");
+            for (String imagePath : currentImages) {
+                fileStorageService.deleteFile(imagePath);
+                System.out.println("🗑️ 삭제: " + imagePath);
+            }
+        } else {
+            // 유지할 이미지만 남기고 나머지 삭제
+            finalImages.addAll(keepImages);
+
+            List<String> imagesToDelete = currentImages.stream()
+                    .filter(img -> !keepImages.contains(img))
+                    .collect(Collectors.toList());
+
+            for (String imagePath : imagesToDelete) {
+                fileStorageService.deleteFile(imagePath);
+                System.out.println("삭제: " + imagePath);
+            }
+
+            System.out.println("유지: " + keepImages.size() + "개");
+        }
+
+        // 새 이미지 추가
+        if (newImages != null && !newImages.isEmpty()) {
+            finalImages.addAll(newImages);
+            System.out.println("새 이미지 추가: " + newImages.size() + "개");
+        }
+
+        // DB 업데이트
+        post.updateImages(finalImages);
+        System.out.println("최종 이미지: " + finalImages.size() + "개");
     }
 }
