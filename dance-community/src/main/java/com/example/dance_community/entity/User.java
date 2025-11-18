@@ -61,7 +61,9 @@ public class User extends BaseEntity{
 
     // UPDATE
     public User updateUser(String nickname, String profileImage) {
-        checkNullOrBlank(nickname, "사용자 이름");
+        if (nickname == null) {
+            throw new IllegalArgumentException("사용자 이름 null 값 입력 불가");
+        }
 
         this.nickname = nickname;
         this.profileImage = profileImage;

@@ -68,7 +68,7 @@ public class PostService {
                 request.getTitle(),
                 request.getContent(),
                 request.getTags(),
-                request.getImages()
+                request.getImages() == null ? post.getImages() : request.getImages()
         );
 
         return PostResponse.from(post);
