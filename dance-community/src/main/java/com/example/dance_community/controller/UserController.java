@@ -46,11 +46,7 @@ public class UserController {
             @RequestParam(value = "nickname", required = false) String nickname,
             @RequestParam(value = "profileImage", required = false) MultipartFile profileImage
     ) {
-        String profileImagePath = null;
-        if (profileImage != null && !profileImage.isEmpty()) {
-            profileImagePath = fileStorageService.saveProfileImage(profileImage);
-        }
-
+        String profileImagePath = fileStorageService.saveProfileImage(profileImage);
         UserUpdateRequest userUpdateRequest = new UserUpdateRequest(nickname, profileImagePath);
 
         UserResponse userResponse = userService.updateUser(userId, userUpdateRequest);
