@@ -44,9 +44,7 @@ public class ClubJoinService {
     }
 
     public List<ClubJoinResponse> getUserClubs(Long userId) {
-        User user = userService.getActiveUser(userId);
-
-        List<ClubJoin> clubJoins = clubJoinRepository.findByUser(user);
+        List<ClubJoin> clubJoins = clubJoinRepository.findByUser_UserIdAndStatus(userId, ClubJoinStatus.valueOf("ACTIVE"));
         return clubJoins.stream()
                 .map(ClubJoinResponse::from)
                 .toList();
