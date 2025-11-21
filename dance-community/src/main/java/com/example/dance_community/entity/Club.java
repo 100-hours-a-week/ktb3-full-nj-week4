@@ -24,8 +24,24 @@ public class Club extends BaseEntity{
     @Column(nullable = false, unique = true, length = 100)
     private String clubName;
 
+    @Column(length = 255)
+    private String intro;
+
     @Column(length = 1000)
     private String description;
+
+    @Column(length = 255, columnDefinition = "TEXT")
+    private String clubImage;
+
+    private String locationName;
+
+    @ElementCollection
+    @CollectionTable(
+            name = "club_tags",
+            joinColumns = @JoinColumn(name = "clubId")
+    )
+    @Column(name = "tag")
+    private List<String> tags = new ArrayList<>();
 
     @OneToMany(mappedBy = "club", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ClubJoin> members = new ArrayList<>();
@@ -38,13 +54,18 @@ public class Club extends BaseEntity{
 
     // CREATE
     @Builder
-    public Club(String clubName, String description) {
-        if (clubName == null || clubName.isBlank()) {
-            throw new IllegalArgumentException("클럽 이름 미입력");
-        }
+    public Club(String clubName, String intro, String description, String clubImage, String locationName, List<String> tags) {
+        checkNullOrBlank(clubName, "클럽 이름");
+        checkNullOrBlank(intro, "클럽 한 줄 소개");
+        checkNullOrBlank(locationName, "클럽 위치");
+        checkNullOrBlank(description, "클럽 설명");
 
         this.clubName = clubName;
+        this.intro = intro;
+        this.clubImage = clubImage;
+        this.locationName = locationName;
         this.description = description;
+        this.tags = tags;
     }
 
     // READ
@@ -53,9 +74,19 @@ public class Club extends BaseEntity{
     }
 
     // UPDATE
-    public Club updateClub(String clubName, String description) {
+    public Club updateClub(String clubName, String intro, String description, String clubImage, String locationName,  List<String> tags) {
+        checkNullOrBlank(clubName, "클럽 이름");
+        checkNullOrBlank(intro, "클럽 한 줄 소개");
+        checkNullOrBlank(locationName, "클럽 위치");
+        checkNullOrBlank(description, "클럽 설명");
+
         this.clubName = clubName;
+        this.intro = intro;
+        this.clubImage = clubImage;
+        this.locationName = locationName;
         this.description = description;
+        this.tags = tags;
+
         return this;
     }
 

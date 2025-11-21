@@ -21,7 +21,11 @@ public class ClubService {
     public ClubResponse createClub(ClubCreateRequest request) {
         Club club = Club.builder()
                 .clubName(request.getClubName())
+                .intro(request.getIntro())
+                .clubImage(request.getClubImage())
+                .locationName(request.getLocationName())
                 .description(request.getDescription())
+                .tags(request.getTags())
                 .build();
 
         Club newClub = clubRepository.save(club);
@@ -44,7 +48,11 @@ public class ClubService {
 
         club.updateClub(
             request.getClubName(),
-            request.getDescription()
+                request.getIntro(),
+            request.getClubImage(),
+                request.getLocationName(),
+            request.getDescription(),
+                request.getTags()
         );
         return ClubResponse.from(club);
     }

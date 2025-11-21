@@ -6,13 +6,16 @@ import com.example.dance_community.dto.club.ClubCreateRequest;
 import com.example.dance_community.dto.club.ClubResponse;
 import com.example.dance_community.dto.club.ClubUpdateRequest;
 import com.example.dance_community.service.ClubService;
+import com.example.dance_community.service.FileStorageService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Email;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -22,10 +25,33 @@ import java.util.List;
 @Tag(name = "3_Club", description = "클럽 관련 API")
 public class ClubController {
     private final ClubService clubService;
+    private final FileStorageService fileStorageService;
 
     @Operation(summary = "클럽 생성", description = "클럽을 새로 작성합니다.")
     @PostMapping()
-    public ResponseEntity<ApiResponse<ClubResponse>> createClub(@GetUserId Long userId, @Valid @RequestBody ClubCreateRequest clubCreateRequest) {
+    public ResponseEntity<ApiResponse<ClubResponse>> createClub(
+            @GetUserId Long userId,
+            @RequestParam("clubName") String clubName,
+            @RequestParam("intro") String intro,
+            @RequestParam("locationName") String locationName,
+            @RequestParam("description") String description,
+            @RequestParam(value = "clubImage", required = false) MultipartFile clubImage,
+            @RequestParam("tags") List<String> tags
+    ) {
+        String clubImagePath = null;
+        if (clubImage != null && !clubImage.isEmpty()) {
+            clubImagePath = fileStorageService.saveProfileImage(clubImage);
+        }
+
+        ClubCreateRequest clubCreateRequest = new ClubCreateRequest(
+                clubName,
+                intro,
+                locationName,
+                description,
+                clubImagePath,
+                tags
+        );
+
         ClubResponse clubResponse = clubService.createClub(clubCreateRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResponse<>("클럽 생성 성공", clubResponse));
     }
@@ -53,10 +79,35 @@ public class ClubController {
 
     @Operation(summary = "내 클럽 수정", description = "사용자의 클럽을 수정합니다.")
     @PatchMapping("/{clubId}")
-    public ResponseEntity<ApiResponse<ClubResponse>> updateClub(@PathVariable Long clubId, @Valid @RequestBody ClubUpdateRequest clubUpdateRequest) {
+    public ResponseEntity<ApiResponse<ClubResponse>> updateClub(
+            @PathVariable Long clubId,
+            @RequestParam("clubName") String clubName,
+            @RequestParam("intro") String intro,
+            @RequestParam("locationName") String locationName,
+            @RequestParam("description") String description,
+            @RequestParam(value = "clubImage", required = false) MultipartFile clubImage,
+            @RequestParam(value = "tags", required = false) List<String> tags
+    ) {
+        // 이미지가 새로 업로드된 경우에만 저장
+        String clubImagePath = null;
+        if (clubImage != null && !clubImage.isEmpty()) {
+            clubImagePath = fileStorageService.saveProfileImage(clubImage);
+        }
+
+        // DTO 구성 (필드는 너가 정의한 ClubUpdateRequest에 맞춰서)
+        ClubUpdateRequest clubUpdateRequest = new ClubUpdateRequest(
+                clubName,
+                intro,
+                locationName,
+                description,
+                clubImagePath,
+                tags
+        );
+
         ClubResponse clubResponse = clubService.updateClub(clubId, clubUpdateRequest);
         return ResponseEntity.ok(new ApiResponse<>("클럽 수정 성공", clubResponse));
     }
+
 
     @Operation(summary = "클럽 삭제", description = "클럽 id를 통해 정보를 삭제합니다.")
     @DeleteMapping("/{clubId}")
