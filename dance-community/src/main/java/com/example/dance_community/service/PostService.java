@@ -6,7 +6,7 @@ import com.example.dance_community.dto.post.PostUpdateRequest;
 import com.example.dance_community.entity.Club;
 import com.example.dance_community.entity.Post;
 import com.example.dance_community.entity.User;
-import com.example.dance_community.entity.enums.Scope;
+import com.example.dance_community.enums.Scope;
 import com.example.dance_community.exception.AccessDeniedException;
 import com.example.dance_community.exception.InvalidRequestException;
 import com.example.dance_community.exception.NotFoundException;

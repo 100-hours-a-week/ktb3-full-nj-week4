@@ -1,6 +1,7 @@
 package com.example.dance_community.service;
 
 import com.example.dance_community.config.FileProperties;
+import com.example.dance_community.enums.ImageType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -17,14 +18,22 @@ import java.util.UUID;
 public class FileStorageService {
     private final FileProperties fileProperties;
 
-    public String saveProfileImage(MultipartFile file) {
+    public String saveImage(MultipartFile file, ImageType type) {
         if (file == null || file.isEmpty()) {
-            return fileProperties.getDefaultProfile();
+            if (type.allowDefault()) {   // user, club
+                return type.defaultImageUrl();
+            } else { // post, event
+                throw new IllegalArgumentException(type.getTypeName() + " 이미지 파일이 없습니다");
+            }
         }
 
         try {
             String filename = generateFileName(file.getOriginalFilename());
-            Path uploadPath = getProfileUploadPath();
+
+            Path uploadPath = Paths.get(
+                    fileProperties.getBaseDir(),
+                    type.getDirectory()
+            );
 
             if (!Files.exists(uploadPath)) {
                 Files.createDirectories(uploadPath);
@@ -35,37 +44,12 @@ public class FileStorageService {
 
             return String.format("/%s/%s/%s",
                     fileProperties.getBaseDir(),
-                    fileProperties.getProfileDir(),
-                    filename);
+                    type.getDirectory(),
+                    filename
+            );
 
         } catch (IOException e) {
-            throw new RuntimeException("프로필 이미지 저장 실패: " + e.getMessage(), e);
-        }
-    }
-
-    public String savePostImage(MultipartFile file) {
-        if (file == null || file.isEmpty()) {
-            throw new IllegalArgumentException("이미지 파일이 없습니다");
-        }
-
-        try {
-            String filename = generateFileName(file.getOriginalFilename());
-            Path uploadPath = Paths.get(fileProperties.getBaseDir(), fileProperties.getPostDir());
-
-            if (!Files.exists(uploadPath)) {
-                Files.createDirectories(uploadPath);
-            }
-
-            Path filePath = uploadPath.resolve(filename);
-            Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
-
-            return String.format("/%s/%s/%s",
-                    fileProperties.getBaseDir(),
-                    fileProperties.getPostDir(),
-                    filename);
-
-        } catch (IOException e) {
-            throw new RuntimeException("게시글 이미지 저장 실패: " + e.getMessage(), e);
+            throw new RuntimeException(type.getTypeName() + " 이미지 저장 실패: " + e.getMessage(), e);
         }
     }
 
@@ -93,7 +77,7 @@ public class FileStorageService {
         return uuid + "_" + originalFilename;
     }
 
-    private Path getProfileUploadPath() {
-        return Paths.get(fileProperties.getBaseDir(), fileProperties.getProfileDir());
+    private Path getUserUploadPath() {
+        return Paths.get(fileProperties.getBaseDir(), fileProperties.getUserDir());
     }
 }

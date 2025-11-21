@@ -10,8 +10,11 @@ import org.springframework.stereotype.Component;
 @Component
 @ConfigurationProperties(prefix = "file.upload")
 public class FileProperties {
-    private String baseDir = "uploads";        // 기본 디렉토리
-    private String profileDir = "profiles";    // 프로필 이미지 서브 디렉토리
-    private String postDir = "posts";          // 게시글 이미지 (나중에)
-    private String defaultProfile = "/images/default-profile.png";  // 디폴트 이미지
+    private String baseDir = "uploads";
+    private String userDir = "users";
+    private String clubDir = "clubs";
+    private String postDir = "posts";
+    private String eventDir = "events";
+    private String defaultProfile = "/images/default-user.png";
+    private String defaultClub = "/images/default-club.png";
 }

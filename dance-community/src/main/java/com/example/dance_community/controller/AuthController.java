@@ -3,6 +3,7 @@ package com.example.dance_community.controller;
 import com.example.dance_community.auth.GetUserId;
 import com.example.dance_community.dto.ApiResponse;
 import com.example.dance_community.dto.auth.*;
+import com.example.dance_community.enums.ImageType;
 import com.example.dance_community.service.AuthService;
 import com.example.dance_community.service.FileStorageService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -32,7 +33,7 @@ public class AuthController {
             @RequestParam("nickname") String nickname,
             @RequestParam(value = "profileImage", required = false) MultipartFile profileImage
     ) {
-        String profileImagePath = fileStorageService.saveProfileImage(profileImage);
+        String profileImagePath = fileStorageService.saveImage(profileImage, ImageType.PROFILE);
 
         SignupRequest signupRequest = new SignupRequest(
                 email,

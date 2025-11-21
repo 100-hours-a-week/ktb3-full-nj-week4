@@ -3,7 +3,7 @@ package com.example.dance_community.service;
 import com.example.dance_community.dto.eventJoin.EventJoinCreateRequest;
 import com.example.dance_community.dto.eventJoin.EventJoinResponse;
 import com.example.dance_community.entity.*;
-import com.example.dance_community.entity.enums.EventJoinStatus;
+import com.example.dance_community.enums.EventJoinStatus;
 import com.example.dance_community.exception.ConflictException;
 import com.example.dance_community.exception.InvalidRequestException;
 import com.example.dance_community.repository.jpa.EventJoinRepository;

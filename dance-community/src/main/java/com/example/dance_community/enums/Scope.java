@@ -1,4 +1,4 @@
-package com.example.dance_community.entity.enums;
+package com.example.dance_community.enums;
 
 public enum Scope {
     GLOBAL("전체 공개"),

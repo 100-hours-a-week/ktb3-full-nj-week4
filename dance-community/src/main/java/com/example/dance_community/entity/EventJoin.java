@@ -1,6 +1,6 @@
 package com.example.dance_community.entity;
 
-import com.example.dance_community.entity.enums.EventJoinStatus;
+import com.example.dance_community.enums.EventJoinStatus;
 import jakarta.persistence.*;
 import lombok.*;
 

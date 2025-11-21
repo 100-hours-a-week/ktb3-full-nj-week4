@@ -4,6 +4,9 @@ import com.example.dance_community.dto.club.ClubCreateRequest;
 import com.example.dance_community.dto.club.ClubResponse;
 import com.example.dance_community.dto.club.ClubUpdateRequest;
 import com.example.dance_community.entity.Club;
+import com.example.dance_community.entity.User;
+import com.example.dance_community.enums.ClubJoinStatus;
+import com.example.dance_community.enums.ClubRole;
 import com.example.dance_community.exception.NotFoundException;
 import com.example.dance_community.repository.jpa.ClubRepository;
 import jakarta.transaction.Transactional;
@@ -16,9 +19,11 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ClubService {
     private final ClubRepository clubRepository;
+    private final UserService userService;
 
     @Transactional
-    public ClubResponse createClub(ClubCreateRequest request) {
+    public ClubResponse createClub(Long userId, ClubCreateRequest request) {
+        User user = userService.getActiveUser(userId);
         Club club = Club.builder()
                 .clubName(request.getClubName())
                 .intro(request.getIntro())
@@ -28,6 +33,7 @@ public class ClubService {
                 .tags(request.getTags())
                 .build();
 
+        club.addMember(user, ClubRole.LEADER, ClubJoinStatus.ACTIVE);
         Club newClub = clubRepository.save(club);
         return ClubResponse.from(newClub);
     }

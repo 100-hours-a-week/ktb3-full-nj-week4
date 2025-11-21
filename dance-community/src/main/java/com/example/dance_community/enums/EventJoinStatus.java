@@ -1,4 +1,4 @@
-package com.example.dance_community.entity.enums;
+package com.example.dance_community.enums;
 
 public enum EventJoinStatus {
     CONFIRMED("확인됨"),

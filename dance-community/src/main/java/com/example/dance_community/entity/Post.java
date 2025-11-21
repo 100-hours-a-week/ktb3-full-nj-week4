@@ -1,6 +1,6 @@
 package com.example.dance_community.entity;
 
-import com.example.dance_community.entity.enums.Scope;
+import com.example.dance_community.enums.Scope;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;

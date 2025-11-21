@@ -5,6 +5,7 @@ import com.example.dance_community.dto.ApiResponse;
 import com.example.dance_community.dto.post.PostCreateRequest;
 import com.example.dance_community.dto.post.PostResponse;
 import com.example.dance_community.dto.post.PostUpdateRequest;
+import com.example.dance_community.enums.ImageType;
 import com.example.dance_community.service.FileStorageService;
 import com.example.dance_community.service.PostService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -42,7 +43,7 @@ public class PostController {
         List<String> imagePaths = new ArrayList<>();
         if (images != null && !images.isEmpty()) {
             for (MultipartFile image : images) {
-                String path = fileStorageService.savePostImage(image);
+                String path = fileStorageService.saveImage(image, ImageType.POST);
                 imagePaths.add(path);
             }
             System.out.println("📷 이미지 " + imagePaths.size() + "개 저장 완료");
@@ -86,7 +87,7 @@ public class PostController {
         if (images != null && !images.isEmpty()) {
             newImagePaths = new ArrayList<>();
             for (MultipartFile image : images) {
-                String path = fileStorageService.savePostImage(image);
+                String path = fileStorageService.saveImage(image, ImageType.POST);
                 newImagePaths.add(path);
             }
             System.out.println("새 이미지 " + newImagePaths.size() + "개 저장 완료");

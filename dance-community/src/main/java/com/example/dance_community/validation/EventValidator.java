@@ -1,8 +1,8 @@
 package com.example.dance_community.validation;
 
 import com.example.dance_community.dto.event.EventCreateRequest;
-import com.example.dance_community.entity.enums.EventType;
-import com.example.dance_community.entity.enums.Scope;
+import com.example.dance_community.enums.EventType;
+import com.example.dance_community.enums.Scope;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 

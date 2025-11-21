@@ -5,6 +5,7 @@ import com.example.dance_community.dto.ApiResponse;
 import com.example.dance_community.dto.club.ClubCreateRequest;
 import com.example.dance_community.dto.club.ClubResponse;
 import com.example.dance_community.dto.club.ClubUpdateRequest;
+import com.example.dance_community.enums.ImageType;
 import com.example.dance_community.service.ClubService;
 import com.example.dance_community.service.FileStorageService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -40,7 +41,7 @@ public class ClubController {
     ) {
         String clubImagePath = null;
         if (clubImage != null && !clubImage.isEmpty()) {
-            clubImagePath = fileStorageService.saveProfileImage(clubImage);
+            clubImagePath = fileStorageService.saveImage(clubImage, ImageType.CLUB);
         }
 
         ClubCreateRequest clubCreateRequest = new ClubCreateRequest(
@@ -52,7 +53,7 @@ public class ClubController {
                 tags
         );
 
-        ClubResponse clubResponse = clubService.createClub(clubCreateRequest);
+        ClubResponse clubResponse = clubService.createClub(userId, clubCreateRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResponse<>("클럽 생성 성공", clubResponse));
     }
 
@@ -91,7 +92,7 @@ public class ClubController {
         // 이미지가 새로 업로드된 경우에만 저장
         String clubImagePath = null;
         if (clubImage != null && !clubImage.isEmpty()) {
-            clubImagePath = fileStorageService.saveProfileImage(clubImage);
+            clubImagePath = fileStorageService.saveImage(clubImage, ImageType.CLUB);
         }
 
         // DTO 구성 (필드는 너가 정의한 ClubUpdateRequest에 맞춰서)

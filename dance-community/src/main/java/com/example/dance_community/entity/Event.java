@@ -1,8 +1,8 @@
 package com.example.dance_community.entity;
 
-import com.example.dance_community.entity.enums.EventJoinStatus;
-import com.example.dance_community.entity.enums.EventType;
-import com.example.dance_community.entity.enums.Scope;
+import com.example.dance_community.enums.EventJoinStatus;
+import com.example.dance_community.enums.EventType;
+import com.example.dance_community.enums.Scope;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;

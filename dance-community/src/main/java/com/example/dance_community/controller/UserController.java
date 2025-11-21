@@ -5,6 +5,7 @@ import com.example.dance_community.dto.ApiResponse;
 import com.example.dance_community.dto.user.PasswordUpdateRequest;
 import com.example.dance_community.dto.user.UserResponse;
 import com.example.dance_community.dto.user.UserUpdateRequest;
+import com.example.dance_community.enums.ImageType;
 import com.example.dance_community.service.FileStorageService;
 import com.example.dance_community.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -46,7 +47,7 @@ public class UserController {
             @RequestParam(value = "nickname", required = false) String nickname,
             @RequestParam(value = "profileImage", required = false) MultipartFile profileImage
     ) {
-        String profileImagePath = fileStorageService.saveProfileImage(profileImage);
+        String profileImagePath = fileStorageService.saveImage(profileImage, ImageType.PROFILE);
         UserUpdateRequest userUpdateRequest = new UserUpdateRequest(nickname, profileImagePath);
 
         UserResponse userResponse = userService.updateUser(userId, userUpdateRequest);
