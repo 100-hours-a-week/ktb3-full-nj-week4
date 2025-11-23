@@ -2,6 +2,7 @@ package com.example.dance_community.entity;
 
 import com.example.dance_community.enums.ClubJoinStatus;
 import com.example.dance_community.enums.ClubRole;
+import com.example.dance_community.enums.ClubType;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;
@@ -30,10 +31,14 @@ public class Club extends BaseEntity{
     @Column(length = 1000)
     private String description;
 
+    private String locationName;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    private ClubType clubType;
+
     @Column(length = 255, columnDefinition = "TEXT")
     private String clubImage;
-
-    private String locationName;
 
     @ElementCollection
     @CollectionTable(
@@ -54,18 +59,22 @@ public class Club extends BaseEntity{
 
     // CREATE
     @Builder
-    public Club(String clubName, String intro, String description, String clubImage, String locationName, List<String> tags) {
+    public Club(String clubName, String intro, String description, String locationName, ClubType clubType, String clubImage, List<String> tags) {
         checkNullOrBlank(clubName, "클럽 이름");
         checkNullOrBlank(intro, "클럽 한 줄 소개");
         checkNullOrBlank(locationName, "클럽 위치");
         checkNullOrBlank(description, "클럽 설명");
+        if (clubType == null) {
+            throw new IllegalArgumentException("클럽 타입 미입력");
+        }
 
         this.clubName = clubName;
         this.intro = intro;
-        this.clubImage = clubImage;
-        this.locationName = locationName;
         this.description = description;
-        this.tags = tags;
+        this.locationName = locationName;
+        this.clubType = clubType;
+        this.clubImage = clubImage;
+        this.tags = tags != null ? tags : new ArrayList<>();
     }
 
     // READ
@@ -74,18 +83,23 @@ public class Club extends BaseEntity{
     }
 
     // UPDATE
-    public Club updateClub(String clubName, String intro, String description, String clubImage, String locationName,  List<String> tags) {
+    public Club updateClub(String clubName, String intro, String description, String locationName, ClubType clubType, String clubImage, List<String> tags) {
+
         checkNullOrBlank(clubName, "클럽 이름");
         checkNullOrBlank(intro, "클럽 한 줄 소개");
         checkNullOrBlank(locationName, "클럽 위치");
         checkNullOrBlank(description, "클럽 설명");
+        if (clubType == null) {
+            throw new IllegalArgumentException("클럽 타입 미입력");
+        }
 
         this.clubName = clubName;
         this.intro = intro;
-        this.clubImage = clubImage;
-        this.locationName = locationName;
         this.description = description;
-        this.tags = tags;
+        this.locationName = locationName;
+        this.clubType = clubType;
+        this.clubImage = clubImage;
+        this.tags = tags != null ? tags : new ArrayList<>();
 
         return this;
     }

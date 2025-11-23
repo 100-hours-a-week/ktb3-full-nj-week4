@@ -5,6 +5,7 @@ import com.example.dance_community.dto.ApiResponse;
 import com.example.dance_community.dto.club.ClubCreateRequest;
 import com.example.dance_community.dto.club.ClubResponse;
 import com.example.dance_community.dto.club.ClubUpdateRequest;
+import com.example.dance_community.enums.ClubType;
 import com.example.dance_community.enums.ImageType;
 import com.example.dance_community.service.ClubService;
 import com.example.dance_community.service.FileStorageService;
@@ -36,6 +37,7 @@ public class ClubController {
             @RequestParam("intro") String intro,
             @RequestParam("locationName") String locationName,
             @RequestParam("description") String description,
+            @RequestParam("clubType") ClubType clubType,
             @RequestParam(value = "clubImage", required = false) MultipartFile clubImage,
             @RequestParam("tags") List<String> tags
     ) {
@@ -47,8 +49,9 @@ public class ClubController {
         ClubCreateRequest clubCreateRequest = new ClubCreateRequest(
                 clubName,
                 intro,
-                locationName,
                 description,
+                locationName,
+                clubType,
                 clubImagePath,
                 tags
         );
@@ -86,6 +89,7 @@ public class ClubController {
             @RequestParam("intro") String intro,
             @RequestParam("locationName") String locationName,
             @RequestParam("description") String description,
+            @RequestParam("clubType") ClubType clubType,
             @RequestParam(value = "clubImage", required = false) MultipartFile clubImage,
             @RequestParam(value = "tags", required = false) List<String> tags
     ) {
@@ -95,12 +99,12 @@ public class ClubController {
             clubImagePath = fileStorageService.saveImage(clubImage, ImageType.CLUB);
         }
 
-        // DTO 구성 (필드는 너가 정의한 ClubUpdateRequest에 맞춰서)
         ClubUpdateRequest clubUpdateRequest = new ClubUpdateRequest(
                 clubName,
                 intro,
-                locationName,
                 description,
+                locationName,
+                clubType,
                 clubImagePath,
                 tags
         );

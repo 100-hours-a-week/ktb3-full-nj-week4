@@ -23,6 +23,10 @@ public class JwtInterceptor implements HandlerInterceptor {
             return true;
         }
 
+        if (req.getMethod().equalsIgnoreCase("OPTIONS")) {
+            return true;
+        }
+
         String header = req.getHeader("Authorization");
 
         if (header == null || !header.startsWith("Bearer ")) {

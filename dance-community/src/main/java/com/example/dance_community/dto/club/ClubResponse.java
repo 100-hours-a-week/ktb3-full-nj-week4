@@ -1,6 +1,7 @@
 package com.example.dance_community.dto.club;
 
 import com.example.dance_community.entity.Club;
+import com.example.dance_community.enums.ClubType;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -9,9 +10,10 @@ public record ClubResponse (
     Long clubId,
     String clubName,
     String intro,
-    String clubImage,
-    String locationName,
     String description,
+    String locationName,
+    ClubType clubType,
+    String clubImage,
     List<String> tags,
     Long memberCount,
     LocalDateTime createdAt
@@ -21,9 +23,10 @@ public record ClubResponse (
                 club.getClubId(),
                 club.getClubName(),
                 club.getIntro(),
-                club.getClubImage(),
-                club.getLocationName(),
                 club.getDescription(),
+                club.getLocationName(),
+                club.getClubType(),
+                club.getClubImage(),
                 club.getTags(),
                 (long) club.getMemberCount(),
                 club.getCreatedAt()
