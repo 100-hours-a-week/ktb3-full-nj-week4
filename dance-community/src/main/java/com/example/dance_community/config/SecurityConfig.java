@@ -1,7 +1,6 @@
 package com.example.dance_community.config;
 
 import com.example.dance_community.security.JwtFilter;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -54,16 +53,20 @@ public class SecurityConfig {
                         .authenticationEntryPoint((request, response, authException) -> {
                             response.setStatus(401);
                             response.setContentType("application/json;charset=UTF-8");
-                            response.getWriter().write(
-                                    "{\"message\":\"인증이 필요합니다\"}"
+                            String jsonResponse = String.format(
+                                    "{\"message\":\"%s\",\"data\":null}",
+                                    "인증이 필요합니다"
                             );
+                            response.getWriter().write(jsonResponse);
                         })
                         .accessDeniedHandler((request, response, accessDeniedException) -> {
                             response.setStatus(403);
                             response.setContentType("application/json;charset=UTF-8");
-                            response.getWriter().write(
-                                    "{\"message\":\"권한이 없습니다\"}"
+                            String jsonResponse = String.format(
+                                    "{\"message\":\"%s\",\"data\":null}",
+                                    "권한이 없습니다"
                             );
+                            response.getWriter().write(jsonResponse);
                         })
                 );
 

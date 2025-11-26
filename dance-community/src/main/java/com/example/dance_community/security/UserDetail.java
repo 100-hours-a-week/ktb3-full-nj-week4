@@ -1,6 +1,5 @@
 package com.example.dance_community.security;
 
-import com.example.dance_community.entity.User;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

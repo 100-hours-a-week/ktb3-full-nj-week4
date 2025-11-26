@@ -22,7 +22,7 @@ public class EventJoinService {
 
     @Transactional
     public EventJoinResponse createEventJoin(Long userId, EventJoinCreateRequest request) {
-        User user = userService.getActiveUser(userId);
+        User user = userService.findByUserId(userId);
         Event event = eventService.getActiveEvent(request.getEventId());
 
         if (eventJoinRepository.existsByParticipantAndEvent(user, event)) {
@@ -40,7 +40,7 @@ public class EventJoinService {
     }
 
     public List<EventJoinResponse> getUserEvents(Long userId) {
-        User user = userService.getActiveUser(userId);
+        User user = userService.findByUserId(userId);
 
         List<EventJoin> eventJoins = eventJoinRepository.findByParticipant(user);
         return eventJoins.stream()
@@ -59,7 +59,7 @@ public class EventJoinService {
 
     @Transactional
     public void deleteEventJoin(Long userId, Long eventId) {
-        User user = userService.getActiveUser(userId);
+        User user = userService.findByUserId(userId);
         Event event = eventService.getActiveEvent(eventId);
 
         if (!eventJoinRepository.existsByParticipantAndEvent(user, event)) {
@@ -70,7 +70,7 @@ public class EventJoinService {
     }
 
     public boolean isEventJoin(Long userId, Long eventId) {
-        User user = userService.getActiveUser(userId);
+        User user = userService.findByUserId(userId);
         Event event = eventService.getActiveEvent(eventId);
 
         return eventJoinRepository.existsByParticipantAndEvent(user, event);

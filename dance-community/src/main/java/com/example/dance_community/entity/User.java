@@ -1,7 +1,5 @@
 package com.example.dance_community.entity;
 
-import com.example.dance_community.enums.ClubRole;
-import com.example.dance_community.enums.ClubJoinStatus;
 import com.example.dance_community.enums.EventJoinStatus;
 import jakarta.persistence.*;
 import lombok.*;
@@ -75,22 +73,6 @@ public class User extends BaseEntity{
         this.password = password;
 
         return this;
-    }
-
-    // Convenience Methods for ClubJoin
-    public void addClubJoin(Club club, ClubRole role, ClubJoinStatus status) {
-        ClubJoin newClubJoin = ClubJoin.builder()
-                .user(this)
-                .club(club)
-                .role(role)
-                .status(status)
-                .build();
-        this.clubs.add(newClubJoin);
-        club.getMembers().add(newClubJoin);
-    }
-    public void removeClubJoin(Club club) {
-        clubs.removeIf(m -> m.getClub().equals(club));
-        club.getMembers().removeIf(m -> m.getUser().equals(this));
     }
 
     // Convenience Methods for Post

@@ -1,11 +1,11 @@
 package com.example.dance_community.enums;
 
 public enum ClubJoinStatus {
-    WAITING("대기중"),
+    PENDING("대기중"),
+    CANCELED("취소"),
     REJECTED("거절됨"),
     ACTIVE("활동중"),
-    LEFT("탈퇴됨"),
-    BANNED("정지됨");
+    LEFT("탈퇴됨");
 
     private final String description;
 

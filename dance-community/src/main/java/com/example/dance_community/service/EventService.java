@@ -22,10 +22,10 @@ import java.util.List;
 public class EventService {
     private final EventRepository eventRepository;
     private final UserService userService;
-    private final ClubService ClubService;
+    private final ClubAuthService clubAuthService;
 
     public EventResponse createEvent(Long userId, EventCreateRequest request) {
-        User host = userService.getActiveUser(userId);
+        User host = userService.findByUserId(userId);
 
         Club club = null;
         if (Scope.CLUB.toString().equals(request.getScope())) {
@@ -33,7 +33,7 @@ public class EventService {
             if (clubId == null) {
                 throw new InvalidRequestException("공개 범위가 CLUB일 경우 clubId가 필요");
             }
-            club = ClubService.getActiveClub(clubId);
+            club = clubAuthService.findByClubId(clubId);
         }
 
         Event event = Event.builder()

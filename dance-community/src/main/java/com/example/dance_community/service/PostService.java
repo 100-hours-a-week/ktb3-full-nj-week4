@@ -24,12 +24,12 @@ import java.util.stream.Collectors;
 public class PostService {
     private final PostRepository postRepository;
     private final UserService userService;
-    private final ClubService ClubService;
+    private final ClubAuthService clubAuthService;
     private final FileStorageService fileStorageService;
 
     @Transactional
     public PostResponse createPost(Long userId, PostCreateRequest request) {
-        User author = userService.getActiveUser(userId);
+        User author = userService.findByUserId(userId);
 
         Club club = null;
         if (Scope.CLUB.toString().equals(request.getScope())) {
@@ -37,7 +37,7 @@ public class PostService {
             if (clubId == null) {
                 throw new InvalidRequestException("공개 범위가 CLUB일 경우 clubId가 필요");
             }
-            club = ClubService.getActiveClub(clubId);
+            club = clubAuthService.findByClubId(clubId);
         }
 
         Post post = Post.builder()

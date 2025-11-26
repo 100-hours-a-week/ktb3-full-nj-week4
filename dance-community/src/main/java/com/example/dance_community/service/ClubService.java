@@ -4,11 +4,9 @@ import com.example.dance_community.dto.club.ClubCreateRequest;
 import com.example.dance_community.dto.club.ClubResponse;
 import com.example.dance_community.dto.club.ClubUpdateRequest;
 import com.example.dance_community.entity.Club;
-import com.example.dance_community.entity.ClubJoin;
 import com.example.dance_community.entity.User;
 import com.example.dance_community.enums.ClubJoinStatus;
 import com.example.dance_community.enums.ClubRole;
-import com.example.dance_community.exception.NotFoundException;
 import com.example.dance_community.repository.ClubRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -21,11 +19,12 @@ import java.util.List;
 public class ClubService {
     private final ClubRepository clubRepository;
     private final UserService userService;
-    private final ClubJoinService clubJoinService;
+    private final ClubAuthService clubAuthService;
 
     @Transactional
     public ClubResponse createClub(Long userId, ClubCreateRequest request) {
-        User user = userService.getActiveUser(userId);
+        User user = userService.findByUserId(userId);
+
         Club club = Club.builder()
                 .clubName(request.getClubName())
                 .intro(request.getIntro())
@@ -42,7 +41,7 @@ public class ClubService {
     }
 
     public ClubResponse getClub(Long clubId) {
-        Club club = getActiveClub(clubId);
+        Club club = clubAuthService.findByClubId(clubId);
         return ClubResponse.from(club);
     }
 
@@ -53,8 +52,9 @@ public class ClubService {
 
     @Transactional
     public ClubResponse updateClub(Long userId, Long clubId, ClubUpdateRequest request) {
-        clubJoinService.validateClubAuthority(userId, clubId);
-        Club club = getActiveClub(clubId);
+        clubAuthService.validateClubAuthority(userId, clubId);
+        Club club = clubAuthService.findByClubId(clubId);
+
         club.updateClub(
                 request.getClubName(),
                 request.getIntro(),
@@ -69,13 +69,10 @@ public class ClubService {
 
     @Transactional
     public void deleteClub(Long userId, Long clubId) {
-        clubJoinService.validateClubAuthority(userId, clubId);
-        Club club = getActiveClub(clubId);
+        clubAuthService.validateLeaderAuthority(userId, clubId);
+        Club club = clubAuthService.findByClubId(clubId);
+        User user = userService.findByUserId(userId);
+        club.removeMember(user);
         club.delete();
-    }
-
-    Club getActiveClub(Long clubId) {
-        return clubRepository.findById(clubId)
-                .orElseThrow(() -> new NotFoundException("클럽을 찾을 수 없습니다"));
     }
 }

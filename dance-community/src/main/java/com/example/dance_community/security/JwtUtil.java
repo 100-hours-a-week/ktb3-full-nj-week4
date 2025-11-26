@@ -72,5 +72,10 @@ public class JwtUtil {
         String type = (String) getClaims(token).get("type");
         return "ACCESS".equals(type);
     }
+
+    public boolean isRefreshToken(String token) {
+        String type = (String) getClaims(token).get("type");
+        return "REFRESH".equals(type);
+    }
 }
 

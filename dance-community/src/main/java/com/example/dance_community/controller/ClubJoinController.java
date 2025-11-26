@@ -1,13 +1,11 @@
 package com.example.dance_community.controller;
 
 import com.example.dance_community.dto.ApiResponse;
-import com.example.dance_community.dto.clubJoin.ClubJoinCreateRequest;
-import com.example.dance_community.dto.clubJoin.ClubJoinResponse;
+import com.example.dance_community.dto.club.ClubJoinResponse;
 import com.example.dance_community.security.UserDetail;
 import com.example.dance_community.service.ClubJoinService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -18,46 +16,104 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/club-joins")
+@RequestMapping("/clubs")
 @RequiredArgsConstructor
 @Tag(name = "4_ClubJoin", description = "클럽 가입 관련 API")
 @Slf4j
 public class ClubJoinController {
     private final ClubJoinService clubJoinService;
 
-    @Operation(summary = "클럽 가입", description = "클럽에 가입합니다.")
-    @PostMapping()
-    public ResponseEntity<ApiResponse<ClubJoinResponse>> createClubJoin(@AuthenticationPrincipal UserDetail userDetail, @Valid @RequestBody ClubJoinCreateRequest clubJoinCreateRequest) {
-        ClubJoinResponse clubJoinResponse = clubJoinService.createClubJoin(userDetail.getUserId(), clubJoinCreateRequest);
-        return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResponse<>("클럽 가입 성공", clubJoinResponse));
+    // 일반 사용자용
+    @Operation(summary = "클럽 가입 신청", description = "클럽에 가입 신청합니다.")
+    @PostMapping("/{clubId}/apply")
+    public ResponseEntity<ApiResponse<ClubJoinResponse>> applyToClub(
+            @AuthenticationPrincipal UserDetail userDetail,
+            @PathVariable Long clubId) {
+        ClubJoinResponse response = clubJoinService.applyToClub(userDetail.getUserId(), clubId);
+        return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResponse<>("클럽 가입 신청 성공", response));
     }
 
-    @Operation(summary = "사용자가 가입한 클럽 조회", description = "특정 사용자가 가입한 모든 클럽의 정보를 불러옵니다.")
-    @GetMapping("/club")
-    public ResponseEntity<ApiResponse<List<ClubJoinResponse>>> getUserClubs(@AuthenticationPrincipal UserDetail userDetail) {
-        List<ClubJoinResponse> clubJoinResponses = clubJoinService.getUsersClubs(userDetail.getUserId());
-        return ResponseEntity.ok(new ApiResponse<>("사용자가 가입한 클럽 조회 성공", clubJoinResponses));
-    }
-
-    @Operation(summary = "클럽에 가입한 사용자 조회", description = "특정 클럽에 가입한 모든 사용자의 정보를 불러옵니다.")
-    @GetMapping("/user/{clubId}")
-    public ResponseEntity<ApiResponse<List<ClubJoinResponse>>> getClubUsers(@PathVariable Long clubId) {
-        List<ClubJoinResponse> clubJoinResponses = clubJoinService.getActiveUserInClub(clubId);
-        return ResponseEntity.ok(new ApiResponse<>("클럽에 가입한 사용자 조회 성공", clubJoinResponses));
-    }
-
-    @Operation(summary = "클럽 가입 확인", description = "특정 사용자가 특정 클럽의 멤버인지 확인합니다.")
-    @GetMapping("/check/{clubId}")
-    public ResponseEntity<Boolean> checkMembership(@AuthenticationPrincipal UserDetail userDetail, @PathVariable Long clubId) {
-        boolean isMember = clubJoinService.isClubJoin(userDetail.getUserId(), clubId);
-        return ResponseEntity.ok(isMember);
+    @Operation(summary = "클럽 가입 신청 취소", description = "클럽 가입 신청을 취소합니다.")
+    @DeleteMapping("/{clubId}/apply")
+    public ResponseEntity<ApiResponse<Void>> cancelApplication(
+            @AuthenticationPrincipal UserDetail userDetail,
+            @PathVariable Long clubId
+    ) {
+        clubJoinService.cancelApplication(userDetail.getUserId(), clubId);
+        return ResponseEntity.ok(new ApiResponse<>("클럽 가입 신청 취소 성공", null));
     }
 
     @Operation(summary = "클럽 탈퇴", description = "클럽에서 탈퇴합니다.")
-    @DeleteMapping("/{clubId}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public ResponseEntity<Void> deleteClubJoin(@AuthenticationPrincipal UserDetail userDetaild, @PathVariable Long clubId) {
-        clubJoinService.deleteClubJoin(userDetaild.getUserId(), clubId);
-        return ResponseEntity.noContent().build();
+    @DeleteMapping("/{clubId}/leave")
+    public ResponseEntity<ApiResponse<Void>> leaveClub(
+            @AuthenticationPrincipal UserDetail userDetail,
+            @PathVariable Long clubId
+    ) {
+        clubJoinService.leaveClub(userDetail.getUserId(), clubId);
+        return ResponseEntity.ok(new ApiResponse<>("클럽 탈퇴 성공", null));
+    }
+
+    @Operation(summary = "내 가입 상태 조회", description = "내 클럽 가입 상태를 조회합니다.")
+    @GetMapping("/{clubId}/my-status")
+    public ResponseEntity<ApiResponse<ClubJoinResponse>> getMyJoinStatus(
+            @AuthenticationPrincipal UserDetail userDetail,
+            @PathVariable Long clubId
+    ) {
+        ClubJoinResponse response = clubJoinService.getJoinStatus(userDetail.getUserId(), clubId);
+        return ResponseEntity.ok(new ApiResponse<>("내 가입 상태 조회 성공", response));
+    }
+
+    // 클럽 관리자용
+    @Operation(summary = "대기 중인 신청 목록 조회", description = "대기 중인 신청 목록을 조회합니다.")
+    @GetMapping("/{clubId}/applications")
+    public ResponseEntity<ApiResponse<List<ClubJoinResponse>>> getPendingApplications(
+            @AuthenticationPrincipal UserDetail userDetail,
+            @PathVariable Long clubId
+    ) {
+        List<ClubJoinResponse> responses = clubJoinService.getPendingApplications(userDetail.getUserId(), clubId);
+        return ResponseEntity.ok(new ApiResponse<>("대기 중인 신청 목록 조회 성공", responses));
+    }
+
+    @Operation(summary = "가입 신청 승인", description = "가입 신청을 승인합니다.")
+    @PostMapping("/{clubId}/applications/{applicantId}/approve")
+    public ResponseEntity<ApiResponse<Void>> approveApplication(
+            @AuthenticationPrincipal UserDetail userDetail,
+            @PathVariable Long clubId,
+            @PathVariable Long applicantId
+    ) {
+        clubJoinService.approveApplication(userDetail.getUserId(), clubId, applicantId);
+        return ResponseEntity.ok(new ApiResponse<>("가입 신청 승인 성공", null));
+    }
+
+    @Operation(summary = "가입 신청 거절", description = "가입 신청을 거절합니다.")
+    @PostMapping("/{clubId}/applications/{applicantId}/reject")
+    public ResponseEntity<ApiResponse<Void>> rejectApplication(
+            @AuthenticationPrincipal UserDetail userDetail,
+            @PathVariable Long clubId,
+            @PathVariable Long applicantId
+    ) {
+        clubJoinService.rejectApplication(userDetail.getUserId(), clubId, applicantId);
+        return ResponseEntity.ok(new ApiResponse<>("가입 신청 거절 성공", null));
+    }
+
+    @Operation(summary = "멤버 추방", description = "멤버를 추방합니다.")
+    @DeleteMapping("/{clubId}/members/{memberId}")
+    public ResponseEntity<ApiResponse<Void>> kickMember(
+            @AuthenticationPrincipal UserDetail userDetail,
+            @PathVariable Long clubId,
+            @PathVariable Long memberId
+    ) {
+        clubJoinService.kickMember(userDetail.getUserId(), clubId, memberId);
+        return ResponseEntity.ok(new ApiResponse<>("멤버 추방 성공", null));
+    }
+
+    // 조회용
+    @Operation(summary = "활동 중인 멤버 목록 조회", description = "활동 중인 멤버 목록을 조회합니다.")
+    @GetMapping("/{clubId}/members")
+    public ResponseEntity<ApiResponse<List<ClubJoinResponse>>> getActiveMembers(
+            @PathVariable Long clubId
+    ) {
+        List<ClubJoinResponse> responses = clubJoinService.getActiveMembers(clubId);
+        return ResponseEntity.ok(new ApiResponse<>("조회 성공", responses));
     }
 }

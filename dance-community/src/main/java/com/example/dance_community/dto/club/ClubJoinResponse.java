@@ -1,4 +1,4 @@
-package com.example.dance_community.dto.clubJoin;
+package com.example.dance_community.dto.club;
 
 import com.example.dance_community.entity.ClubJoin;
 

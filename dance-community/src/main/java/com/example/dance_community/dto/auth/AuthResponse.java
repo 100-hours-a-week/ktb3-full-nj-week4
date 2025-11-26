@@ -4,10 +4,9 @@ import com.example.dance_community.dto.user.UserResponse;
 
 public record AuthResponse(
         UserResponse userResponse,
-        String accessToken,
-        String refreshToken
+        String accessToken
 ) {
-    public static AuthResponse from(UserResponse userResponse, String accessToken, String refreshToken) {
-        return new AuthResponse(userResponse, accessToken, refreshToken);
+    public static AuthResponse from(UserResponse userResponse, String accessToken) {
+        return new AuthResponse(userResponse, accessToken);
     }
 }

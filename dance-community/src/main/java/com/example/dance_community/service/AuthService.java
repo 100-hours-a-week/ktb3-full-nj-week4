@@ -4,57 +4,64 @@ import com.example.dance_community.dto.auth.*;
 import com.example.dance_community.dto.user.UserResponse;
 import com.example.dance_community.entity.User;
 import com.example.dance_community.exception.AuthException;
-import com.example.dance_community.exception.ConflictException;
+import com.example.dance_community.security.CookieUtil;
 import com.example.dance_community.security.JwtUtil;
-import com.example.dance_community.repository.UserRepository;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
 public class AuthService {
-    private final UserRepository userRepository;
+    private final UserService userService;
+    private final CookieUtil cookieUtil;
     private final JwtUtil jwtUtil;
-    private final PasswordEncoder passwordEncoder;
 
     @Transactional
-    public AuthResponse signup(SignupRequest signupRequest){
-        if (userRepository.existsByEmail(signupRequest.getEmail())) {
-            throw new ConflictException("이메일 중복");
-        }
-        User user = User.builder()
-                .email(signupRequest.getEmail())
-                .password(passwordEncoder.encode(signupRequest.getPassword()))
-                .nickname(signupRequest.getNickname())
-                .profileImage(signupRequest.getProfileImage())
-                .build();
-        User newUser = userRepository.save(user);
-        return new AuthResponse(UserResponse.from(user), "", "");
+    public AuthResponse signup(SignupRequest request){
+        UserResponse userResponse = userService.createUser(
+                request.getEmail(),
+                request.getPassword(),
+                request.getNickname(),
+                request.getProfileImage()
+        );
+
+        return new AuthResponse(userResponse, "");
     }
 
-    public AuthResponse login(LoginRequest loginRequest) {
-        User user = userRepository.findByEmail(loginRequest.getEmail())
-                .orElseThrow(() -> new AuthException("등록되지 않은 이메일"));
+    public AuthResponse login(LoginRequest request, HttpServletResponse response) {
+        User user = userService.findByEmail(request.getEmail());
 
-        if (!passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
-            throw new AuthException("비밀번호 미일치");
+        if (!userService.matchesPassword(user, request.getPassword())) {
+            throw new AuthException("비밀번호가 일치하지 않습니다");
         }
 
         String accessToken = jwtUtil.generateAccessToken(user.getUserId());
         String refreshToken = jwtUtil.generateRefreshToken(user.getUserId());
 
-        return new AuthResponse(UserResponse.from(user), accessToken, refreshToken);
+        cookieUtil.setRefreshTokenCookie(response, refreshToken);
+
+        return new AuthResponse(UserResponse.from(user), accessToken);
     }
 
-    public AuthResponse refreshAccessToken(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new AuthException("등록되지 않은 사용자"));
+    public AuthResponse refresh(String refreshToken) {
+        if (refreshToken == null) {
+            throw new AuthException("refreshToken이 없습니다");
+        }
+
+        if (!jwtUtil.validateToken(refreshToken) || !jwtUtil.isRefreshToken(refreshToken)) {
+            throw new AuthException("유효하지 않은 refreshToken");
+        }
+
+        Long userId = jwtUtil.getUserId(refreshToken);
+        User user = userService.findByUserId(userId);
 
         String newAccessToken = jwtUtil.generateAccessToken(userId);
-        String newRefreshToken = jwtUtil.generateRefreshToken(userId);
+        return new AuthResponse(UserResponse.from(user), newAccessToken);
+    }
 
-        return new AuthResponse(UserResponse.from(user), newAccessToken, newRefreshToken);
+    public void logout(HttpServletResponse response) {
+        cookieUtil.deleteRefreshTokenCookie(response);
     }
 }
