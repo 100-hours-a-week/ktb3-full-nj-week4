@@ -35,14 +35,14 @@ public class ClubJoinController {
     @Operation(summary = "사용자가 가입한 클럽 조회", description = "특정 사용자가 가입한 모든 클럽의 정보를 불러옵니다.")
     @GetMapping("/club")
     public ResponseEntity<ApiResponse<List<ClubJoinResponse>>> getUserClubs(@AuthenticationPrincipal UserDetail userDetail) {
-        List<ClubJoinResponse> clubJoinResponses = clubJoinService.getUserClubs(userDetail.getUserId());
+        List<ClubJoinResponse> clubJoinResponses = clubJoinService.getUsersClubs(userDetail.getUserId());
         return ResponseEntity.ok(new ApiResponse<>("사용자가 가입한 클럽 조회 성공", clubJoinResponses));
     }
 
     @Operation(summary = "클럽에 가입한 사용자 조회", description = "특정 클럽에 가입한 모든 사용자의 정보를 불러옵니다.")
     @GetMapping("/user/{clubId}")
     public ResponseEntity<ApiResponse<List<ClubJoinResponse>>> getClubUsers(@PathVariable Long clubId) {
-        List<ClubJoinResponse> clubJoinResponses = clubJoinService.getClubUsers(clubId);
+        List<ClubJoinResponse> clubJoinResponses = clubJoinService.getActiveUserInClub(clubId);
         return ResponseEntity.ok(new ApiResponse<>("클럽에 가입한 사용자 조회 성공", clubJoinResponses));
     }
 

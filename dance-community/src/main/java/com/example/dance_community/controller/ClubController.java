@@ -83,6 +83,7 @@ public class ClubController {
     @Operation(summary = "내 클럽 수정", description = "사용자의 클럽을 수정합니다.")
     @PatchMapping("/{clubId}")
     public ResponseEntity<ApiResponse<ClubResponse>> updateClub(
+            @AuthenticationPrincipal UserDetail userDetail,
             @PathVariable Long clubId,
             @RequestParam("clubName") String clubName,
             @RequestParam("intro") String intro,
@@ -108,7 +109,7 @@ public class ClubController {
                 tags
         );
 
-        ClubResponse clubResponse = clubService.updateClub(clubId, clubUpdateRequest);
+        ClubResponse clubResponse = clubService.updateClub(userDetail.getUserId(), clubId, clubUpdateRequest);
         return ResponseEntity.ok(new ApiResponse<>("클럽 수정 성공", clubResponse));
     }
 
@@ -116,8 +117,8 @@ public class ClubController {
     @Operation(summary = "클럽 삭제", description = "클럽 id를 통해 정보를 삭제합니다.")
     @DeleteMapping("/{clubId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public ResponseEntity<Void> deleteClub(@PathVariable Long clubId) {
-        clubService.deleteClub(clubId);
+    public ResponseEntity<Void> deleteClub(@AuthenticationPrincipal UserDetail userDetail, @PathVariable Long clubId) {
+        clubService.deleteClub(userDetail.getUserId(), clubId);
         return ResponseEntity.noContent().build();
     }
 }

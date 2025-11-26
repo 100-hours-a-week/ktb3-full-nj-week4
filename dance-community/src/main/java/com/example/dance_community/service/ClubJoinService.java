@@ -25,12 +25,14 @@ public class ClubJoinService {
 
     @Transactional
     public ClubJoinResponse createClubJoin(Long userId, ClubJoinCreateRequest request) {
-        User user = userService.getActiveUser(userId);
-        Club club = clubService.getActiveClub(request.getClubId());
+        Long clubId = request.getClubId();
 
-        if (clubJoinRepository.existsByUserAndClub(user, club)) {
+        if (isClubJoin(userId, clubId)) {
             throw new ConflictException("이미 가입한 클럽");
         }
+
+        User user = userService.getActiveUser(userId);
+        Club club = clubService.getActiveClub(clubId);
 
         ClubJoin newClubJoin = ClubJoin.builder()
                 .user(user)
@@ -43,17 +45,15 @@ public class ClubJoinService {
         return ClubJoinResponse.from(savedClubJoin);
     }
 
-    public List<ClubJoinResponse> getUserClubs(Long userId) {
+    public List<ClubJoinResponse> getUsersClubs(Long userId) {
         List<ClubJoin> clubJoins = clubJoinRepository.findByUser_UserIdAndStatus(userId, ClubJoinStatus.valueOf("ACTIVE"));
         return clubJoins.stream()
                 .map(ClubJoinResponse::from)
                 .toList();
     }
 
-    public List<ClubJoinResponse> getClubUsers(Long clubId) {
-        Club club = clubService.getActiveClub(clubId);
-
-        List<ClubJoin> clubJoins = clubJoinRepository.findByClub(club);
+    public List<ClubJoinResponse> getActiveUserInClub(Long clubId) {
+        List<ClubJoin> clubJoins = clubJoinRepository.findByClub_ClubIdAndStatus(clubId, ClubJoinStatus.valueOf("ACTIVE"));
         return clubJoins.stream()
                 .map(ClubJoinResponse::from)
                 .toList();
@@ -61,20 +61,22 @@ public class ClubJoinService {
 
     @Transactional
     public void deleteClubJoin(Long userId, Long clubId) {
-        User user = userService.getActiveUser(userId);
-        Club club = clubService.getActiveClub(clubId);
-
-        if (!clubJoinRepository.existsByUserAndClub(user, club)) {
+        if (!isClubJoin(userId, clubId)) {
             throw new InvalidRequestException("가입하지 않은 클럽");
         }
 
-        clubJoinRepository.deleteByUserAndClub(user, club);
+        ClubJoin clubJoin = clubJoinRepository.findByUser_UserIdAndClub_ClubId(userId, clubId);
+        clubJoin.changeStatus(ClubJoinStatus.valueOf("REJECTED"));
     }
 
     public boolean isClubJoin(Long userId, Long clubId) {
-        User user = userService.getActiveUser(userId);
-        Club club = clubService.getActiveClub(clubId);
+        return clubJoinRepository.existsByUser_UserIdAndClub_ClubId(userId, clubId);
+    }
 
-        return clubJoinRepository.existsByUserAndClub(user, club);
+    public void validateClubAuthority(Long userId, Long clubId) {
+        ClubJoin clubJoin = clubJoinRepository.findByUser_UserIdAndClub_ClubId(userId, clubId);
+        if (clubJoin == null || !clubJoin.hasManagementPermission()) {
+            throw new InvalidRequestException("클럽 권한이 없습니다");
+        }
     }
 }

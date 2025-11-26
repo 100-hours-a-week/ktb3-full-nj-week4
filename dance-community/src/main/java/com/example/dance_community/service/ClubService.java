@@ -4,6 +4,7 @@ import com.example.dance_community.dto.club.ClubCreateRequest;
 import com.example.dance_community.dto.club.ClubResponse;
 import com.example.dance_community.dto.club.ClubUpdateRequest;
 import com.example.dance_community.entity.Club;
+import com.example.dance_community.entity.ClubJoin;
 import com.example.dance_community.entity.User;
 import com.example.dance_community.enums.ClubJoinStatus;
 import com.example.dance_community.enums.ClubRole;
@@ -20,6 +21,7 @@ import java.util.List;
 public class ClubService {
     private final ClubRepository clubRepository;
     private final UserService userService;
+    private final ClubJoinService clubJoinService;
 
     @Transactional
     public ClubResponse createClub(Long userId, ClubCreateRequest request) {
@@ -50,9 +52,9 @@ public class ClubService {
     }
 
     @Transactional
-    public ClubResponse updateClub(Long clubId, ClubUpdateRequest request) {
+    public ClubResponse updateClub(Long userId, Long clubId, ClubUpdateRequest request) {
+        clubJoinService.validateClubAuthority(userId, clubId);
         Club club = getActiveClub(clubId);
-
         club.updateClub(
                 request.getClubName(),
                 request.getIntro(),
@@ -66,7 +68,8 @@ public class ClubService {
     }
 
     @Transactional
-    public void deleteClub(Long clubId) {
+    public void deleteClub(Long userId, Long clubId) {
+        clubJoinService.validateClubAuthority(userId, clubId);
         Club club = getActiveClub(clubId);
         club.delete();
     }
