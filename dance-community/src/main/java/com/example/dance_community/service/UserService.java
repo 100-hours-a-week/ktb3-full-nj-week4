@@ -6,7 +6,7 @@ import com.example.dance_community.dto.user.UserUpdateRequest;
 import com.example.dance_community.encoder.PasswordEncoder;
 import com.example.dance_community.entity.User;
 import com.example.dance_community.exception.NotFoundException;
-import com.example.dance_community.repository.jpa.UserRepository;
+import com.example.dance_community.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

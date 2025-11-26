@@ -7,7 +7,7 @@ import com.example.dance_community.entity.User;
 import com.example.dance_community.exception.AuthException;
 import com.example.dance_community.exception.ConflictException;
 import com.example.dance_community.security.JwtUtil;
-import com.example.dance_community.repository.jpa.UserRepository;
+import com.example.dance_community.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

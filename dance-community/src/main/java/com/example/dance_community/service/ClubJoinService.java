@@ -9,7 +9,7 @@ import com.example.dance_community.enums.ClubJoinStatus;
 import com.example.dance_community.enums.ClubRole;
 import com.example.dance_community.exception.ConflictException;
 import com.example.dance_community.exception.InvalidRequestException;
-import com.example.dance_community.repository.jpa.ClubJoinRepository;
+import com.example.dance_community.repository.ClubJoinRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

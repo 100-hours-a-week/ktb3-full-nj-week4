@@ -8,7 +8,7 @@ import com.example.dance_community.entity.User;
 import com.example.dance_community.enums.ClubJoinStatus;
 import com.example.dance_community.enums.ClubRole;
 import com.example.dance_community.exception.NotFoundException;
-import com.example.dance_community.repository.jpa.ClubRepository;
+import com.example.dance_community.repository.ClubRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

@@ -1,7 +1,7 @@
 package com.example.dance_community.service;
 
 import com.example.dance_community.entity.User;
-import com.example.dance_community.repository.jpa.UserRepository;
+import com.example.dance_community.repository.UserRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;

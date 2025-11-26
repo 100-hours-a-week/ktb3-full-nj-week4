@@ -6,7 +6,7 @@ import com.example.dance_community.entity.*;
 import com.example.dance_community.enums.EventJoinStatus;
 import com.example.dance_community.exception.ConflictException;
 import com.example.dance_community.exception.InvalidRequestException;
-import com.example.dance_community.repository.jpa.EventJoinRepository;
+import com.example.dance_community.repository.EventJoinRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

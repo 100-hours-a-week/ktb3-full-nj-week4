@@ -1,4 +1,4 @@
-package com.example.dance_community.repository.jpa;
+package com.example.dance_community.repository;
 
 import com.example.dance_community.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
