@@ -1,20 +1,20 @@
 package com.example.dance_community.controller;
 
-import com.example.dance_community.auth.GetUserId;
 import com.example.dance_community.dto.ApiResponse;
 import com.example.dance_community.dto.post.PostCreateRequest;
 import com.example.dance_community.dto.post.PostResponse;
 import com.example.dance_community.dto.post.PostUpdateRequest;
 import com.example.dance_community.enums.ImageType;
+import com.example.dance_community.security.UserDetail;
 import com.example.dance_community.service.FileStorageService;
 import com.example.dance_community.service.PostService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -32,7 +32,7 @@ public class PostController {
     @Operation(summary = "게시물 생성", description = "게시물을 새로 작성합니다.")
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ApiResponse<PostResponse>> createPost(
-            @GetUserId Long userId,
+            @AuthenticationPrincipal UserDetail userDetail,
             @RequestParam("scope") String scope,
             @RequestParam(value = "clubId", required = false) Long clubId,
             @RequestParam("title") String title,
@@ -53,7 +53,7 @@ public class PostController {
                 scope, clubId, title, content, tags, imagePaths
         );
 
-        PostResponse postResponse = postService.createPost(userId, postCreateRequest);
+        PostResponse postResponse = postService.createPost(userDetail.getUserId(), postCreateRequest);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(new ApiResponse<>("게시물 생성 성공", postResponse));
     }
@@ -76,7 +76,7 @@ public class PostController {
     @PatchMapping(value = "/{postId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ApiResponse<PostResponse>> updatePost(
             @PathVariable Long postId,
-            @GetUserId Long userId,
+            @AuthenticationPrincipal UserDetail userDetail,
             @RequestParam(value = "title", required = false) String title,
             @RequestParam(value = "content", required = false) String content,
             @RequestParam(value = "tags", required = false) List<String> tags,
@@ -97,7 +97,7 @@ public class PostController {
                 title, content, tags, newImagePaths, keepImages
         );
 
-        PostResponse postResponse = postService.updatePost(postId, userId, request);
+        PostResponse postResponse = postService.updatePost(postId, userDetail.getUserId(), request);
         return ResponseEntity.ok(new ApiResponse<>("게시물 수정 성공", postResponse));
     }
 

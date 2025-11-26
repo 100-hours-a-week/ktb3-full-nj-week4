@@ -1,5 +1,6 @@
 package com.example.dance_community.security;
 
+import com.example.dance_community.entity.User;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -9,28 +10,58 @@ import java.util.Collection;
 import java.util.List;
 
 @Getter
-public class CustomUserDetails implements UserDetails {
+public class UserDetail implements UserDetails {
 
     private final Long userId;
     private final String email;
     private final String nickname;
+    private final String profileImage;
+
     private final String password;
     private final List<GrantedAuthority> authorities;
 
-    // 기본 생성자 (일반 사용자)
-    public CustomUserDetails(Long userId, String email, String nickname, String password) {
+    public UserDetail(
+            Long userId,
+            String email,
+            String nickname,
+            String password
+    ) {
         this.userId = userId;
         this.email = email;
         this.nickname = nickname;
+        this.profileImage = null;
         this.password = password;
         this.authorities = List.of(new SimpleGrantedAuthority("ROLE_USER"));
     }
 
-    // 권한 포함 생성자 (나중에 사용)
-    public CustomUserDetails(Long userId, String email, String nickname, String password, List<GrantedAuthority> authorities) {
+    public UserDetail(
+            Long userId,
+            String email,
+            String nickname,
+            String profileImage,
+            String password
+    ) {
         this.userId = userId;
         this.email = email;
         this.nickname = nickname;
+        this.profileImage = profileImage;
+        this.password = password;
+        this.authorities = List.of(new SimpleGrantedAuthority("ROLE_USER"));
+    }
+
+    // 생성자 3: 권한 포함 (나중에 ADMIN 등 추가 시)
+    public UserDetail(
+            Long userId,
+            String email,
+            String nickname,
+            String profileImage,
+            String password,
+            List<GrantedAuthority> authorities
+    ) {
+        this.userId = userId;
+        this.email = email;
+        this.nickname = nickname;
+        this.profileImage = profileImage;
         this.password = password;
         this.authorities = authorities;
     }

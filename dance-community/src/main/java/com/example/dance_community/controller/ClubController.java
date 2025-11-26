@@ -1,21 +1,20 @@
 package com.example.dance_community.controller;
 
-import com.example.dance_community.auth.GetUserId;
 import com.example.dance_community.dto.ApiResponse;
 import com.example.dance_community.dto.club.ClubCreateRequest;
 import com.example.dance_community.dto.club.ClubResponse;
 import com.example.dance_community.dto.club.ClubUpdateRequest;
 import com.example.dance_community.enums.ClubType;
 import com.example.dance_community.enums.ImageType;
+import com.example.dance_community.security.UserDetail;
 import com.example.dance_community.service.ClubService;
 import com.example.dance_community.service.FileStorageService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.Email;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -32,7 +31,7 @@ public class ClubController {
     @Operation(summary = "클럽 생성", description = "클럽을 새로 작성합니다.")
     @PostMapping()
     public ResponseEntity<ApiResponse<ClubResponse>> createClub(
-            @GetUserId Long userId,
+            @AuthenticationPrincipal UserDetail userDetail,
             @RequestParam("clubName") String clubName,
             @RequestParam("intro") String intro,
             @RequestParam("locationName") String locationName,
@@ -56,7 +55,7 @@ public class ClubController {
                 tags
         );
 
-        ClubResponse clubResponse = clubService.createClub(userId, clubCreateRequest);
+        ClubResponse clubResponse = clubService.createClub(userDetail.getUserId(), clubCreateRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResponse<>("클럽 생성 성공", clubResponse));
     }
 
@@ -69,8 +68,8 @@ public class ClubController {
 
     @Operation(summary = "내 클럽 조회", description = "사용자의 클럽 정보를 불러옵니다.")
     @GetMapping("/my")
-    public ResponseEntity<ApiResponse<ClubResponse>> getMyClub(@GetUserId Long userId) {
-        ClubResponse clubResponse = clubService.getClub(userId);
+    public ResponseEntity<ApiResponse<ClubResponse>> getMyClub(@AuthenticationPrincipal UserDetail userDetail) {
+        ClubResponse clubResponse = clubService.getClub(userDetail.getUserId());
         return ResponseEntity.ok(new ApiResponse<>("내 클럽 조회 성공", clubResponse));
     }
 

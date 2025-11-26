@@ -67,10 +67,11 @@ public class JwtFilter extends OncePerRequestFilter {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다"));
 
-        CustomUserDetails userDetails = new CustomUserDetails(
+        UserDetail userDetails = new UserDetail(
                 user.getUserId(),
                 user.getEmail(),
                 user.getNickname(),
+                user.getProfileImage(),
                 user.getPassword()
         );
 

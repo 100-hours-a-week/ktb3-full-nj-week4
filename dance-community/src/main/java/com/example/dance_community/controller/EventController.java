@@ -1,10 +1,10 @@
 package com.example.dance_community.controller;
 
-import com.example.dance_community.auth.GetUserId;
 import com.example.dance_community.dto.ApiResponse;
 import com.example.dance_community.dto.event.EventCreateRequest;
 import com.example.dance_community.dto.event.EventResponse;
 import com.example.dance_community.dto.event.EventUpdateRequest;
+import com.example.dance_community.security.UserDetail;
 import com.example.dance_community.service.EventService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -12,6 +12,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -25,8 +26,8 @@ public class EventController {
 
     @Operation(summary = "행사 생성", description = "행사를 새로 만듭니다.")
     @PostMapping()
-    public ResponseEntity<ApiResponse<EventResponse>> createEvent(@GetUserId Long userId, @Valid @RequestBody EventCreateRequest eventCreateRequest) {
-        EventResponse eventResponse = eventService.createEvent(userId, eventCreateRequest);
+    public ResponseEntity<ApiResponse<EventResponse>> createEvent(@AuthenticationPrincipal UserDetail userDetail, @Valid @RequestBody EventCreateRequest eventCreateRequest) {
+        EventResponse eventResponse = eventService.createEvent(userDetail.getUserId(), eventCreateRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResponse<>("행사 생성 성공", eventResponse));
     }
 

@@ -1,12 +1,11 @@
 package com.example.dance_community.controller;
 
-import com.example.dance_community.auth.GetUserId;
 import com.example.dance_community.dto.ApiResponse;
 import com.example.dance_community.dto.user.PasswordUpdateRequest;
 import com.example.dance_community.dto.user.UserResponse;
 import com.example.dance_community.dto.user.UserUpdateRequest;
 import com.example.dance_community.enums.ImageType;
-import com.example.dance_community.security.CustomUserDetails;
+import com.example.dance_community.security.UserDetail;
 import com.example.dance_community.service.FileStorageService;
 import com.example.dance_community.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -30,8 +29,8 @@ public class UserController {
 
     @Operation(summary = "내 정보 조회", description = "사용자의 정보를 불러옵니다.")
     @GetMapping("/me")
-    public ResponseEntity<ApiResponse<UserResponse>> getMe(@AuthenticationPrincipal CustomUserDetails userDetails) {
-        UserResponse userResponse = userService.getUser(userDetails.getUserId());
+    public ResponseEntity<ApiResponse<UserResponse>> getMe(@AuthenticationPrincipal UserDetail userDetail) {
+        UserResponse userResponse = userService.getUser(userDetail.getUserId());
         return ResponseEntity.ok(new ApiResponse<>("내 정보 조회 성공", userResponse));
     }
 
@@ -45,30 +44,30 @@ public class UserController {
     @Operation(summary = "내 정보 수정", description = "사용자 정보를 수정합니다.")
     @PatchMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ApiResponse<UserResponse>> updateUser(
-            @GetUserId Long userId,
+            @AuthenticationPrincipal UserDetail userDetail,
             @RequestParam(value = "nickname", required = false) String nickname,
             @RequestParam(value = "profileImage", required = false) MultipartFile profileImage
     ) {
         String profileImagePath = fileStorageService.saveImage(profileImage, ImageType.PROFILE);
         UserUpdateRequest userUpdateRequest = new UserUpdateRequest(nickname, profileImagePath);
 
-        UserResponse userResponse = userService.updateUser(userId, userUpdateRequest);
+        UserResponse userResponse = userService.updateUser(userDetail.getUserId(), userUpdateRequest);
         return ResponseEntity.ok(new ApiResponse<>("회원 정보 수정 성공", userResponse));
     }
 
     @Operation(summary = "내 비밀번호 수정", description = "사용자 비밀번호를 수정합니다.")
     @PatchMapping("/password")
     public ResponseEntity<ApiResponse<UserResponse>> updatePassword(
-            @GetUserId Long userId, @Valid @RequestBody PasswordUpdateRequest request) {
-        UserResponse userResponse = userService.updatePassword(userId, request);
+            @AuthenticationPrincipal UserDetail userDetail, @Valid @RequestBody PasswordUpdateRequest request) {
+        UserResponse userResponse = userService.updatePassword(userDetail.getUserId(), request);
         return ResponseEntity.ok(new ApiResponse<>("비밀번호 수정 성공", userResponse));
     }
 
     @Operation(summary = "탈퇴", description = "사용자 정보를 삭제합니다.")
     @DeleteMapping()
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public ResponseEntity<Void> deleteUser(@GetUserId Long userId) {
-        userService.deleteUser(userId);
+    public ResponseEntity<Void> deleteUser(@AuthenticationPrincipal UserDetail userDetail) {
+        userService.deleteUser(userDetail.getUserId());
         return ResponseEntity.noContent().build();
     }
 }
