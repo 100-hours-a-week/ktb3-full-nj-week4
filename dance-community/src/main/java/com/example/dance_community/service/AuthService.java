@@ -2,7 +2,6 @@ package com.example.dance_community.service;
 
 import com.example.dance_community.dto.auth.*;
 import com.example.dance_community.dto.user.UserResponse;
-import com.example.dance_community.encoder.PasswordEncoder;
 import com.example.dance_community.entity.User;
 import com.example.dance_community.exception.AuthException;
 import com.example.dance_community.exception.ConflictException;
@@ -10,6 +9,7 @@ import com.example.dance_community.security.JwtUtil;
 import com.example.dance_community.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
