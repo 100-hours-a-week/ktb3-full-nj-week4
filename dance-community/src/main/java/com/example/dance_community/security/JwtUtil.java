@@ -1,4 +1,4 @@
-package com.example.dance_community.jwt;
+package com.example.dance_community.security;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
@@ -12,12 +12,8 @@ import java.util.Date;
 
 @Component
 public class JwtUtil {
-    // JWT : Header-Payload-Signature로 구성
-
-    // JWT 서명 시 사용되는 비밀키 배정
     @Value("${jwt.secret}")
     private String jwtSecret;
-
     private Key key;
 
     @PostConstruct
@@ -30,23 +26,24 @@ public class JwtUtil {
 
     public String generateAccessToken(Long userId) {
         return Jwts.builder()
-                .setSubject(String.valueOf(userId)) //sub : 토큰 주체
-                .setIssuedAt(new Date()) // iat : 발급 시간
-                .setExpiration(new Date(System.currentTimeMillis() + accessTokenExpirationMs)) // exp : 만료 시간
-                .signWith(key) //서명
-                .compact(); //문자열 반환
+                .setSubject(String.valueOf(userId))
+                .claim("type", "ACCESS")
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + accessTokenExpirationMs))
+                .signWith(key)
+                .compact();
     }
 
     public String generateRefreshToken(Long userId) {
         return Jwts.builder()
                 .setSubject(String.valueOf(userId))
+                .claim("type", "REFRESH")
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + refreshTokenExpirationMs))
                 .signWith(key)
                 .compact();
     }
 
-    // 토큰 유효성 검증(서명 유효성 & 토큰 만료 여부 확인)
     public boolean validateToken(String token) {
         try {
             Jwts.parserBuilder()
@@ -59,7 +56,6 @@ public class JwtUtil {
         }
     }
 
-    // 토큰 내부 Payload 정보 가져오기 -> userId 받아오기
     public Claims getClaims(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(key)
@@ -70,6 +66,11 @@ public class JwtUtil {
 
     public Long getUserId(String token) {
         return Long.valueOf(getClaims(token).getSubject());
+    }
+
+    public boolean isAccessToken(String token) {
+        String type = (String) getClaims(token).get("type");
+        return "ACCESS".equals(type);
     }
 }
 

@@ -6,6 +6,7 @@ import com.example.dance_community.dto.user.PasswordUpdateRequest;
 import com.example.dance_community.dto.user.UserResponse;
 import com.example.dance_community.dto.user.UserUpdateRequest;
 import com.example.dance_community.enums.ImageType;
+import com.example.dance_community.security.CustomUserDetails;
 import com.example.dance_community.service.FileStorageService;
 import com.example.dance_community.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -15,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -28,8 +30,8 @@ public class UserController {
 
     @Operation(summary = "내 정보 조회", description = "사용자의 정보를 불러옵니다.")
     @GetMapping("/me")
-    public ResponseEntity<ApiResponse<UserResponse>> getMe(@GetUserId Long userId) {
-        UserResponse userResponse = userService.getUser(userId);
+    public ResponseEntity<ApiResponse<UserResponse>> getMe(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        UserResponse userResponse = userService.getUser(userDetails.getUserId());
         return ResponseEntity.ok(new ApiResponse<>("내 정보 조회 성공", userResponse));
     }
 

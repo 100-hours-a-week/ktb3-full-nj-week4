@@ -6,7 +6,7 @@ import com.example.dance_community.encoder.PasswordEncoder;
 import com.example.dance_community.entity.User;
 import com.example.dance_community.exception.AuthException;
 import com.example.dance_community.exception.ConflictException;
-import com.example.dance_community.jwt.JwtUtil;
+import com.example.dance_community.security.JwtUtil;
 import com.example.dance_community.repository.jpa.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
