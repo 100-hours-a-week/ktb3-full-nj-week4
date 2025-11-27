@@ -147,4 +147,11 @@ public class PostService {
         post.updateImages(finalImages);
         System.out.println("최종 이미지: " + finalImages.size() + "개");
     }
+
+    public void softDeleteByUserId(Long userId) {
+        postRepository.softDeleteByUserId(userId);
+    }
+    public void softDeleteByClubId(Long clubId) {
+        postRepository.softDeleteByClubId(clubId);
+    }
 }

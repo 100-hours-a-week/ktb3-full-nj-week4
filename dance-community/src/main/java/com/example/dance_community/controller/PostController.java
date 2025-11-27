@@ -46,7 +46,6 @@ public class PostController {
                 String path = fileStorageService.saveImage(image, ImageType.POST);
                 imagePaths.add(path);
             }
-            System.out.println("📷 이미지 " + imagePaths.size() + "개 저장 완료");
         }
 
         PostCreateRequest postCreateRequest = new PostCreateRequest(
@@ -60,14 +59,17 @@ public class PostController {
 
     @Operation(summary = "게시물 조회", description = "게시물 id를 통해 정보를 불러옵니다.")
     @GetMapping("/{postId}")
-    public ResponseEntity<ApiResponse<PostResponse>> getPost(@PathVariable Long postId) {
+    public ResponseEntity<ApiResponse<PostResponse>> getPost(
+            @PathVariable Long postId
+    ) {
         PostResponse postResponse = postService.getPost(postId);
         return ResponseEntity.ok(new ApiResponse<>("게시물 조회 성공", postResponse));
     }
 
     @Operation(summary = "전체 게시물 조회", description = "전체 게시물의 정보를 불러옵니다.")
     @GetMapping
-    public ResponseEntity<ApiResponse<List<PostResponse>>> getPosts() {
+    public ResponseEntity<ApiResponse<List<PostResponse>>> getPosts(
+    ) {
         List<PostResponse> postResponses = postService.getPosts();
         return ResponseEntity.ok(new ApiResponse<>("게시글 전체 조회 성공", postResponses));
     }
@@ -75,26 +77,23 @@ public class PostController {
     @Operation(summary = "내 게시물 수정", description = "사용자의 게시물을 수정합니다.")
     @PatchMapping(value = "/{postId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ApiResponse<PostResponse>> updatePost(
-            @PathVariable Long postId,
             @AuthenticationPrincipal UserDetail userDetail,
+            @PathVariable Long postId,
             @RequestParam(value = "title", required = false) String title,
             @RequestParam(value = "content", required = false) String content,
             @RequestParam(value = "tags", required = false) List<String> tags,
             @RequestParam(value = "images", required = false) List<MultipartFile> images,
             @RequestParam(value = "keepImages", required = false) List<String> keepImages
     ) {
-        List<String> newImagePaths = null;
         if (images != null && !images.isEmpty()) {
-            newImagePaths = new ArrayList<>();
             for (MultipartFile image : images) {
                 String path = fileStorageService.saveImage(image, ImageType.POST);
-                newImagePaths.add(path);
+                keepImages.add(path);
             }
-            System.out.println("새 이미지 " + newImagePaths.size() + "개 저장 완료");
         }
 
         PostUpdateRequest request = new PostUpdateRequest(
-                title, content, tags, newImagePaths, keepImages
+                title, content, tags, keepImages, keepImages
         );
 
         PostResponse postResponse = postService.updatePost(postId, userDetail.getUserId(), request);
@@ -104,8 +103,11 @@ public class PostController {
     @Operation(summary = "게시물 삭제", description = "게시물 id를 통해 정보를 삭제합니다.")
     @DeleteMapping("/{postId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public ResponseEntity<Void> deletePost(@PathVariable Long postId) {
-        postService.deletePost(postId);
+    public ResponseEntity<Void> deletePost(
+            @AuthenticationPrincipal UserDetail userDetail,
+            @PathVariable Long postId
+    ) {
+        postService.deletePost(userDetail.getUserId(), postId);
         return ResponseEntity.noContent().build();
     }
 }

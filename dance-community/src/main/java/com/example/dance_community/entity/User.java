@@ -32,16 +32,16 @@ public class User extends BaseEntity{
     @Column(length = 255, columnDefinition = "TEXT")
     private String profileImage;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "user")
     private List<ClubJoin> clubs = new ArrayList<>();
 
-    @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "author")
     private List<Post> posts = new ArrayList<>();
 
-    @OneToMany(mappedBy = "host", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "host")
     private List<Event> events = new ArrayList<>();
 
-    @OneToMany(mappedBy = "participant", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "participant")
     private List<EventJoin> eventJoins = new ArrayList<>();
 
     // CREATE

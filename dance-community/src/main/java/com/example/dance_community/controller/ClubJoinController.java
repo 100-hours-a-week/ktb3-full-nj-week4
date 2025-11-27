@@ -26,7 +26,8 @@ public class ClubJoinController {
     @PostMapping("/{clubId}/apply")
     public ResponseEntity<ApiResponse<ClubJoinResponse>> applyToClub(
             @AuthenticationPrincipal UserDetail userDetail,
-            @PathVariable Long clubId) {
+            @PathVariable Long clubId
+    ) {
         ClubJoinResponse response = clubJoinService.applyToClub(userDetail.getUserId(), clubId);
         return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResponse<>("클럽 가입 신청 성공", response));
     }

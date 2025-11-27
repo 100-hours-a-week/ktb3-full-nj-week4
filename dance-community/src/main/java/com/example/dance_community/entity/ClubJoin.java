@@ -13,14 +13,14 @@ import lombok.*;
         uniqueConstraints = {
                 @UniqueConstraint(
                         name = "unique_user_club",
-                        columnNames = {"user_id", "club_id"}  // Unique 설정 -> 중복 가입 방지
+                        columnNames = {"user_id", "club_id"}
                 )
         }
 )
 public class ClubJoin extends BaseEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long ClubJoinId;
+    private Long clubJoinId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)

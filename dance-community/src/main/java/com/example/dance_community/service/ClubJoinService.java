@@ -152,4 +152,11 @@ public class ClubJoinService {
     public boolean isClubJoin(Long userId, Long clubId) {
         return clubJoinRepository.existsByUser_UserIdAndClub_ClubId(userId, clubId);
     }
+
+    public void softDeleteByUserId(Long userId) {
+        clubJoinRepository.softDeleteByUserId(userId, ClubJoinStatus.LEFT);
+    }
+    public void softDeleteByClubId(Long clubId) {
+        clubJoinRepository.softDeleteByClubId(clubId, ClubJoinStatus.CANCELED);
+    }
 }

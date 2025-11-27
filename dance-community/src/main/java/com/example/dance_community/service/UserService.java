@@ -19,6 +19,8 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final FileStorageService fileStorageService;
+    private final PostService postService;
+    private final ClubJoinService clubJoinService;
 
     @Transactional
     public UserResponse createUser(String email, String password, String nickname, String profileImage) {
@@ -100,6 +102,8 @@ public class UserService {
             fileStorageService.deleteFile(user.getProfileImage());
         }
 
+        postService.softDeleteByUserId(userId);
+        clubJoinService.softDeleteByUserId(userId);
         user.delete();
     }
 

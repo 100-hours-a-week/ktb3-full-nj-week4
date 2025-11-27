@@ -38,20 +38,14 @@ public class ClubController {
             @RequestParam("locationName") String locationName,
             @RequestParam("description") String description,
             @RequestParam("clubType") ClubType clubType,
-            @RequestParam(value = "clubImage", required = false) MultipartFile clubImage,
-            @RequestParam("tags") List<String> tags
+            @RequestParam("tags") List<String> tags,
+            @RequestParam(value = "clubImage", required = false) MultipartFile clubImage
     ) {
         String clubImagePath = clubImage != null && !clubImage.isEmpty()
                 ? fileStorageService.saveImage(clubImage, ImageType.CLUB) : null;
 
         ClubCreateRequest clubCreateRequest = new ClubCreateRequest(
-                clubName,
-                intro,
-                description,
-                locationName,
-                clubType,
-                clubImagePath,
-                tags
+                clubName, intro, description, locationName, clubType, clubImagePath, tags
         );
 
         ClubResponse clubResponse = clubService.createClub(userDetail.getUserId(), clubCreateRequest);
@@ -85,20 +79,14 @@ public class ClubController {
             @RequestParam("locationName") String locationName,
             @RequestParam("description") String description,
             @RequestParam("clubType") ClubType clubType,
-            @RequestParam(value = "clubImage", required = false) MultipartFile clubImage,
-            @RequestParam(value = "tags", required = false) List<String> tags
+            @RequestParam(value = "tags", required = false) List<String> tags,
+            @RequestParam(value = "clubImage", required = false) MultipartFile clubImage
     ) {
         String clubImagePath = clubImage != null && !clubImage.isEmpty()
                 ? fileStorageService.saveImage(clubImage, ImageType.CLUB) : null;
 
         ClubUpdateRequest clubUpdateRequest = new ClubUpdateRequest(
-                clubName,
-                intro,
-                description,
-                locationName,
-                clubType,
-                clubImagePath,
-                tags
+                clubName, intro, description, locationName, clubType, clubImagePath, tags
         );
 
         ClubResponse clubResponse = clubService.updateClub(userDetail.getUserId(), clubId, clubUpdateRequest);

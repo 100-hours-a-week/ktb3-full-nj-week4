@@ -8,6 +8,7 @@ import com.example.dance_community.entity.User;
 import com.example.dance_community.enums.ClubJoinStatus;
 import com.example.dance_community.enums.ClubRole;
 import com.example.dance_community.repository.ClubRepository;
+import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,6 +22,7 @@ public class ClubService {
     private final UserService userService;
     private final ClubAuthService clubAuthService;
     private final FileStorageService fileStorageService;
+    private final EntityManager em;
 
     @Transactional
     public ClubResponse createClub(Long userId, ClubCreateRequest request) {
@@ -96,5 +98,8 @@ public class ClubService {
 
         club.removeMember(user);
         club.delete();
+
+        em.flush();
+        em.clear();
     }
 }

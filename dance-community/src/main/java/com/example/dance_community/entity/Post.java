@@ -77,6 +77,7 @@ public class Post extends BaseEntity{
         this.tags = tags == null ? new ArrayList<>() : new ArrayList<>(tags);
         this.images = images == null ? new ArrayList<>() : new ArrayList<>(images);
     }
+
     public Post setAuthor(User author) {
         this.author = author;
         return this;
