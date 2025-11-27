@@ -76,6 +76,11 @@ public class ClubJoinService {
         clubJoin.changeStatus(ClubJoinStatus.LEFT);
     }
 
+    public List<ClubJoinResponse> getMyClubs(Long userId) {
+        List<ClubJoin> clubJoins = clubJoinRepository.findByUser_UserIdAndStatus(userId, ClubJoinStatus.ACTIVE);
+        return clubJoins.stream().map(ClubJoinResponse::from).toList();
+    }
+
     // 클럽 관리자용
     @Transactional
     public void approveApplication(Long managerId, Long clubId, Long applicantId) {
@@ -131,11 +136,6 @@ public class ClubJoinService {
         }
 
         return ClubJoinResponse.from(clubJoin);
-    }
-
-    public List<ClubJoinResponse> getUsersClubs(Long userId) {
-        List<ClubJoin> clubJoins = clubJoinRepository.findByUser_UserIdAndStatus(userId, ClubJoinStatus.ACTIVE);
-        return clubJoins.stream().map(ClubJoinResponse::from).toList();
     }
 
     public List<ClubJoinResponse> getActiveMembers(Long clubId) {
