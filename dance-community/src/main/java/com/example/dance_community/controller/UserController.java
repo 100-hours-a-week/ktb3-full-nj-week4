@@ -12,7 +12,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -24,49 +23,69 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 @Tag(name = "2_User", description = "회원 관련 API")
 public class UserController {
+
     private final UserService userService;
     private final FileStorageService fileStorageService;
 
     @Operation(summary = "내 정보 조회", description = "사용자의 정보를 불러옵니다.")
     @GetMapping("/me")
-    public ResponseEntity<ApiResponse<UserResponse>> getMe(@AuthenticationPrincipal UserDetail userDetail) {
+    public ResponseEntity<ApiResponse<UserResponse>> getMe(
+            @AuthenticationPrincipal UserDetail userDetail
+    ) {
         UserResponse userResponse = userService.getUser(userDetail.getUserId());
         return ResponseEntity.ok(new ApiResponse<>("내 정보 조회 성공", userResponse));
     }
 
     @Operation(summary = "회원 정보 조회", description = "회원 id를 통해 정보를 불러옵니다.")
     @GetMapping("/{userId}")
-    public ResponseEntity<ApiResponse<UserResponse>> getUser(@PathVariable Long userId) {
+    public ResponseEntity<ApiResponse<UserResponse>> getUser(
+            @PathVariable Long userId
+    ) {
         UserResponse userResponse = userService.getUser(userId);
         return ResponseEntity.ok(new ApiResponse<>("회원 정보 조회 성공", userResponse));
     }
 
-    @Operation(summary = "내 정보 수정", description = "사용자 정보를 수정합니다.")
+    @Operation(summary = "내 프로필 수정", description = "사용자 정보를 수정합니다.")
     @PatchMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ApiResponse<UserResponse>> updateUser(
             @AuthenticationPrincipal UserDetail userDetail,
             @RequestParam(value = "nickname", required = false) String nickname,
             @RequestParam(value = "profileImage", required = false) MultipartFile profileImage
     ) {
-        String profileImagePath = fileStorageService.saveImage(profileImage, ImageType.PROFILE);
-        UserUpdateRequest userUpdateRequest = new UserUpdateRequest(nickname, profileImagePath);
+        String profileImagePath = null;
+        if (profileImage != null && !profileImage.isEmpty()) {
+            profileImagePath = fileStorageService.saveImage(profileImage, ImageType.PROFILE);
+        }
+        UserUpdateRequest request = new UserUpdateRequest(nickname, profileImagePath);
+        UserResponse response = userService.updateUser(userDetail.getUserId(), request);
 
-        UserResponse userResponse = userService.updateUser(userDetail.getUserId(), userUpdateRequest);
-        return ResponseEntity.ok(new ApiResponse<>("회원 정보 수정 성공", userResponse));
+        return ResponseEntity.ok(new ApiResponse<>("회원 정보 수정 성공", response));
     }
 
     @Operation(summary = "내 비밀번호 수정", description = "사용자 비밀번호를 수정합니다.")
     @PatchMapping("/password")
     public ResponseEntity<ApiResponse<UserResponse>> updatePassword(
-            @AuthenticationPrincipal UserDetail userDetail, @Valid @RequestBody PasswordUpdateRequest request) {
+            @AuthenticationPrincipal UserDetail userDetail,
+            @Valid @RequestBody PasswordUpdateRequest request
+    ) {
         UserResponse userResponse = userService.updatePassword(userDetail.getUserId(), request);
         return ResponseEntity.ok(new ApiResponse<>("비밀번호 수정 성공", userResponse));
     }
 
+    @Operation(summary = "프로필 이미지 삭제", description = "사용자 프로필 이미지를 삭제합니다.")
+    @DeleteMapping("/profile-image")
+    public ResponseEntity<ApiResponse<UserResponse>> deleteProfileImage(
+            @AuthenticationPrincipal UserDetail userDetail
+    ) {
+        UserResponse response = userService.deleteProfileImage(userDetail.getUserId());
+        return ResponseEntity.ok(new ApiResponse<>("프로필 이미지 삭제 성공", response));
+    }
+
     @Operation(summary = "탈퇴", description = "사용자 정보를 삭제합니다.")
     @DeleteMapping()
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public ResponseEntity<Void> deleteUser(@AuthenticationPrincipal UserDetail userDetail) {
+    public ResponseEntity<Void> deleteUser(
+            @AuthenticationPrincipal UserDetail userDetail
+    ) {
         userService.deleteUser(userDetail.getUserId());
         return ResponseEntity.noContent().build();
     }

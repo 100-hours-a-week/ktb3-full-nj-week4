@@ -18,11 +18,15 @@ import org.springframework.stereotype.Service;
 public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final FileStorageService fileStorageService;
 
     @Transactional
     public UserResponse createUser(String email, String password, String nickname, String profileImage) {
-        if (existsByEmail(email)) {
-            throw new ConflictException("이미 존재하는 이메일입니다");
+        if(this.existsByEmail(email)) {
+            throw new ConflictException("이미 사용 중인 이메일입니다");
+        }
+        if(this.existsByNickname(nickname)) {
+            throw new ConflictException("이미 사용 중인 닉네임입니다");
         }
 
         User user = User.builder()
@@ -43,14 +47,24 @@ public class UserService {
 
     @Transactional
     public UserResponse updateUser(Long userId, UserUpdateRequest request) {
+        validateNickname(request.getNickname(), userId);
+
         User user = this.findByUserId(userId);
+        String currentProfileImage = user.getProfileImage();
+
+        if (request.getProfileImage() != null) {
+            if (currentProfileImage != null) {
+                fileStorageService.deleteFile(currentProfileImage);
+            }
+        }
 
         user.updateUser(
                 request.getNickname(),
                 request.getProfileImage() == null ? user.getProfileImage() : request.getProfileImage()
         );
 
-        return UserResponse.from(user);
+        User savedUser = userRepository.save(user);
+        return UserResponse.from(savedUser);
     }
 
     @Transactional
@@ -60,12 +74,32 @@ public class UserService {
         user.updatePassword(
                 passwordEncoder.encode(request.getPassword())
         );
-        return UserResponse.from(user);
+
+        User savedUser = userRepository.save(user);
+        return UserResponse.from(savedUser);
+    }
+
+    @Transactional
+    public UserResponse deleteProfileImage(Long userId) {
+        User user = this.findByUserId(userId);
+
+        if (user.getProfileImage() != null) {
+            fileStorageService.deleteFile(user.getProfileImage());
+            user.deleteImage();
+        }
+
+        User savedUser = userRepository.save(user);
+        return UserResponse.from(savedUser);
     }
 
     @Transactional
     public void deleteUser(Long userId) {
         User user = findByUserId(userId);
+
+        if (user.getProfileImage() != null) {
+            fileStorageService.deleteFile(user.getProfileImage());
+        }
+
         user.delete();
     }
 
@@ -82,5 +116,17 @@ public class UserService {
     }
     public boolean existsByEmail(String email) {
         return userRepository.existsByEmail(email);
+    }
+    public boolean existsByNickname(String nickname) {
+        return userRepository.existsByNickname(nickname);
+    }
+    public void validateNickname(String nickname, Long userId) {
+        if (nickname == null || nickname.trim().isEmpty()) {
+            return;
+        }
+
+        if (userRepository.existsByNicknameAndUserIdNot(nickname, userId)) {
+            throw new ConflictException("이미 사용 중인 닉네임입니다");
+        }
     }
 }

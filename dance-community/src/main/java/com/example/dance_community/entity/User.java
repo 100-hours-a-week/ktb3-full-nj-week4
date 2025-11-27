@@ -59,7 +59,7 @@ public class User extends BaseEntity{
 
     // UPDATE
     public User updateUser(String nickname, String profileImage) {
-        if (nickname == null) {
+        if (nickname == null && nickname.trim().isEmpty()) {
             throw new IllegalArgumentException("사용자 이름 null 값 입력 불가");
         }
 
@@ -72,6 +72,12 @@ public class User extends BaseEntity{
         checkNullOrBlank(password, "비밀번호");
         this.password = password;
 
+        return this;
+    }
+
+    // DELETE
+    public User deleteImage() {
+        this.profileImage = null;
         return this;
     }
 

@@ -20,9 +20,9 @@ public class FileStorageService {
 
     public String saveImage(MultipartFile file, ImageType type) {
         if (file == null || file.isEmpty()) {
-            if (type.allowDefault()) {   // user, club
-                return type.defaultImageUrl();
-            } else { // post, event
+            if (type.allowDefault()) {
+                return null;
+            } else {
                 throw new IllegalArgumentException(type.getTypeName() + " 이미지 파일이 없습니다");
             }
         }
@@ -54,7 +54,7 @@ public class FileStorageService {
     }
 
     public void deleteFile(String filePath) {
-        if (filePath == null || filePath.equals(fileProperties.getDefaultProfile())) {
+        if (filePath == null) {
             return;
         }
 
@@ -68,16 +68,11 @@ public class FileStorageService {
             }
         } catch (IOException e) {
             System.err.println("파일 삭제 실패: " + filePath + " - " + e.getMessage());
-            // 삭제 실패는 치명적이지 않으므로 예외를 던지지 않음
         }
     }
 
     private String generateFileName(String originalFilename) {
         String uuid = UUID.randomUUID().toString();
         return uuid + "_" + originalFilename;
-    }
-
-    private Path getUserUploadPath() {
-        return Paths.get(fileProperties.getBaseDir(), fileProperties.getUserDir());
     }
 }

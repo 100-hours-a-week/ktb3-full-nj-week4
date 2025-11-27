@@ -15,6 +15,4 @@ public class FileProperties {
     private String clubDir = "clubs";
     private String postDir = "posts";
     private String eventDir = "events";
-    private String defaultProfile = "/images/default-user.png";
-    private String defaultClub = "/images/default-club.png";
 }
