@@ -75,7 +75,7 @@ public class User extends BaseEntity{
         return this;
     }
 
-    // DELETE
+    // DELETE IMAGE
     public User deleteImage() {
         this.profileImage = null;
         return this;

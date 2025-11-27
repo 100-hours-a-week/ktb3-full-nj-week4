@@ -84,7 +84,6 @@ public class Club extends BaseEntity{
 
     // UPDATE
     public Club updateClub(String clubName, String intro, String description, String locationName, ClubType clubType, String clubImage, List<String> tags) {
-
         checkNullOrBlank(clubName, "클럽 이름");
         checkNullOrBlank(intro, "클럽 한 줄 소개");
         checkNullOrBlank(locationName, "클럽 위치");
@@ -101,6 +100,12 @@ public class Club extends BaseEntity{
         this.clubImage = clubImage;
         this.tags = tags != null ? tags : new ArrayList<>();
 
+        return this;
+    }
+
+    // DELETE IMAGE
+    public Club deleteImage() {
+        this.clubImage = null;
         return this;
     }
 

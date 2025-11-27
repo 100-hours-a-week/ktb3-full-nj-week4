@@ -20,6 +20,7 @@ public class ClubService {
     private final ClubRepository clubRepository;
     private final UserService userService;
     private final ClubAuthService clubAuthService;
+    private final FileStorageService fileStorageService;
 
     @Transactional
     public ClubResponse createClub(Long userId, ClubCreateRequest request) {
@@ -64,7 +65,23 @@ public class ClubService {
                 request.getClubImage(),
                 request.getTags()
         );
-        return ClubResponse.from(club);
+
+        Club savedClub = clubRepository.save(club);
+        return ClubResponse.from(savedClub);
+    }
+
+    @Transactional
+    public ClubResponse deleteClubImage(Long userId, Long clubId) {
+        clubAuthService.validateClubAuthority(userId, clubId);
+        Club club = clubAuthService.findByClubId(clubId);
+
+        if (club.getClubImage() != null) {
+            fileStorageService.deleteFile(club.getClubImage());
+            club.deleteImage();
+        }
+
+        Club savedClub = clubRepository.save(club);
+        return ClubResponse.from(savedClub);
     }
 
     @Transactional
@@ -72,6 +89,11 @@ public class ClubService {
         clubAuthService.validateLeaderAuthority(userId, clubId);
         Club club = clubAuthService.findByClubId(clubId);
         User user = userService.findByUserId(userId);
+
+        if (club.getClubImage() != null) {
+            fileStorageService.deleteFile(club.getClubImage());
+        }
+
         club.removeMember(user);
         club.delete();
     }

@@ -3,12 +3,10 @@ package com.example.dance_community.controller;
 import com.example.dance_community.dto.ApiResponse;
 import com.example.dance_community.dto.auth.*;
 import com.example.dance_community.enums.ImageType;
-import com.example.dance_community.security.UserDetail;
 import com.example.dance_community.service.AuthService;
 import com.example.dance_community.service.FileStorageService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
@@ -16,7 +14,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -36,7 +33,8 @@ public class AuthController {
             @RequestParam("nickname") String nickname,
             @RequestParam(value = "profileImage", required = false) MultipartFile profileImage
     ) {
-        String profileImagePath = fileStorageService.saveImage(profileImage, ImageType.PROFILE);
+        String profileImagePath = profileImage != null && !profileImage.isEmpty()
+                ? fileStorageService.saveImage(profileImage, ImageType.PROFILE) : null;
         SignupRequest signupRequest = new SignupRequest(email, password, nickname, profileImagePath);
 
         AuthResponse authResponse = authService.signup(signupRequest);
@@ -47,7 +45,8 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<AuthResponse>> login(
             @Valid @RequestBody LoginRequest request,
-            HttpServletResponse response) {
+            HttpServletResponse response
+    ) {
         AuthResponse authResponse = authService.login(request, response);
         return ResponseEntity.ok(new ApiResponse<>("로그인 성공", authResponse));
     }
@@ -55,7 +54,8 @@ public class AuthController {
     @Operation(summary = "토큰 재발급", description = "토큰이 만료됐을 때 재발급합니다.")
     @PostMapping("/refresh")
     public ResponseEntity<ApiResponse<AuthResponse>> refresh(
-            @CookieValue(name = "refreshToken", required = false) String refreshToken) {
+            @CookieValue(name = "refreshToken", required = false) String refreshToken)
+    {
         AuthResponse authResponse = authService.refresh(refreshToken);
         return ResponseEntity.ok(new ApiResponse<>("토큰 재발급 성공", authResponse));
     }
@@ -63,7 +63,6 @@ public class AuthController {
     @Operation(summary = "로그아웃", description = "로그아웃을 진행합니다.")
     @PostMapping("/logout")
     public ResponseEntity<ApiResponse<Void>> logout(
-            @AuthenticationPrincipal UserDetail userDetails,
             HttpServletResponse response
     ) {
         authService.logout(response);

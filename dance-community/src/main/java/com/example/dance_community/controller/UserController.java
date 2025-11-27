@@ -52,14 +52,12 @@ public class UserController {
             @RequestParam(value = "nickname", required = false) String nickname,
             @RequestParam(value = "profileImage", required = false) MultipartFile profileImage
     ) {
-        String profileImagePath = null;
-        if (profileImage != null && !profileImage.isEmpty()) {
-            profileImagePath = fileStorageService.saveImage(profileImage, ImageType.PROFILE);
-        }
-        UserUpdateRequest request = new UserUpdateRequest(nickname, profileImagePath);
-        UserResponse response = userService.updateUser(userDetail.getUserId(), request);
+        String profileImagePath = profileImage != null && !profileImage.isEmpty()
+                ? fileStorageService.saveImage(profileImage, ImageType.PROFILE) : null;
+        UserUpdateRequest userUpdateRequest = new UserUpdateRequest(nickname, profileImagePath);
 
-        return ResponseEntity.ok(new ApiResponse<>("회원 정보 수정 성공", response));
+        UserResponse userResponse = userService.updateUser(userDetail.getUserId(), userUpdateRequest);
+        return ResponseEntity.ok(new ApiResponse<>("회원 정보 수정 성공", userResponse));
     }
 
     @Operation(summary = "내 비밀번호 수정", description = "사용자 비밀번호를 수정합니다.")
@@ -77,8 +75,8 @@ public class UserController {
     public ResponseEntity<ApiResponse<UserResponse>> deleteProfileImage(
             @AuthenticationPrincipal UserDetail userDetail
     ) {
-        UserResponse response = userService.deleteProfileImage(userDetail.getUserId());
-        return ResponseEntity.ok(new ApiResponse<>("프로필 이미지 삭제 성공", response));
+        UserResponse userResponse = userService.deleteProfileImage(userDetail.getUserId());
+        return ResponseEntity.ok(new ApiResponse<>("프로필 이미지 삭제 성공", userResponse));
     }
 
     @Operation(summary = "탈퇴", description = "사용자 정보를 삭제합니다.")
